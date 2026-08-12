@@ -1,0 +1,10 @@
+@font-face {
+  font-family: 'Rufina';
+  src: url(Rufina-Regular.ttf) ;
+}
+
+@font-face {
+  font-family: 'Rufina-bold';
+  font-weight: bold;
+  src: url(Rufina-Bold.ttf);
+}

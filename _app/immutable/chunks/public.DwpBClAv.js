@@ -1,0 +1,1 @@
+const s="https://cms.orcam.com",a="https://ed.orcam.com/sw/try-me/V2",t="https://api.learn.orcam.io/api/v8",o="https://db.learn.orcam.com/api",c="https://api.store.orcam.com/api/v1",_="1.2.0";export{c as P,t as a,a as b,o as c,_ as d,s as e};
