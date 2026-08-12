@@ -97,6 +97,9 @@ function orcam_theme_google_api_key(): string
 function orcam_theme_render_document(string $file): void
 {
     $html = (string) file_get_contents($file);
+    $translations = require get_template_directory() . '/inc/vietnamese-translations.php';
+    $html = strtr($html, $translations);
+    $html = preg_replace('/<html([^>]*?)\blang=["\'][^"\']*["\']([^>]*)>/i', '<html$1lang="vi"$2>', $html, 1);
     $theme_uri = untrailingslashit(get_template_directory_uri());
     $static_root = trailingslashit(realpath(get_template_directory() . '/static-pages'));
     $relative_file = str_replace('\\', '/', substr(realpath($file), strlen($static_root)));
