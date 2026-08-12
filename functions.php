@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('ORCAM_THEME_VERSION', '1.1.2');
+define('ORCAM_THEME_VERSION', '1.2.0');
 define('ORCAM_USERWAY_ACCOUNT', 't2KpHXGp9h');
 
 add_action('after_setup_theme', static function () {
@@ -90,6 +90,52 @@ function orcam_theme_google_api_key(): string
     return '';
 }
 
+/** Build the blog index from post data bundled inside the static Svelte state. */
+function orcam_theme_blog_index(string $html): string
+{
+    $pattern = '#blogPage:"((?:\\\\.|[^"\\\\])*)",tagline:"(?:\\\\.|[^"\\\\])*",image:"((?:\\\\.|[^"\\\\])*)",title:"((?:\\\\.|[^"\\\\])*)",blurb:"((?:\\\\.|[^"\\\\])*)"#';
+    if (!preg_match_all($pattern, $html, $matches, PREG_SET_ORDER)) {
+        return '';
+    }
+
+    $decode = static function (string $value): string {
+        $decoded = json_decode('"' . $value . '"', true);
+        return is_string($decoded) ? $decoded : $value;
+    };
+    $seen = array();
+    $cards = '';
+
+    foreach ($matches as $match) {
+        $path = $decode($match[1]);
+        $post_file = get_template_directory() . '/static-pages/' . ltrim($path, '/') . '.html';
+        if (isset($seen[$path]) || !is_file($post_file)) {
+            continue;
+        }
+        $seen[$path] = true;
+        $image = $decode($match[2]);
+        $title = $decode($match[3]);
+        $blurb = $decode($match[4]);
+        $url = home_url('/' . ltrim($path, '/') . '/');
+
+        $cards .= '<article class="orcam-blog-card">';
+        $cards .= '<a class="orcam-blog-card__link" href="' . esc_url($url) . '">';
+        if ($image !== '') {
+            $cards .= '<img class="orcam-blog-card__image" src="' . esc_url($image) . '" alt="" loading="lazy">';
+        }
+        $cards .= '<span class="orcam-blog-card__body">';
+        $cards .= '<h2>' . esc_html($title) . '</h2>';
+        if ($blurb !== '') {
+            $cards .= '<span class="orcam-blog-card__summary">' . esc_html(wp_trim_words($blurb, 28, '…')) . '</span>';
+        }
+        $cards .= '<span class="orcam-blog-card__more">Đọc bài viết →</span>';
+        $cards .= '</span></a></article>';
+    }
+
+    return '<section class="orcam-blog-index" aria-label="Danh sách bài viết">'
+        . '<div class="orcam-blog-index__heading"><h2>Tất cả bài viết</h2><p>'
+        . count($seen) . ' bài viết</p></div><div class="orcam-blog-grid">' . $cards . '</div></section>';
+}
+
 /**
  * Adjust asset URLs at render time so the theme works on any domain or in a
  * WordPress subdirectory. Relative URLs retain the original document base.
@@ -100,13 +146,20 @@ function orcam_theme_render_document(string $file): void
     $translations = require get_template_directory() . '/inc/vietnamese-translations.php';
     $html = strtr($html, $translations);
     $html = preg_replace('/<html([^>]*?)\blang=["\'][^"\']*["\']([^>]*)>/i', '<html$1lang="vi"$2>', $html, 1);
+
+    if (str_replace('\\', '/', realpath($file)) === str_replace('\\', '/', realpath(get_template_directory() . '/static-pages/en-us/blog.html'))) {
+        $blog_index = orcam_theme_blog_index($html);
+        $html = preg_replace('/<nav class="orcam-footer/i', $blog_index . '<nav class="orcam-footer', $html, 1);
+    }
     $theme_uri = untrailingslashit(get_template_directory_uri());
     $static_root = trailingslashit(realpath(get_template_directory() . '/static-pages'));
     $relative_file = str_replace('\\', '/', substr(realpath($file), strlen($static_root)));
     $relative_dir = dirname($relative_file);
     $base_uri = home_url('/' . ($relative_dir === '.' ? '' : trailingslashit($relative_dir)));
 
-    $base = '<base href="' . esc_url(trailingslashit($base_uri)) . '">';
+    $theme_stylesheet = $theme_uri . '/style.css?ver=' . rawurlencode(ORCAM_THEME_VERSION);
+    $base = '<base href="' . esc_url(trailingslashit($base_uri)) . '">'
+        . '<link rel="stylesheet" id="orcam-theme-css" href="' . esc_url($theme_stylesheet) . '">';
     $html = preg_replace('/<head(\\s[^>]*)?>/i', '$0' . $base, $html, 1);
 
     // The exported documents use paths relative to their old build directory
