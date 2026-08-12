@@ -20,11 +20,14 @@ clean WordPress routes.
 ## Google API key
 
 The exported JavaScript reads its Google API key at runtime so credentials are
-not committed to the repository. Add the replacement key to `wp-config.php`:
+not committed to the repository. Copy `.env.example` to `.env` and add a newly
+rotated key:
 
-```php
-define('ORCAM_GOOGLE_API_KEY', 'your-restricted-google-api-key');
+```dotenv
+ORCAM_GOOGLE_API_KEY=your-restricted-google-api-key
 ```
 
-Restrict the key to the production HTTP referrers and only the Google APIs used
-by this site.
+The local `.env` is ignored by Git. A server-level environment variable or an
+`ORCAM_GOOGLE_API_KEY` constant in `wp-config.php` takes precedence. Restrict
+the key to the production HTTP referrers and only the Google APIs used by this
+site.

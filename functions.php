@@ -58,6 +58,38 @@ function orcam_theme_static_document(?string $route = null): ?string
     return null;
 }
 
+/** Read the Google key from the process environment or the ignored local .env file. */
+function orcam_theme_google_api_key(): string
+{
+    $environment_key = getenv('ORCAM_GOOGLE_API_KEY');
+    if (is_string($environment_key) && $environment_key !== '') {
+        return $environment_key;
+    }
+
+    if (defined('ORCAM_GOOGLE_API_KEY')) {
+        return (string) ORCAM_GOOGLE_API_KEY;
+    }
+
+    $env_file = get_template_directory() . '/.env';
+    if (!is_readable($env_file)) {
+        return '';
+    }
+
+    foreach (file($env_file, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: array() as $line) {
+        $line = trim($line);
+        if ($line === '' || $line[0] === '#' || strpos($line, '=') === false) {
+            continue;
+        }
+
+        [$name, $value] = array_map('trim', explode('=', $line, 2));
+        if ($name === 'ORCAM_GOOGLE_API_KEY') {
+            return trim($value, "\"'");
+        }
+    }
+
+    return '';
+}
+
 /**
  * Adjust asset URLs at render time so the theme works on any domain or in a
  * WordPress subdirectory. Relative URLs retain the original document base.
@@ -103,7 +135,7 @@ function orcam_theme_render_document(string $file): void
     // SvelteKit data endpoints are unavailable in a static export. Load the
     // compatibility handler before the client router can intercept links.
     $navigation_uri = $theme_uri . '/js/static-navigation.js?ver=' . rawurlencode(ORCAM_THEME_VERSION);
-    $google_api_key = defined('ORCAM_GOOGLE_API_KEY') ? (string) ORCAM_GOOGLE_API_KEY : '';
+    $google_api_key = orcam_theme_google_api_key();
     $navigation_config = '<script>window.orcamThemeUri=' . wp_json_encode($theme_uri)
         . ';window.orcamGoogleApiKey=' . wp_json_encode($google_api_key) . ';</script>';
     $navigation_tag = $navigation_config . '<script id="orcam-static-navigation" src="' . esc_url($navigation_uri) . '"></script>';
