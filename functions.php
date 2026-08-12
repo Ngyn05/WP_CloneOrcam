@@ -147,7 +147,9 @@ function orcam_theme_render_document(string $file): void
     $html = strtr($html, $translations);
     $html = preg_replace('/<html([^>]*?)\blang=["\'][^"\']*["\']([^>]*)>/i', '<html$1lang="vi"$2>', $html, 1);
 
-    if (str_replace('\\', '/', realpath($file)) === str_replace('\\', '/', realpath(get_template_directory() . '/static-pages/en-us/blog.html'))) {
+    $normalized_file = wp_normalize_path((string) realpath($file));
+    $blog_file = wp_normalize_path((string) realpath(get_template_directory() . '/static-pages/en-us/blog.html'));
+    if ($normalized_file === $blog_file) {
         $blog_index = orcam_theme_blog_index($html);
         $html = preg_replace('/<nav class="orcam-footer/i', $blog_index . '<nav class="orcam-footer', $html, 1);
     }
