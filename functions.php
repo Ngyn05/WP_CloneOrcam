@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('ORCAM_THEME_VERSION', '1.2.0');
+define('ORCAM_THEME_VERSION', '2.0.8');
 define('ORCAM_USERWAY_ACCOUNT', 't2KpHXGp9h');
 
 add_action('after_setup_theme', static function () {
@@ -19,6 +19,22 @@ add_action('after_setup_theme', static function () {
     add_theme_support('custom-logo');
     add_theme_support('post-thumbnails');
     add_theme_support('html5', array('search-form', 'comment-form', 'comment-list', 'gallery', 'caption', 'style', 'script'));
+    add_theme_support('automatic-feed-links');
+    add_theme_support('responsive-embeds');
+    add_theme_support('align-wide');
+    register_nav_menus(array(
+        'primary' => __('Primary navigation', 'orcam-theme'),
+        'footer'  => __('Footer navigation', 'orcam-theme'),
+    ));
+});
+
+add_action('wp_enqueue_scripts', static function () {
+    wp_enqueue_style(
+        'orcam-theme',
+        get_stylesheet_uri(),
+        array(),
+        ORCAM_THEME_VERSION
+    );
 });
 
 /** Return a normalized route relative to the WordPress installation. */
@@ -56,6 +72,18 @@ function orcam_theme_static_document(?string $route = null): ?string
         }
     }
     return null;
+}
+
+/** Render a bundled route when the current request belongs to the static export. */
+function orcam_theme_maybe_render_static(): bool
+{
+    $document = orcam_theme_static_document();
+    if (!$document) {
+        return false;
+    }
+
+    orcam_theme_render_document($document);
+    return true;
 }
 
 /** Read the Google key from the process environment or the ignored local .env file. */
@@ -104,6 +132,7 @@ function orcam_theme_blog_index(string $html): string
     };
     $seen = array();
     $cards = '';
+    $fallback_image = get_template_directory_uri() . '/media/3A1A5245%20(1)%20(1).webp';
 
     foreach ($matches as $match) {
         $path = $decode($match[1]);
@@ -116,19 +145,18 @@ function orcam_theme_blog_index(string $html): string
         $title = $decode($match[3]);
         $blurb = $decode($match[4]);
         $url = home_url('/' . ltrim($path, '/') . '/');
-
         $cards .= '<article class="orcam-blog-card">';
         $cards .= '<a class="orcam-blog-card__link" href="' . esc_url($url) . '">';
-        if ($image !== '') {
-            $cards .= '<img class="orcam-blog-card__image" src="' . esc_url($image) . '" alt="" loading="lazy">';
-        }
-        $cards .= '<span class="orcam-blog-card__body">';
-        $cards .= '<h2>' . esc_html($title) . '</h2>';
+        $card_image = $image !== '' ? $image : $fallback_image;
+        $cards .= '<span class="orcam-blog-card__media">';
+        $cards .= '<img class="orcam-blog-card__image" src="' . esc_url($card_image) . '"'
+            . ' data-fallback-src="' . esc_url($fallback_image) . '" alt="" loading="lazy" decoding="async">';
+        $cards .= '</span>';
+        $cards .= '<span class="orcam-blog-card__body"><h2>' . esc_html($title) . '</h2>';
         if ($blurb !== '') {
-            $cards .= '<span class="orcam-blog-card__summary">' . esc_html(wp_trim_words($blurb, 28, '…')) . '</span>';
+            $cards .= '<span class="orcam-blog-card__summary">' . esc_html($blurb) . '</span>';
         }
-        $cards .= '<span class="orcam-blog-card__more">Đọc bài viết →</span>';
-        $cards .= '</span></a></article>';
+        $cards .= '<span class="orcam-blog-card__more">Đọc thêm &gt;</span></span></a></article>';
     }
 
     return '<section class="orcam-blog-index" aria-label="Danh sách bài viết">'
@@ -144,7 +172,21 @@ function orcam_theme_render_document(string $file): void
 {
     $html = (string) file_get_contents($file);
     $translations = require get_template_directory() . '/inc/vietnamese-translations.php';
+
+    // Translation keys such as "Reading" can also occur inside filenames.
+    // Protect URLs so translating page copy never corrupts an asset path.
+    $protected_urls = array();
+    $html = preg_replace_callback(
+        '#https?://[^"\'\s<>]+#i',
+        static function (array $matches) use (&$protected_urls): string {
+            $placeholder = '__ORCAM_PROTECTED_URL_' . count($protected_urls) . '__';
+            $protected_urls[$placeholder] = $matches[0];
+            return $placeholder;
+        },
+        $html
+    );
     $html = strtr($html, $translations);
+    $html = strtr($html, $protected_urls);
     $html = preg_replace('/<html([^>]*?)\blang=["\'][^"\']*["\']([^>]*)>/i', '<html$1lang="vi"$2>', $html, 1);
 
     $normalized_file = wp_normalize_path((string) realpath($file));
@@ -154,6 +196,28 @@ function orcam_theme_render_document(string $file): void
         $html = preg_replace('/<nav class="orcam-footer/i', $blog_index . '<nav class="orcam-footer', $html, 1);
     }
     $theme_uri = untrailingslashit(get_template_directory_uri());
+
+    // Open the mirrored Helpjuice knowledge base from this theme instead of
+    // leaving the site for the externally hosted help center.
+    $local_help_center = $theme_uri . '/help-center/';
+    $html = preg_replace(
+        '#https://orcam\.helpjuice\.com/?(?=["\'])#i',
+        $local_help_center,
+        $html
+    );
+
+    // Prefer a bundled copy when an exported media URL exists in the theme.
+    $html = preg_replace_callback(
+        '#https://www\.orcam\.com/media/(?P<path>[^"\'\s<>]+)#i',
+        static function (array $matches) use ($theme_uri): string {
+            $relative_path = rawurldecode($matches['path']);
+            $local_file = get_template_directory() . '/media/' . $relative_path;
+            return is_file($local_file)
+                ? $theme_uri . '/media/' . $matches['path']
+                : $matches[0];
+        },
+        $html
+    );
     $static_root = trailingslashit(realpath(get_template_directory() . '/static-pages'));
     $relative_file = str_replace('\\', '/', substr(realpath($file), strlen($static_root)));
     $relative_dir = dirname($relative_file);
@@ -177,6 +241,21 @@ function orcam_theme_render_document(string $file): void
     $html = preg_replace(
         '#(["\'(=])(?:\\.\\./|\\./|/)*smui\\.css#i',
         '$1' . $theme_uri . '/smui.css',
+        $html
+    );
+
+    // Percent-encode spaces in exported asset URLs. Leaving them as &#32;
+    // makes some local web servers route the decoded URL through WordPress.
+    $html = preg_replace_callback(
+        '#\b(?P<attribute>src|href)=(?P<quote>["\'])(?P<url>[^"\']*)(?P=quote)#i',
+        static function (array $matches): string {
+            $url = $matches['url'];
+            if (preg_match('#/(?:_app|fonts|images|media)/#i', $url)) {
+                $url = str_replace(array('&#32;', '&#x20;', ' '), '%20', $url);
+            }
+
+            return $matches['attribute'] . '=' . $matches['quote'] . $url . $matches['quote'];
+        },
         $html
     );
 

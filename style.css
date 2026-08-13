@@ -3,71 +3,328 @@ Theme Name: OrCam Theme
 Theme URI: https://www.orcam.com/
 Author: OrCam
 Description: Complete WordPress conversion of the supplied OrCam static website.
-Version: 1.2.0
+Version: 2.0.8
 Requires at least: 6.0
 Requires PHP: 7.4
 Text Domain: orcam-theme
 */
 
+.orcam-wp-content {
+    box-sizing: border-box;
+    margin: 0 auto;
+    max-width: 960px;
+    min-height: 60vh;
+    padding: clamp(3rem, 7vw, 7rem) clamp(1.25rem, 4vw, 3rem);
+}
+
+.orcam-wp-header,
+.orcam-wp-footer {
+    background: #202020;
+    color: #fff;
+    font-family: Arial, sans-serif;
+    padding: 1rem clamp(1.25rem, 4vw, 4rem);
+}
+
+.orcam-wp-header__inner {
+    align-items: center;
+    display: flex;
+    gap: 2rem;
+    justify-content: space-between;
+    margin: 0 auto;
+    max-width: 1440px;
+}
+
+.orcam-wp-brand,
+.orcam-wp-header a,
+.orcam-wp-footer a {
+    color: inherit;
+}
+
+.orcam-wp-header .custom-logo {
+    height: auto;
+    max-width: 120px;
+}
+
+.orcam-wp-header ul,
+.orcam-wp-footer ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.orcam-wp-footer {
+    text-align: center;
+}
+
+.orcam-wp-footer ul {
+    justify-content: center;
+}
+
+.orcam-wp-content img {
+    height: auto;
+    max-width: 100%;
+}
+
+.orcam-wp-content article + article {
+    border-top: 1px solid #d9e0ea;
+    margin-top: 2rem;
+    padding-top: 2rem;
+}
+
+.orcam-error-page {
+    text-align: center;
+}
+
+/* Blog listing */
+article#mainBody:has(.orcam-blog-index) {
+    background: #f7f7f9;
+}
+
+article#mainBody:has(.orcam-blog-index) #section_suc95n37 {
+    background: linear-gradient(135deg, #eef4ff 0%, #fff 55%, #f3ecff 100%);
+    border-radius: 0;
+    margin: 0;
+    min-height: 220px;
+    padding: clamp(48px, 7vw, 96px) 24px !important;
+}
+
+article#mainBody:has(.orcam-blog-index) #section_suc95n37 h1 {
+    color: #101828 !important;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    letter-spacing: -.045em;
+    margin: 0;
+}
+
+article#mainBody:has(.orcam-blog-index) #section_ij3eajvd {
+    display: none;
+}
+
 .orcam-blog-index {
     box-sizing: border-box;
-    padding: 30px var(--orcam-sides-padding, 5%);
+    flex: 0 0 auto;
+    margin: 0 auto;
+    max-width: 1584px;
+    order: 1;
+    padding: clamp(36px, 4vw, 64px) clamp(20px, 4.25vw, 72px) clamp(64px, 7vw, 104px);
+    width: 100%;
+}
+
+article#mainBody > nav.orcam-footer {
+    flex: 0 0 auto;
+    order: 2;
 }
 
 .orcam-blog-index__heading {
-    align-items: baseline;
+    align-items: end;
+    border-bottom: 1px solid #d9e0ea;
     display: flex;
+    gap: 24px;
     justify-content: space-between;
-    margin-bottom: 24px;
+    margin-bottom: clamp(28px, 4vw, 48px);
+    padding-bottom: 20px;
+}
+
+.orcam-blog-index__heading h2 {
+    color: #101828;
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    letter-spacing: -.03em;
+    line-height: 1.15;
+    margin: 0;
+}
+
+.orcam-blog-index__heading p {
+    background: #e7efff;
+    border-radius: 999px;
+    color: #174ea6;
+    flex: 0 0 auto;
+    font-size: .875rem;
+    font-weight: 700;
+    line-height: 1;
+    margin: 0;
+    padding: 10px 14px;
 }
 
 .orcam-blog-grid {
     display: grid;
-    gap: 24px;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 22px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .orcam-blog-card {
     background: #fff;
-    border-radius: 18px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, .08);
+    border: 0;
+    border-radius: 12px;
+    box-shadow: none;
+    min-width: 0;
     overflow: hidden;
+    transition: border-color .25s ease, box-shadow .25s ease, transform .25s ease;
+}
+
+.orcam-blog-card:hover {
+    box-shadow: 0 12px 30px rgba(16, 24, 40, .1);
+    transform: translateY(-3px);
 }
 
 .orcam-blog-card__link {
-    color: inherit;
+    color: #101828;
     display: flex;
     flex-direction: column;
     height: 100%;
-    text-decoration: none;
+    text-decoration: none !important;
+}
+
+.orcam-blog-card__link:focus-visible {
+    border-radius: 18px;
+    outline: 3px solid #236cff;
+    outline-offset: -3px;
+}
+
+.orcam-blog-card__media {
+    aspect-ratio: 16 / 9;
+    background: #e9edf3;
+    display: block;
+    overflow: hidden;
+    width: 100%;
 }
 
 .orcam-blog-card__image {
-    aspect-ratio: 16 / 9;
+    display: block;
+    height: 100%;
     object-fit: cover;
+    transition: transform .4s ease;
     width: 100%;
+}
+
+.orcam-blog-card:hover .orcam-blog-card__image {
+    transform: scale(1.035);
 }
 
 .orcam-blog-card__body {
     display: flex;
     flex: 1;
     flex-direction: column;
-    padding: 20px;
+    min-height: 217px;
+    padding: 28px 25px 26px;
 }
 
-.orcam-blog-card__body h2 {
-    font-size: 1.25rem;
-    line-height: 1.3;
-    margin: 0 0 12px;
+.orcam-blog-card .orcam-blog-card__body h2 {
+    color: #101828;
+    display: block;
+    font-size: 1rem !important;
+    font-weight: 700;
+    letter-spacing: -.018em;
+    line-height: 1.4 !important;
+    margin: 0 0 15px;
+    max-height: none;
+    overflow: visible;
+    white-space: normal;
+    -webkit-box-orient: initial;
+    -webkit-line-clamp: unset;
 }
 
 .orcam-blog-card__summary {
-    line-height: 1.55;
+    color: #101010;
+    display: block;
+    font-size: .76rem;
+    line-height: 1.45;
+    max-height: none;
+    overflow: visible;
+    white-space: normal;
+    -webkit-box-orient: initial;
+    -webkit-line-clamp: unset;
 }
 
 .orcam-blog-card__more {
-    color: #236cff;
-    font-weight: 700;
+    align-items: center;
+    color: #155eef;
+    display: flex;
+    font-size: .72rem;
+    font-weight: 400;
     margin-top: auto;
-    padding-top: 18px;
+    padding-top: 20px;
+}
+
+.orcam-blog-card:hover .orcam-blog-card__more {
+    color: #0b44b7;
+}
+
+@media (max-width: 1024px) {
+    .orcam-blog-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 640px) {
+    article#mainBody:has(.orcam-blog-index) #section_suc95n37 {
+        min-height: 160px;
+        padding: 42px 20px !important;
+    }
+
+    .orcam-blog-index {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    .orcam-blog-index__heading {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 14px;
+    }
+
+    .orcam-blog-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .orcam-blog-card {
+        border-radius: 16px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .orcam-blog-card,
+    .orcam-blog-card__image {
+        transition: none;
+    }
+
+    .orcam-blog-card:hover,
+    .orcam-blog-card:hover .orcam-blog-card__image {
+        transform: none;
+    }
+}
+
+/* Complete blog article */
+article#mainBody .orcam-blog {
+    background: #fff;
+    color: #101828;
+}
+
+article#mainBody .orcam-blog .blog {
+    overflow-wrap: anywhere;
+}
+
+article#mainBody .orcam-blog h1 {
+    font-size: clamp(2rem, 4vw, 3.75rem) !important;
+    line-height: 1.12 !important;
+}
+
+article#mainBody .orcam-blog article.blog {
+    font-size: 1rem;
+    line-height: 1.75;
+}
+
+article#mainBody .orcam-blog article.blog h2 {
+    margin-top: 2.25rem;
+}
+
+article#mainBody .orcam-blog article.blog h3 {
+    margin-top: 1.75rem;
+}
+
+article#mainBody .orcam-blog article.blog img,
+article#mainBody .orcam-blog > .orcam-flex img {
+    height: auto;
+    max-width: 100%;
 }

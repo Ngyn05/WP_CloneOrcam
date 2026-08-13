@@ -1,23 +1,19 @@
 <?php
-/** Main router for the complete OrCam static-site migration. */
+/** Default WordPress post index. */
 
-if (!defined('ABSPATH')) {
-    exit;
-}
-
-$orcam_document = orcam_theme_static_document();
-if ($orcam_document) {
-    orcam_theme_render_document($orcam_document);
-    exit;
-}
-
-status_header(404);
 get_header();
 ?>
-<main id="primary" style="max-width: 760px; margin: 8rem auto; padding: 2rem; font-family: sans-serif;">
-    <h1><?php esc_html_e('Page not found', 'orcam-theme'); ?></h1>
-    <p><?php esc_html_e('The requested OrCam page could not be found.', 'orcam-theme'); ?></p>
-    <p><a href="<?php echo esc_url(home_url('/')); ?>"><?php esc_html_e('Return home', 'orcam-theme'); ?></a></p>
+<main id="primary" class="orcam-wp-content">
+    <?php if (have_posts()) : ?>
+        <?php while (have_posts()) : the_post(); ?>
+            <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
+                <h2><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h2>
+                <?php the_excerpt(); ?>
+            </article>
+        <?php endwhile; ?>
+        <?php the_posts_navigation(); ?>
+    <?php else : ?>
+        <p><?php esc_html_e('No content found.', 'orcam-theme'); ?></p>
+    <?php endif; ?>
 </main>
 <?php get_footer();
-

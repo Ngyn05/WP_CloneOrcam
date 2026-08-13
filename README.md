@@ -1,7 +1,7 @@
 # WP_CloneOrcam
 
-WordPress theme that serves the bundled OrCam Svelte static export through
-clean WordPress routes.
+Hybrid WordPress theme that preserves the complete OrCam Svelte export while
+also supporting normal editable WordPress pages, posts, archives and menus.
 
 ## Installation
 
@@ -12,10 +12,17 @@ clean WordPress routes.
 ## Structure
 
 - `static-pages/`: exported HTML documents and blog articles.
+- `help-center/`: local public Helpjuice knowledge-base mirror.
 - `_app/`: compiled Svelte CSS and JavaScript.
 - `fonts/`, `images/`, `media/`: local page assets.
-- `functions.php`: static route resolution and asset URL rewriting.
+- `front-page.php` and `404.php`: bridge clean legacy routes into WordPress.
+- `page.php`, `single.php`, `archive.php`: native WordPress content templates.
+- `functions.php`: theme setup, static route resolution and URL rewriting.
 - `js/static-navigation.js`: full-page navigation compatibility for the static export.
+
+Assign the **Primary navigation** and **Footer navigation** menu locations in
+Appearance > Menus. Existing exported OrCam routes continue to render their
+bundled navigation, while new WordPress content uses these editable menus.
 
 ## Google API key
 
