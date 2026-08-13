@@ -1,0 +1,6 @@
+Bản Việt hóa HTML
+
+- Đã áp dụng trực tiếp các chuỗi tiếng Việt có trong inc/vietnamese-translations.php vào phần chữ/thuộc tính giao diện của toàn bộ file HTML.
+- Script/CSS/noscript/svg/template, class/id, data-* và URL không bị thay đổi bởi bước dịch tĩnh.
+- Các đoạn nội dung dài còn tiếng Anh (đặc biệt bài blog/help-center) dùng Google Website Translator được nhúng trong từng HTML để tự hiển thị tiếng Việt khi trang chạy có Internet.
+- Thuộc tính lang của tài liệu đã chuyển sang vi.

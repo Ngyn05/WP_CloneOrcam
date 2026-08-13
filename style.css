@@ -3,7 +3,7 @@ Theme Name: OrCam Theme
 Theme URI: https://www.orcam.com/
 Author: OrCam
 Description: Complete WordPress conversion of the supplied OrCam static website.
-Version: 2.0.8
+Version: 2.1.3
 Requires at least: 6.0
 Requires PHP: 7.4
 Text Domain: orcam-theme
@@ -66,6 +66,84 @@ Text Domain: orcam-theme
 .orcam-wp-content img {
     height: auto;
     max-width: 100%;
+}
+
+/* Shared article presentation; editor-style.css mirrors these rules. */
+.orcam-wp-content:has(.orcam-article-content) {
+    max-width: 1120px;
+}
+
+.orcam-wp-content article > h1 {
+    color: #101828;
+    font-size: clamp(2.25rem, 5vw, 4.25rem);
+    letter-spacing: -.04em;
+    line-height: 1.08;
+    margin: 0 0 2rem;
+}
+
+.orcam-article-featured-image {
+    margin: 0 0 clamp(2rem, 5vw, 4rem);
+}
+
+.orcam-article-featured-image img {
+    border-radius: 16px;
+    display: block;
+    width: 100%;
+}
+
+.orcam-article-content {
+    color: #20242c;
+    font-family: Arial, sans-serif;
+    font-size: 18px;
+    line-height: 1.75;
+}
+
+.orcam-article-content h2,
+.orcam-article-content h3,
+.orcam-article-content h4 {
+    color: #101828;
+    line-height: 1.25;
+}
+
+.orcam-article-content h2 { font-size: 2rem; margin: 2.5em 0 .75em; }
+.orcam-article-content h3 { font-size: 1.5rem; margin: 2em 0 .65em; }
+.orcam-article-content p { margin: 0 0 1.35em; }
+.orcam-article-content ul,
+.orcam-article-content ol { margin: 0 0 1.5em; padding-left: 1.5em; }
+.orcam-article-content blockquote {
+    border-left: 4px solid #155eef;
+    color: #475467;
+    margin: 2em 0;
+    padding: .5em 0 .5em 1.5em;
+}
+.orcam-article-content a { color: #155eef; }
+.orcam-article-content img { height: auto; max-width: 100%; }
+.orcam-article-content figure { margin: 2em 0; max-width: 100%; }
+.orcam-article-content iframe { max-width: 100%; }
+
+/* Database-backed copies use normal page scrolling, not Svelte's app shell. */
+body.orcam-database-blog,
+body.orcam-database-blog .app,
+body.orcam-database-blog .app > .fill-height,
+body.orcam-database-blog article#mainBody {
+    height: auto !important;
+    max-height: none !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+}
+
+body.orcam-database-blog .app > .fill-height {
+    display: block !important;
+}
+
+body.orcam-database-blog article#mainBody {
+    display: block !important;
+    width: 100% !important;
+}
+
+body.orcam-database-blog .orcam-blog {
+    min-height: 0 !important;
+    overflow: visible !important;
 }
 
 .orcam-wp-content article + article {
@@ -327,4 +405,202 @@ article#mainBody .orcam-blog article.blog img,
 article#mainBody .orcam-blog > .orcam-flex img {
     height: auto;
     max-width: 100%;
+}
+
+/* Native consultation form replacing the exported Google Form. */
+.orcam-contact-form-container {
+    box-sizing: border-box;
+    display: block !important;
+    height: auto !important;
+    margin: 0 auto;
+    max-width: 1040px;
+    padding: 40px 24px 64px;
+    width: 100%;
+}
+
+.orcam-contact-card {
+    color: #101828;
+    font-family: Arial, sans-serif;
+}
+
+.orcam-contact-card header {
+    margin-bottom: 34px;
+    text-align: center;
+}
+
+.orcam-contact-card h2 {
+    font-size: clamp(1.75rem, 3vw, 2.5rem);
+    line-height: 1.2;
+    margin: 0 0 12px;
+}
+
+.orcam-contact-card h1 {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    line-height: 1.12;
+    margin: 0 0 12px;
+}
+
+.orcam-contact-card header p {
+    color: #667085;
+    font-size: 1.05rem;
+    margin: 0;
+}
+
+.orcam-consultation-form {
+    display: grid;
+    gap: 10px;
+}
+
+.orcam-consultation-form {
+    gap: 22px;
+}
+
+.orcam-form-row {
+    display: grid;
+    gap: 18px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.orcam-consultation-form label {
+    display: block;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.orcam-consultation-form label span {
+    color: #e5484d;
+}
+
+.orcam-consultation-form input,
+.orcam-consultation-form select,
+.orcam-consultation-form textarea {
+    background: #fff;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    box-sizing: border-box;
+    color: #101828;
+    font: inherit;
+    font-weight: 400;
+    margin-top: 10px;
+    padding: 16px;
+    width: 100%;
+}
+
+.orcam-consultation-form input:focus,
+.orcam-consultation-form select:focus,
+.orcam-consultation-form textarea:focus {
+    border-color: #1597e5;
+    box-shadow: 0 0 0 3px rgba(21, 151, 229, .15);
+    outline: none;
+}
+
+.orcam-consultation-form select {
+    min-height: 54px;
+}
+
+.orcam-support-case-container {
+    max-width: 1100px;
+}
+
+.orcam-consultation-form textarea {
+    min-height: 130px;
+    resize: vertical;
+}
+
+.orcam-consultation-form button {
+    background: #101828;
+    border: 0;
+    border-radius: 10px;
+    color: #fff;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 700;
+    min-height: 54px;
+    padding: 14px 28px;
+}
+
+.orcam-consultation-form button:hover {
+    background: #1597e5;
+}
+
+.orcam-form-honeypot {
+    height: 0;
+    overflow: hidden;
+    position: absolute;
+    width: 0;
+}
+
+.orcam-form-notice {
+    border-radius: 8px;
+    margin: 0 0 24px;
+    padding: 14px 16px;
+}
+
+.orcam-form-notice.is-success {
+    background: #ecfdf3;
+    color: #027a48;
+}
+
+.orcam-form-notice.is-error {
+    background: #fef3f2;
+    color: #b42318;
+}
+
+@media (max-width: 700px) {
+    .orcam-form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Keep the exported Svelte header visually consistent on every static page. */
+:root {
+    --orcam-synced-header-height: 80px;
+}
+
+#header .desktop-header__main-menu {
+    box-sizing: border-box;
+    min-height: var(--orcam-synced-header-height) !important;
+    padding-left: clamp(32px, 5vw, 96px) !important;
+    padding-right: clamp(32px, 5vw, 96px) !important;
+}
+
+#header .desktop-header__menu-items {
+    gap: clamp(20px, 2vw, 36px) !important;
+    min-height: var(--orcam-synced-header-height) !important;
+}
+
+#header .desktop-header__logo {
+    width: 20% !important;
+}
+
+#header .desktop-header__logo img {
+    height: auto !important;
+    max-width: none !important;
+    width: 120px !important;
+}
+
+#header .desktop-header__menu-items > div > a,
+#header .desktop-header__menu-items > div > button {
+    font-size: 15px !important;
+    line-height: 1.35 !important;
+    white-space: nowrap;
+}
+
+#header .desktop-header__sub-menu {
+    top: var(--orcam-synced-header-height) !important;
+}
+
+@media (max-width: 960px) {
+    :root {
+        --orcam-synced-header-height: 64px;
+    }
+
+    #header .mobile-header {
+        box-sizing: border-box;
+        min-height: var(--orcam-synced-header-height) !important;
+    }
+
+    #header .mobile-header__menu {
+        top: var(--orcam-synced-header-height) !important;
+    }
 }

@@ -1,6 +1,29 @@
 <?php
 /** Vietnamese copy for the primary site navigation and commercial pages. */
 return array(
+    // Keep press outlet names intact when shorter UI keys such as "News"
+    // are translated at render time.
+    'PR Newswire' => 'PR Newswire',
+    'ABC 7 News' => 'ABC 7 News',
+    'Decatur Daily' => 'Decatur Daily',
+    'THIIS' => 'THIIS',
+    'The Courier Express' => 'The Courier Express',
+    'Forbes' => 'Forbes',
+    'Grimsby Live' => 'Grimsby Live',
+    'Healio' => 'Healio',
+    'ATM Marketplace' => 'ATM Marketplace',
+    'Healthcare Business Today' => 'Healthcare Business Today',
+    'Engadget' => 'Engadget',
+    'Daily Mail' => 'Daily Mail',
+    'FeaturedNews' => 'FeaturedNews',
+    'In The News' => 'In The News',
+    'Show More' => 'Tải thêm',
+    'Show more' => 'Tải thêm',
+    'Hiển thị thêm' => 'Tải thêm',
+    'Khả năng lãnh đạo' => 'Ban lãnh đạo',
+    'Tin t?c' => 'Tin tức',
+    'Nghề nghiệp' => 'Tuyển dụng',
+    'Liên hệ với chúng tôi' => 'Liên hệ',
     'OrCam Learn Testimonials: Real User Stories & Feedback' => 'Cảm nhận về OrCam Learn: Câu chuyện và đánh giá thực tế từ người dùng',
     'OrCam Read 3 Testimonials: User Experiences & Reviews' => 'Cảm nhận về OrCam Read 3: Trải nghiệm và đánh giá từ người dùng',
     "Discover the Latest Assistive Tech News and Stories on OrCam's Blog" => 'Khám phá tin tức và câu chuyện mới nhất về công nghệ hỗ trợ trên blog OrCam',
