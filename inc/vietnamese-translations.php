@@ -397,4 +397,106 @@ return array(
     'Parental Involvement and Tracking: The speaker highlights the device\'s benefit for parents, noting that they can track their child\'s reading progress through an app. This app provides insights into the duration of reading sessions, words the child struggles with, and areas of improvement. This function is particularly helpful for parents seeking ways to support their struggling readers effectively.' => 'Theo dõi dành cho phụ huynh: Ứng dụng giúp cha mẹ theo dõi tiến độ đọc, thời lượng từng buổi, những từ trẻ gặp khó khăn và các kỹ năng đang cải thiện. Dữ liệu này giúp gia đình hỗ trợ trẻ hiệu quả hơn.',
     'Encouraging Learning Experience: The video concludes with the speaker expressing enthusiasm about how OrCam Learn is a beneficial tool for assisting readers. It emphasizes the device\'s role in making the reading learning process more engaging and supportive for both the reader and their family.' => 'Trải nghiệm học tập đầy khích lệ: Video nhấn mạnh OrCam Learn giúp quá trình học đọc trở nên hấp dẫn, tích cực và có sự đồng hành tốt hơn cho cả người đọc lẫn gia đình.',
     "This video illustrates OrCam Learn's effectiveness in enhancing the reading experience for struggling readers, providing real-time feedback, and facilitating parental involvement in their child's reading development." => 'Video minh họa hiệu quả của OrCam Learn trong việc nâng cao trải nghiệm đọc, cung cấp phản hồi theo thời gian thực và tạo điều kiện để phụ huynh đồng hành cùng sự phát triển của trẻ.',
+    'Which OrCam MyEye Is Right For You?' => 'Thiết bị OrCam MyEye nào phù hợp với bạn?',
+    'Which OrCam MyEye Is Right
+For You?' => 'Thiết bị OrCam MyEye nào
+phù hợp với bạn?',
+    'Which OrCam Read' => 'Thiết bị OrCam Read nào',
+    'Is Right For You?' => 'phù hợp với bạn?',
+    'Which OrCam device ' => 'Thiết bị OrCam nào ',
+    'is right for you?' => 'phù hợp với bạn?',
+    'AI Assistant-Just Ask' => 'Trợ lý AI - Chỉ cần hỏi',
+    'AI Assistant - Just Ask' => 'Trợ lý AI - Chỉ cần hỏi',
+    'Summarize text into main topics' => 'Tóm tắt văn bản thành các chủ đề chính',
+    'Summarize text into main topics ' => 'Tóm tắt văn bản thành các chủ đề chính',
+    'Utilizes intext and outsourced data' => 'Sử dụng dữ liệu trong văn bản và dữ liệu mở rộng',
+    'Utilizes intext and outsourced data' => 'Sử dụng dữ liệu trong văn bản và dữ liệu mở rộng',
+    'Reads handwriting' => 'Đọc chữ viết tay',
+    'Zoom in&out' => 'Phóng to & thu nhỏ',
+    'Change contrast' => 'Thay đổi độ tương phản',
+    'Extract and copy text' => 'Trích xuất và sao chép văn bản',
+    'Converts image text to digital text' => 'Chuyển văn bản hình ảnh thành văn bản số',
+    'Converts image text to digital text' => 'Chuyển văn bản hình ảnh thành văn bản số',
+    'Connect to any screen' => 'Kết nối với mọi màn hình',
+    'Connect to most screens' => 'Kết nối với hầu hết màn hình',
+    'Supports over 140 languages' => 'Hỗ trợ hơn 140 ngôn ngữ',
+    'Supports over 140 languages ' => 'Hỗ trợ hơn 140 ngôn ngữ',
+    'Voice commands' => 'Lệnh bằng giọng nói',
+    'Voice commands
+
+' => 'Lệnh bằng giọng nói
+
+',
+    'Text reading' => 'Đọc văn bản',
+    'Smart reading' => 'Đọc thông minh',
+    'Identifying Products' => 'Nhận diện sản phẩm',
+    'Money Notes' => 'Nhận biết tiền tệ',
+    'Barcodes' => 'Mã vạch',
+    'Colors' => 'Màu sắc',
+    '1.5-2 Hours of active use' => 'Thời lượng pin: 1,5-2 giờ',
+    '1.5-2 Hours of 
+active use
+
+' => 'Thời lượng pin: 1,5-2 giờ
+sử dụng liên tục
+
+',
+    '4 Hours' => 'Thời lượng pin: 4 giờ',
+    '4 Hours
+' => 'Thời lượng pin: 4 giờ
+',
+    'Smart Magnifier' => 'Kính lúp thông minh',
+    'Handheld' => 'Cầm tay',
+    'Wearable' => 'Thiết bị đeo',
+    'Works offline' => 'Hoạt động ngoại tuyến',
+    'Wireless' => 'Không dây',
+    'Reading light' => 'Đèn đọc sách',
+    'Touch Bar' => 'Thanh cảm ứng',
+    '1 Year Warranty' => 'Bảo hành 1 năm',
+    '2 Year Warranty' => 'Bảo hành 2 năm',
+    '
+1 Year Warranty
+
+' => '
+Bảo hành 1 năm
+
+',
+    '
+2 Year Warranty
+
+' => '
+Bảo hành 2 năm
+
+',
+    '
+Handheld' => '
+Cầm tay',
+    '
+Touch Bar
+
+' => '
+Thanh cảm ứng
+
+',
+    '
+Wearable
+
+' => '
+Thiết bị đeo
+
+',
+    'Connectivity 
+Wi-Fi, Bluetooth
+' => 'Kết nối 
+Wi-Fi, Bluetooth
+',
+    'Groundbreaking New Feature:' => 'Tính năng đột phá mới:',
+    'Easily Engage With the World' => 'Dễ dàng tương tác với thế giới',
+    'Around You' => 'Xung quanh bạn',
+    'Explore your surroundings in an entirely new, interactive way.' => 'Khám phá môi trường xung quanh bạn theo cách hoàn toàn mới, đầy tương tác.',
+    'Simply ask OrCam MyEye, "What\'s in Front of Me?" and receive descriptions in real-time.' => 'Chỉ cần hỏi OrCam MyEye: "Có gì ở phía trước tôi?" và nhận mô tả theo thời gian thực.',
+    'Simply ask OrCam MyEye, \"What\'s in Front of Me?\"  and receive descriptions in real-time. ' => 'Chỉ cần hỏi OrCam MyEye: \"Có gì ở phía trước tôi?\" và nhận mô tả theo thời gian thực. ',
+    'Simply ask OrCam MyEye, "What\'s in Front of Me?"  and receive descriptions in real-time. ' => 'Chỉ cần hỏi OrCam MyEye: "Có gì ở phía trước tôi?" và nhận mô tả theo thời gian thực. ',
+    'To get even more insights, you can ask follow-up questions.' => 'Để tìm hiểu thêm thông tin, bạn có thể đặt thêm câu hỏi tiếp theo.',
+    'Summarize text' => 'Tóm tắt văn bản',
 );

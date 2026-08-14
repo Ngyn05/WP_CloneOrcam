@@ -409,11 +409,11 @@ function orcam_theme_render_document(string $file, ?string $document_html = null
     $html = $document_html ?? (string) file_get_contents($file);
     $translations = require get_template_directory() . '/inc/vietnamese-translations.php';
 
-    // Translation keys such as "Reading" can also occur inside filenames.
-    // Protect URLs so translating page copy never corrupts an asset path.
+    // Translation keys such as "Blogs" and "Reading" can also occur inside
+    // asset filenames. Protect URL-valued attributes before translating copy.
     $protected_urls = array();
     $html = preg_replace_callback(
-        '#https?://[^"\'\s<>]+#i',
+        '#\b(?:href|src|srcset|action|poster)\s*=\s*(["\']).*?\1|https?://[^"\'\s<>]+#is',
         static function (array $matches) use (&$protected_urls): string {
             $placeholder = '__ORCAM_PROTECTED_URL_' . count($protected_urls) . '__';
             $protected_urls[$placeholder] = $matches[0];
@@ -423,6 +423,31 @@ function orcam_theme_render_document(string $file, ?string $document_html = null
     );
     $html = strtr($html, $translations);
     $html = strtr($html, $protected_urls);
+
+    // Correct the OrCam Learn export without changing the shared renderer or
+    // downloading the rest of the media library.
+    if (wp_normalize_path((string) realpath($file)) === wp_normalize_path((string) realpath(get_template_directory() . '/static-pages/vi/orcam-learn.html'))) {
+        $html = str_replace(
+            '<h1><strong>OrCam Học </strong><span style="font-family: Trebuchet MS"><span style="color: rgb(73, 26, 189)"><strong>Cơ bản</strong></span></span></h1>',
+            '<h1><strong>OrCam </strong><span style="font-family: Trebuchet MS"><span style="color: rgb(73, 26, 189)"><strong>Learn Basic</strong></span></span></h1>',
+            $html
+        );
+        $html = str_replace(
+            array('Group&#32;4151.png', 'Book_10M_txt&#32;3.png'),
+            array('Group&#32;4151.webp', 'Book_10M_txt&#32;3.webp'),
+            $html
+        );
+        $html = str_replace(
+            'https://www.orcam.com/media/Frame%2016%20(2)%20(1).png',
+            get_template_directory_uri() . '/media/Frame%2016%20%282%29%20%281%29.webp',
+            $html
+        );
+        $html = str_replace(
+            'https://www.orcam.com/media/Girl%20Reading%20Little%20Women_2.11%202%20(1)-1.png',
+            get_template_directory_uri() . '/media/Girl%20Reading%20Little%20Women_2.11%202%20%281%29-1.webp',
+            $html
+        );
+    }
     $html = preg_replace('/<html([^>]*?)\blang=["\'][^"\']*["\']([^>]*)>/i', '<html$1lang="vi"$2>', $html, 1);
     $html = preg_replace_callback(
         '#(<a\b[^>]*\bclass=["\'][^"\']*(?:desktop-header__logo|mobile-header__logo)[^"\']*["\'][^>]*\bhref=)(["\'])[^"\']*\2#i',
@@ -439,6 +464,41 @@ function orcam_theme_render_document(string $file, ?string $document_html = null
         $html = preg_replace('/<nav class="orcam-footer/i', $blog_index . '<nav class="orcam-footer', $html, 1);
     }
     $theme_uri = untrailingslashit(get_template_directory_uri());
+    $request_host = strtolower((string) ($_SERVER['HTTP_HOST'] ?? ''));
+    $request_host = preg_replace('/:\d+$/', '', $request_host);
+    $is_local_development = $request_host === 'localhost'
+        || $request_host === '127.0.0.1'
+        || str_ends_with($request_host, '.local');
+
+    if ($is_local_development) {
+        // Third-party tracking/storage APIs are intentionally blocked by Edge
+        // on local domains. Do not execute those integrations during local
+        // development; production hosts retain them unchanged.
+        $html = preg_replace(
+            '#<script\b[^>]*>\s*\(function\(w,d,s,l,i\).*?</script>#is',
+            '',
+            $html
+        );
+        $html = preg_replace(
+            '#<script\b[^>]*\bsrc=["\'][^"\']*(?:googletagmanager\.com|cdn\.userway\.org)[^"\']*["\'][^>]*>\s*</script>#is',
+            '',
+            $html
+        );
+        $html = preg_replace(
+            '#<noscript>\s*<iframe\b[^>]*googletagmanager\.com.*?</iframe>\s*</noscript>#is',
+            '',
+            $html
+        );
+
+        // The exported documents preload route chunks for pages that are not
+        // visited. Native imports still request each chunk when it is needed.
+        $html = preg_replace('#<link\b[^>]*\brel=["\']modulepreload["\'][^>]*>#i', '', $html);
+        $html = preg_replace(
+            '#(<link\b[^>]*\bhref=["\'][^"\']+/fonts/[^"\']+\.css["\'][^>]*?)\s+rel=["\']preload["\']\s+as=["\']font["\']#i',
+            '$1',
+            $html
+        );
+    }
 
     // Open the mirrored Helpjuice knowledge base from this theme instead of
     // leaving the site for the externally hosted help center.
@@ -504,7 +564,7 @@ function orcam_theme_render_document(string $file, ?string $document_html = null
 
     // Some exported pages do not include the accessibility widget. Inject it
     // once at render time so the accessibility control is present everywhere.
-    if (!preg_match('#<script[^>]+cdn\\.userway\\.org/widget\\.js[^>]*>#i', $html)) {
+    if (!$is_local_development && !preg_match('#<script[^>]+cdn\\.userway\\.org/widget\\.js[^>]*>#i', $html)) {
         $accessibility_tag = sprintf(
             '<script src="https://cdn.userway.org/widget.js" data-account="%s" async></script>',
             esc_attr(ORCAM_USERWAY_ACCOUNT)
