@@ -1117,6 +1117,11 @@ function orcam_theme_append_products_to_static_submenu(string $html, string $fil
         '$1{label:"Tất cả sản phẩm",pageUrl:"' . esc_js(home_url('/vi/shop/')) . '",id:"all-products",blockName:"All Products",blockType:"internalNavigation"},',
         $html,
         1
+    ) ?: $html;
+
+    return $html;
+}
+
 /**
  * Synchronize real WooCommerce prices and product images into static page comparison tables,
  * pricing cards, and product landing pages.
