@@ -1259,3 +1259,23 @@ form.cart .quantity,
     }
 }
 
+/* ==========================================================================
+   Hide Top Login & Magnifier Notification Banners
+   ========================================================================== */
+#section_422r6xj0,
+#section_jvpy486r,
+.orcam-flex:has(a[href*="get-started"]),
+.orcam-flex:has(a[href*="user-area"]) {
+    display: none !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    overflow: hidden !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+
