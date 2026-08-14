@@ -1182,16 +1182,17 @@ function orcam_theme_post_card_image(WP_Post $post): string
         return $cached_image;
     }
 
-    $source = (string) get_post_meta($post->ID, '_orcam_source_file', true);
-    $source = str_replace(array('static-pages/en-us/', 'static-pages/en-gb/'), 'static-pages/vi/', $source);
-    $file = $source !== '' ? get_template_directory() . '/' . ltrim($source, '/') : '';
-    if ($file && is_readable($file)) {
-        $html = (string) file_get_contents($file);
-        if (preg_match('#<meta\s+property=(["\'])og:image\1\s+content=(["\'])(.*?)\2#is', $html, $match)) {
-            $image_url = html_entity_decode($match[3], ENT_QUOTES | ENT_HTML5, 'UTF-8');
-            update_post_meta($post->ID, '_orcam_cached_card_image', $image_url);
-            return $image_url;
-        }
+    static $blog_images = null;
+    if ($blog_images === null) {
+        $json_file = get_template_directory() . '/inc/blog-images-cache.json';
+        $blog_images = is_file($json_file) ? (json_decode((string) file_get_contents($json_file), true) ?: array()) : array();
+    }
+
+    $source_slug = (string) get_post_meta($post->ID, '_orcam_source_slug', true);
+    if ($source_slug !== '' && isset($blog_images[$source_slug])) {
+        $image_url = $blog_images[$source_slug];
+        update_post_meta($post->ID, '_orcam_cached_card_image', $image_url);
+        return $image_url;
     }
 
     return get_template_directory_uri() . '/media/3A1A5245%20(1)%20(1).webp';
@@ -1255,13 +1256,6 @@ function orcam_theme_render_document(string $file, ?string $document_html = null
     $cache_file = $cache_dir . '/' . $cache_key . '.html';
 
     $html = $document_html ?? (string) file_get_contents($file);
-    static $translations = null;
-    if ($translations === null) {
-        $translations = require get_template_directory() . '/inc/vietnamese-translations.php';
-    }
-
-    // Fast selective translation for visible text segments
-    $html = strtr($html, $translations);
     $html = orcam_theme_append_products_to_static_submenu($html, $file);
 
     // Correct the OrCam Learn export without changing the shared renderer or
