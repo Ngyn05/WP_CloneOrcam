@@ -534,6 +534,22 @@
             el.remove();
         });
 
+        // Remove any top login/get-started notification banners
+        var banners = document.querySelectorAll('#section_422r6xj0, #section_jvpy486r, a[href*="get-started"], a[href*="user-area"]');
+        Array.prototype.slice.call(banners).forEach(function (el) {
+            if (el.matches('#section_422r6xj0, #section_jvpy486r')) {
+                el.remove();
+            } else if (el.closest('#section_422r6xj0, #section_jvpy486r')) {
+                var parentBanner = el.closest('#section_422r6xj0, #section_jvpy486r');
+                if (parentBanner) parentBanner.remove();
+            } else if (el.textContent && (el.textContent.indexOf('OrCam Magnifier') !== -1 || el.textContent.indexOf('sở hữu') !== -1)) {
+                var parentSec = el.closest('.orcam-flex');
+                if (parentSec) {
+                    parentSec.remove();
+                }
+            }
+        });
+
         // Ensure "Đọc và học tập" is a direct link without dropdown
         var wrappers = document.querySelectorAll('.desktop-header__menu-items > .d-flex.flex-column');
         wrappers.forEach(function (wrapper) {
