@@ -3,6 +3,9 @@
 
 defined('ABSPATH') || exit;
 
+// Fast cache check for shop catalog
+orcam_theme_try_serve_cache('shop_catalog', 'vi_shop_page');
+
 ob_start();
 ?>
 <main class="orcam-shop" id="primary">
@@ -59,7 +62,7 @@ ob_start();
 </main>
 <?php
 $shop_content = (string) ob_get_clean();
-if (!orcam_theme_render_shared_static_shell($shop_content, 'Tất cả sản phẩm')) {
+if (!orcam_theme_render_shared_static_shell($shop_content, 'Tất cả sản phẩm', false, 'shop_catalog', 'vi_shop_page')) {
     get_header();
     echo $shop_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
     get_footer();

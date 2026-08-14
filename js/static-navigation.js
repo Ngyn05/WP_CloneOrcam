@@ -250,10 +250,30 @@
             } else {
                 var container = desktopSubmenu.querySelector('.desktop-submenu__items');
                 if (container) {
-                    var allLink = Array.prototype.find.call(container.querySelectorAll('a[href]'), function (link) {
-                        try { return new URL(link.href, document.baseURI).pathname.replace(/\/$/, '') === new URL(shopUrl, document.baseURI).pathname.replace(/\/$/, ''); }
-                        catch (error) { return false; }
+                    // Find all existing "Tất cả sản phẩm" links in the submenu
+                    var allLinks = Array.prototype.slice.call(container.querySelectorAll('a[href]')).filter(function (link) {
+                        var text = link.textContent.trim();
+                        var href = link.getAttribute('href') || '';
+                        if (text === 'Tất cả sản phẩm' || text === 'All Products' || href.indexOf('/shop') !== -1) {
+                            return true;
+                        }
+                        try {
+                            return new URL(link.href, document.baseURI).pathname.replace(/\/$/, '') === new URL(shopUrl, document.baseURI).pathname.replace(/\/$/, '');
+                        } catch (error) {
+                            return false;
+                        }
                     });
+
+                    var allLink = null;
+                    if (allLinks.length > 0) {
+                        allLink = allLinks[0];
+                        // Remove any duplicate "Tất cả sản phẩm" links
+                        for (var i = 1; i < allLinks.length; i++) {
+                            var dupParent = allLinks[i].closest('.d-flex') || allLinks[i];
+                            dupParent.remove();
+                        }
+                    }
+
                     if (!allLink) {
                         var allItem = document.createElement('div');
                         allItem.className = 'd-flex';
@@ -265,11 +285,36 @@
                         allItem.appendChild(allLink);
                         container.insertBefore(allItem, container.firstChild);
                     } else {
+                        allLink.textContent = 'Tất cả sản phẩm';
+                        allLink.href = shopUrl;
+                        if (isCurrentShop && !allLink.classList.contains('orcam-submenu__active')) {
+                            allLink.classList.add('orcam-submenu__active');
+                        } else if (!isCurrentShop && allLink.classList.contains('orcam-submenu__active')) {
+                            allLink.classList.remove('orcam-submenu__active');
+                        }
                         var parentEl = allLink.closest('.d-flex') || allLink;
                         if (parentEl !== container.firstElementChild) {
                             container.insertBefore(parentEl, container.firstChild);
                         }
                     }
+
+                    // Deduplicate any repeated product links
+                    var seenPaths = {};
+                    try {
+                        seenPaths[new URL(shopUrl, document.baseURI).pathname.replace(/\/$/, '')] = true;
+                    } catch (e) {}
+
+                    Array.prototype.slice.call(container.querySelectorAll('a[href]')).forEach(function (link) {
+                        if (link === allLink) return;
+                        try {
+                            var path = new URL(link.href, document.baseURI).pathname.replace(/\/$/, '');
+                            if (seenPaths[path]) {
+                                (link.closest('.d-flex') || link).remove();
+                            } else {
+                                seenPaths[path] = true;
+                            }
+                        } catch (e) {}
+                    });
 
                     products.forEach(function (product) {
                         var exists = Array.prototype.some.call(container.querySelectorAll('a[href]'), function (link) {
@@ -321,13 +366,27 @@
                 return;
             }
 
-            var allMobileLink = Array.prototype.find.call(mobileSubmenu.querySelectorAll('a[href]'), function (link) {
+            // Find all existing "Tất cả sản phẩm" links in mobile submenu
+            var allMobileLinks = Array.prototype.slice.call(mobileSubmenu.querySelectorAll('a[href]')).filter(function (link) {
+                var text = link.textContent.trim();
+                var href = link.getAttribute('href') || '';
+                if (text === 'Tất cả sản phẩm' || text === 'All Products' || href.indexOf('/shop') !== -1) {
+                    return true;
+                }
                 try {
                     return new URL(link.href, document.baseURI).pathname.replace(/\/$/, '') === new URL(shopUrl, document.baseURI).pathname.replace(/\/$/, '');
                 } catch (error) {
                     return false;
                 }
             });
+
+            var allMobileLink = null;
+            if (allMobileLinks.length > 0) {
+                allMobileLink = allMobileLinks[0];
+                for (var j = 1; j < allMobileLinks.length; j++) {
+                    allMobileLinks[j].remove();
+                }
+            }
 
             if (!allMobileLink) {
                 allMobileLink = document.createElement('a');
@@ -344,10 +403,35 @@
                     mobileContainer.appendChild(allMobileLink);
                 }
             } else {
+                allMobileLink.textContent = 'Tất cả sản phẩm';
+                allMobileLink.href = shopUrl;
+                if (isCurrentShop && !allMobileLink.classList.contains('orcam-submenu__active')) {
+                    allMobileLink.classList.add('orcam-submenu__active');
+                } else if (!isCurrentShop && allMobileLink.classList.contains('orcam-submenu__active')) {
+                    allMobileLink.classList.remove('orcam-submenu__active');
+                }
                 if (firstItemLink && allMobileLink !== mobileContainer.firstElementChild) {
                     mobileContainer.insertBefore(allMobileLink, mobileContainer.firstElementChild);
                 }
             }
+
+            // Deduplicate any repeated product links on mobile
+            var seenMobilePaths = {};
+            try {
+                seenMobilePaths[new URL(shopUrl, document.baseURI).pathname.replace(/\/$/, '')] = true;
+            } catch (e) {}
+
+            Array.prototype.slice.call(mobileContainer.querySelectorAll('a[href]')).forEach(function (link) {
+                if (link === allMobileLink) return;
+                try {
+                    var path = new URL(link.href, document.baseURI).pathname.replace(/\/$/, '');
+                    if (seenMobilePaths[path]) {
+                        link.remove();
+                    } else {
+                        seenMobilePaths[path] = true;
+                    }
+                } catch (e) {}
+            });
 
             products.forEach(function (product) {
                 var exists = Array.prototype.some.call(mobileSubmenu.querySelectorAll('a[href]'), function (link) {
@@ -773,43 +857,38 @@
     syncDynamicProductSubmenu();
     ensureHeaderDropdowns();
     preserveNativeWooBody();
-    window.setTimeout(syncDynamicProductSubmenu, 100);
-    window.setTimeout(syncDynamicProductSubmenu, 600);
-    window.setTimeout(ensureHeaderDropdowns, 100);
-    window.setTimeout(ensureHeaderDropdowns, 600);
-    window.setTimeout(preserveNativeWooBody, 100);
-    window.setTimeout(preserveNativeWooBody, 600);
-    window.setTimeout(preserveNativeWooBody, 1500);
+
+    var mutationScheduled = false;
+    function scheduleBatchUpdate() {
+        if (mutationScheduled) return;
+        mutationScheduled = true;
+        (window.requestAnimationFrame || window.setTimeout)(function () {
+            mutationScheduled = false;
+            normalizeHeaderNavigation(document);
+            syncDynamicProductSubmenu();
+            ensureHeaderDropdowns();
+            repairBlogImages(document);
+            replaceGoogleContactForm(document);
+            placeBlogIndex();
+            renderSupportCaseForm();
+            scheduleNativeWooPreservation();
+            scheduleBlogPreservation();
+        }, 16);
+    }
 
     if ('MutationObserver' in window) {
         new MutationObserver(function (mutations) {
-            var hasChildListChanges = false;
-            mutations.forEach(function (mutation) {
+            var needsUpdate = false;
+            for (var i = 0; i < mutations.length; i++) {
+                var mutation = mutations[i];
                 if (mutation.type === 'attributes') {
                     repairAssetUrl(mutation.target);
-                    return;
+                } else if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+                    needsUpdate = true;
                 }
-
-                hasChildListChanges = true;
-                mutation.addedNodes.forEach(function (node) {
-                    repairAssetUrl(node);
-                    if (node instanceof Element) {
-                        repairBlogImages(node);
-                        normalizeHeaderNavigation(node);
-                        ensureHeaderDropdowns();
-                        replaceGoogleContactForm(node);
-                    }
-                });
-            });
-
-            placeBlogIndex();
-            renderSupportCaseForm();
-            if (hasChildListChanges) {
-                syncDynamicProductSubmenu();
-                scheduleNativeWooPreservation();
             }
-            if (hasChildListChanges) {
-                scheduleBlogPreservation();
+            if (needsUpdate) {
+                scheduleBatchUpdate();
             }
         }).observe(document.documentElement, {
             childList: true,

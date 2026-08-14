@@ -121,19 +121,48 @@ Text Domain: orcam-theme
 .orcam-article-content figure { margin: 2em 0; max-width: 100%; }
 .orcam-article-content iframe { max-width: 100%; }
 
-/* Database-backed copies use normal page scrolling, not Svelte's app shell. */
-body.orcam-database-blog,
+/* Prevent duplicate scrollbars across all pages and WooCommerce */
+html,
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden !important;
+}
+
+body .app,
+body .app.overflow-auto {
+    height: 100% !important;
+    overflow: hidden !important;
+}
+
+body article#mainBody,
+body article#mainBody.overflow-auto {
+    height: 100% !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+}
+
+/* Database-backed single blog posts use normal document scroll flow */
+html:has(body.orcam-database-blog),
+body.orcam-database-blog {
+    height: auto !important;
+    max-height: none !important;
+    min-height: 100% !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    position: static !important;
+}
+
 body.orcam-database-blog .app,
+body.orcam-database-blog .app.overflow-auto,
 body.orcam-database-blog .app > .fill-height,
 body.orcam-database-blog article#mainBody {
     height: auto !important;
     max-height: none !important;
     min-height: 0 !important;
     overflow: visible !important;
-}
-
-body.orcam-database-blog .app > .fill-height {
-    display: block !important;
+    position: static !important;
 }
 
 body.orcam-database-blog article#mainBody {
@@ -1028,6 +1057,82 @@ article#mainBody .orcam-blog > .orcam-flex img {
     .orcam-checkout__content .checkout_coupon .form-row-last { float:none;width:100%; }
     .orcam-checkout__content #place_order { font-size:17px;min-height:52px; }
 }
+
+/* Order Received / Thank You Page Styling */
+.orcam-checkout__content .woocommerce-order {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    box-shadow: 0 12px 36px -4px rgba(15, 23, 42, .07);
+    box-sizing: border-box;
+    margin: 0 auto;
+    max-width: 820px;
+    padding: 40px clamp(20px, 4vw, 48px);
+}
+
+.orcam-checkout__content .woocommerce-notice--success {
+    background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+    border: 1px solid #a7f3d0;
+    border-radius: 12px;
+    color: #065f46;
+    font-size: 18px;
+    font-weight: 700;
+    margin: 0 0 28px;
+    padding: 18px 24px;
+    text-align: center;
+}
+
+.orcam-checkout__content ul.woocommerce-order-overview {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    display: grid;
+    gap: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    list-style: none;
+    margin: 0 0 32px;
+    padding: 20px;
+}
+
+.orcam-checkout__content ul.woocommerce-order-overview li {
+    border: 0;
+    border-right: 1px solid #e2e8f0;
+    color: #64748b;
+    font-size: 13px;
+    margin: 0;
+    padding: 0 12px 0 0;
+}
+
+.orcam-checkout__content ul.woocommerce-order-overview li:last-child {
+    border-right: 0;
+}
+
+.orcam-checkout__content ul.woocommerce-order-overview li strong {
+    color: #0f172a;
+    display: block;
+    font-size: 15px;
+    font-weight: 750;
+    margin-top: 4px;
+}
+
+.orcam-checkout__content .woocommerce-order-details__title,
+.orcam-checkout__content .woocommerce-column__title {
+    color: #0f172a;
+    font-size: 20px;
+    font-weight: 750;
+    margin: 24px 0 16px;
+}
+
+.orcam-checkout__content .woocommerce-customer-details address {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    color: #334155;
+    font-style: normal;
+    line-height: 1.7;
+    padding: 18px 22px;
+}
+
 .orcam-default-product__buy-now { align-items:center;background:#3535c9;border-radius:6px;color:#fff;display:inline-flex;font-size:17px;font-weight:700;justify-content:center;min-height:52px;padding:0 28px;text-decoration:none;transition:background .2s ease,box-shadow .2s ease; }
 .orcam-default-product__buy-now:hover { background:#24249b;box-shadow:0 6px 18px rgba(53,53,201,.35);color:#fff; }
 .orcam-default-product__hero { background: #222; color: #fff; padding: 72px 5%; }
