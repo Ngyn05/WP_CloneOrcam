@@ -489,18 +489,39 @@
             }
         });
 
-        // Sync comparison table product images
+        // Sync comparison table and card product images from database
         Object.keys(dataMap).forEach(function (slug) {
             var prod = dataMap[slug];
             if (prod && prod.imageUrl) {
-                if (slug === 'orcam-myeye-3-pro') {
-                    var myeyeImages = document.querySelectorAll('img[src*="MYEYE_on%20floor"], img[src*="MYEYE_on floor"]');
-                    myeyeImages.forEach(function (img) {
+                var selectorMap = {
+                    'orcam-myeye-3-pro': 'img[src*="MYEYE_on%20floor"], img[src*="MYEYE_on floor"]',
+                    'orcam-myeye-2-pro': 'img[src*="MYEYE_2_Pro"], img[src*="0165"]',
+                    'orcam-read-3': 'img[src*="Group%203676"], img[src*="Group 3676"], img[src*="Read3"]',
+                    'orcam-read-5': 'img[src*="Read5"], img[src*="Read 5"]',
+                    'orcam-read': 'img[src*="Read_on"], img[src*="Read.webp"]',
+                    'orcam-learn': 'img[src*="Group%204151"], img[src*="Group 4151"]'
+                };
+                if (selectorMap[slug]) {
+                    var imgs = document.querySelectorAll(selectorMap[slug]);
+                    imgs.forEach(function (img) {
                         if (img.src !== prod.imageUrl) {
                             img.src = prod.imageUrl;
                         }
                     });
                 }
+
+                var headings = document.querySelectorAll('.comparison-table p, .comparison-table h1, .comparison-table h2, .comparison-table h3, .comparison-table h4, .comparison-table h5, table th, table td, .orcam-tile p, .orcam-tile h4');
+                headings.forEach(function (head) {
+                    if (head.textContent && prod.title && head.textContent.trim() === prod.title.trim()) {
+                        var col = head.closest('.flex-element, .orcam-tile, tr, td, th, .smui-paper') || head.parentElement;
+                        if (col) {
+                            var colImg = col.querySelector('img');
+                            if (colImg && colImg.src !== prod.imageUrl) {
+                                colImg.src = prod.imageUrl;
+                            }
+                        }
+                    }
+                });
             }
         });
     }

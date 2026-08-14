@@ -1192,8 +1192,16 @@ function orcam_theme_sync_woocommerce_product_data_into_html(string $html, strin
             $html
         );
         if (!empty($p3['image_url'])) {
-            $html = str_replace('MYEYE_on%20floor%20Flip%201-1.png', esc_url($p3['image_url']), $html);
-            $html = str_replace('MYEYE_on floor Flip 1-1.png', esc_url($p3['image_url']), $html);
+            $html = str_replace(
+                array(
+                    'https://www.orcam.com/media/MYEYE_on%20floor%20Flip%201-1.png',
+                    'https://www.orcam.com/media/MYEYE_on floor Flip 1-1.png',
+                    'MYEYE_on%20floor%20Flip%201-1.png',
+                    'MYEYE_on floor Flip 1-1.png'
+                ),
+                esc_url($p3['image_url']),
+                $html
+            );
         }
     }
 
@@ -1210,6 +1218,18 @@ function orcam_theme_sync_woocommerce_product_data_into_html(string $html, strin
             $p2['formatted_price'],
             $html
         );
+        if (!empty($p2['image_url'])) {
+            $html = str_replace(
+                array(
+                    'https://www.orcam.com/media/MYEYE_2_Pro.png',
+                    'MYEYE_2_Pro.png',
+                    'orcam%200165%20(1)%20(1).webp',
+                    'orcam 0165 (1) (1).webp'
+                ),
+                esc_url($p2['image_url']),
+                $html
+            );
+        }
     }
 
     // 3. Read 3
@@ -1220,6 +1240,20 @@ function orcam_theme_sync_woocommerce_product_data_into_html(string $html, strin
             $r3['formatted_price'],
             $html
         );
+        if (!empty($r3['image_url'])) {
+            $html = str_replace(
+                array(
+                    'https://www.orcam.com/media/Group%203676%20(1)%20(1)-min.png',
+                    'https://www.orcam.com/media/Group 3676 (1) (1)-min.png',
+                    'Group%203676%20(1)%20(1)-min.png',
+                    'Group 3676 (1) (1)-min.png',
+                    'Read3_on%20floor%201.png',
+                    'Read3_on floor 1.png'
+                ),
+                esc_url($r3['image_url']),
+                $html
+            );
+        }
     }
 
     // 4. Read 5
@@ -1230,6 +1264,18 @@ function orcam_theme_sync_woocommerce_product_data_into_html(string $html, strin
             $r5['formatted_price'],
             $html
         );
+        if (!empty($r5['image_url'])) {
+            $html = str_replace(
+                array(
+                    'https://www.orcam.com/media/Read5.png',
+                    'Read5.png',
+                    'Read%205.png',
+                    'Read 5.png'
+                ),
+                esc_url($r5['image_url']),
+                $html
+            );
+        }
     }
 
     // 5. Read (Standard)
@@ -1240,6 +1286,18 @@ function orcam_theme_sync_woocommerce_product_data_into_html(string $html, strin
             $r['formatted_price'],
             $html
         );
+        if (!empty($r['image_url'])) {
+            $html = str_replace(
+                array(
+                    'https://www.orcam.com/media/Read_on%20floor%201.png',
+                    'https://www.orcam.com/media/Read_on floor 1.png',
+                    'Read_on%20floor%201.png',
+                    'Read_on floor 1.png'
+                ),
+                esc_url($r['image_url']),
+                $html
+            );
+        }
     }
 
     // 6. Learn
@@ -1250,6 +1308,17 @@ function orcam_theme_sync_woocommerce_product_data_into_html(string $html, strin
             $l['formatted_price'],
             $html
         );
+        if (!empty($l['image_url'])) {
+            $html = str_replace(
+                array(
+                    'https://www.orcam.com/media/Group%204151.webp',
+                    'Group%204151.webp',
+                    'Group 4151.webp'
+                ),
+                esc_url($l['image_url']),
+                $html
+            );
+        }
     }
 
     // Remove old monthly installment texts
