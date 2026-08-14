@@ -1278,4 +1278,20 @@ form.cart .quantity,
     pointer-events: none !important;
 }
 
+/* ==========================================================================
+   Hero Dark Banner Text Contrast Fix
+   ========================================================================== */
+#section_2e2d4cu8,
+#section_2e2d4cu8 h1,
+#section_2e2d4cu8 h2,
+#section_2e2d4cu8 h3,
+#section_2e2d4cu8 h4,
+#section_2e2d4cu8 h5,
+#section_2e2d4cu8 p,
+#section_2e2d4cu8 span,
+#section_2e2d4cu8 .orcam-richtext-component * {
+    color: #ffffff !important;
+}
+
+
 
