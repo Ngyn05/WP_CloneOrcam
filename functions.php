@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('ORCAM_THEME_VERSION', '2.1.8');
+define('ORCAM_THEME_VERSION', '2.2.2');
 define('ORCAM_USERWAY_ACCOUNT', 't2KpHXGp9h');
 
 add_action('after_setup_theme', static function () {
@@ -940,12 +940,22 @@ function orcam_theme_append_products_to_static_submenu(string $html, string $fil
         $extra_links .= '<div class="d-flex"><a class="p3 desktop-submenu__submenu-link svelte-alcb1y" href="'
             . esc_url(get_permalink($product)) . '" target="_self">' . esc_html(get_the_title($product)) . '</a> </div>';
     }
-    return preg_replace(
+    $html = preg_replace(
         '#(<div class="desktop-submenu__items svelte-alcb1y">)(.*?)(</div>\s*<div class="desktop-submenu__buttons svelte-alcb1y">)#s',
         '$1' . $all_products_link . '$2' . $extra_links . '$3',
         $html,
         1
     ) ?: $html;
+
+    // Inject "Tất cả sản phẩm" into Svelte inline script submenu data so client hydration on mobile also includes it
+    $html = preg_replace(
+        '#(submenu:\s*\{[^}]*?items:\s*\[)(?!\s*\{\s*label\s*:\s*["\']Tất cả sản phẩm["\'])#s',
+        '$1{label:"Tất cả sản phẩm",pageUrl:"' . esc_js(home_url('/vi/shop/')) . '",id:"all-products",blockName:"All Products",blockType:"internalNavigation"},',
+        $html,
+        1
+    ) ?: $html;
+
+    return $html;
 }
 
 /**

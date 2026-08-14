@@ -17,7 +17,7 @@
     var savedNativeWooContent = nativeWooContent ? nativeWooContent.cloneNode(true) : null;
     var preserveNativeWooScheduled = false;
 
-    /** Keep exported and hydrated headers on one Vietnamese navigation copy. */
+    /** Keep exported and hydrated headers, mobile drawers, submenus and footers in Vietnamese. */
     function normalizeHeaderNavigation(root) {
         var labelsByPath = {
             '/vi/low-vision': 'Thị lực kém',
@@ -33,13 +33,133 @@
             '/vi/faq': 'Câu hỏi thường gặp',
             '/vi/release-notes': 'Ghi chú phát hành',
             '/vi/submit-case': 'Gửi yêu cầu hỗ trợ',
-            '/vi/orcam-learn-schools': 'OrCam Learn dành cho trường học'
+            '/vi/orcam-learn-schools': 'OrCam Learn dành cho trường học',
+            '/vi/shop': 'Tất cả sản phẩm',
+            '/vi/shop/': 'Tất cả sản phẩm'
         };
+
+        var textDict = {
+            'Low Vision': 'Thị lực kém',
+            'Reading and Learning': 'Đọc và học tập',
+            'Reading & Learning': 'Đọc và học tập',
+            'Resources': 'Tài nguyên',
+            'About': 'Giới thiệu',
+            'Support': 'Hỗ trợ',
+            'Schools': 'Trường học',
+            'Events': 'Sự kiện',
+            'Find Us Near You': 'Tìm đại lý gần bạn',
+            'Products': 'Sản phẩm',
+            'Blog': 'Bài viết',
+            'Leadership': 'Ban lãnh đạo',
+            'Distributors': 'Nhà phân phối',
+            'News': 'Tin tức',
+            'Affiliates': 'Đối tác',
+            'Careers': 'Tuyển dụng',
+            'Help Center': 'Trung tâm trợ giúp',
+            'Release Notes': 'Ghi chú phát hành',
+            'Submit a case': 'Gửi yêu cầu hỗ trợ',
+            'Contact Us': 'Liên hệ',
+            'Contact us': 'Liên hệ',
+            'Contact Us ': 'Liên hệ',
+            'Learn More': 'Tìm hiểu thêm',
+            'Learn more': 'Tìm hiểu thêm',
+            'Show More': 'Tải thêm',
+            'Show more': 'Tải thêm',
+            'Hiển thị thêm': 'Tải thêm',
+            'Buy Now': 'Mua ngay',
+            'Buy now': 'Mua ngay',
+            'Order Now': 'Đặt hàng ngay',
+            'Back to top': 'Về đầu trang',
+            'Speak with an OrCam Specialist': 'Tư vấn với chuyên viên OrCam',
+            'Talk to OrCam Specialist': 'Trò chuyện với chuyên viên OrCam',
+            'OrCam Learn Testimonials': 'Cảm nhận về OrCam Learn',
+            'OrCam Read 3 Testimonials': 'Cảm nhận về OrCam Read 3',
+            'OrCam Learn For Schools': 'OrCam Learn dành cho trường học',
+            'Accessibility': 'Trợ năng',
+            'Cookies Policy': 'Chính sách cookie',
+            'Terms Of Use': 'Điều khoản sử dụng',
+            'Privacy Statement': 'Chính sách quyền riêng tư',
+            'Terms & Conditions': 'Điều khoản và điều kiện',
+            'Patent': 'Bằng sáng chế',
+            'Identify Objects': 'Nhận diện đồ vật',
+            'Identify Products, Nhận biết tiền tệ and Màu sắc': 'Nhận diện sản phẩm, tiền tệ và màu sắc',
+            'Recognize Money notes,  Product & Màu sắc': 'Nhận diện tiền tệ, sản phẩm & màu sắc',
+            'Recognize Money notes, Product & Màu sắc': 'Nhận diện tiền tệ, sản phẩm & màu sắc',
+            'Recognize Faces': 'Nhận diện khuôn mặt',
+            'Recognize loved ones': 'Nhận diện người thân',
+            'Identify Products': 'Nhận diện sản phẩm',
+            'Identifying Products': 'Nhận diện sản phẩm',
+            'Money Notes': 'Nhận biết tiền tệ',
+            'Color Detection': 'Nhận diện màu sắc',
+            'Colors': 'Màu sắc',
+            'Barcodes': 'Mã vạch',
+            'Read Barcodes': 'Đọc mã vạch',
+            'Your Voice is Key': 'Giọng nói của bạn là chìa khóa',
+            '"Hey OrCam" Voice Commands': 'Lệnh thoại "Hey OrCam"',
+            'Voice commands': 'Lệnh bằng giọng nói',
+            'Your Interactive Reading Companion, Everywhere You Go': 'Người bạn đọc tương tác của bạn, mọi lúc mọi nơi',
+            'Your Personal Reading Assistant Awaits!': 'Trợ lý đọc cá nhân đang chờ đón bạn!',
+            'Your Reading, Your Rules': 'Cách bạn đọc, do bạn làm chủ',
+            'Your Reading, <br>Your Rules': 'Cách bạn đọc, <br>do bạn làm chủ',
+            'Your pocket-sized reading assistant.': 'Trợ lý đọc sách bỏ túi của bạn.',
+            'Zoom in & out': 'Phóng to & thu nhỏ',
+            'Zoom in&out': 'Phóng to & thu nhỏ',
+            'Change contrast': 'Thay đổi độ tương phản',
+            'Extract and copy text': 'Trích xuất và sao chép văn bản',
+            'Converts image text to digital text': 'Chuyển văn bản hình ảnh thành văn bản số',
+            'Connect to any screen': 'Kết nối với mọi màn hình',
+            'Connect to most screens': 'Kết nối với hầu hết màn hình',
+            'Supports over 140 languages': 'Hỗ trợ hơn 140 ngôn ngữ',
+            'Stationary Reader': 'Thiết bị đọc cố định',
+            'Works offline': 'Hoạt động ngoại tuyến',
+            'Wireless': 'Không dây',
+            'Portable': 'Di động',
+            'Reading light': 'Đèn đọc sách',
+            'Touch Bar': 'Thanh cảm ứng',
+            'Handheld Device': 'Thiết bị cầm tay',
+            'Handheld': 'Cầm tay',
+            'Wearable': 'Thiết bị đeo',
+            '1 Year Warranty': 'Bảo hành 1 năm',
+            '2 Year Warranty': 'Bảo hành 2 năm',
+            '1.5-2 Hours of active use': 'Thời lượng pin: 1,5-2 giờ',
+            '4 Hours': 'Thời lượng pin: 4 giờ',
+            'Smart reading': 'Đọc thông minh',
+            'Smart Reading': 'Đọc thông minh',
+            'Text reading': 'Đọc văn bản',
+            'Reads handwriting': 'Đọc chữ viết tay',
+            'Product Comparison': 'So sánh sản phẩm',
+            'Summarize text': 'Tóm tắt văn bản',
+            'Summarize text into main topics': 'Tóm tắt văn bản thành các chủ đề chính',
+            'Utilizes intext and outsourced data': 'Sử dụng dữ liệu trong văn bản và dữ liệu mở rộng',
+            'Advanced Magnification Meets the Power of AI': 'Khả năng phóng đại tiên tiến kết hợp sức mạnh của AI',
+            'Advanced Magnification': 'Khả năng phóng đại tiên tiến',
+            'Interactive AI Assistant': 'Trợ lý AI tương tác',
+            'AI Assistant': 'Trợ lý AI',
+            'AI Assistant-': 'Trợ lý AI - ',
+            'AI Assistant -': 'Trợ lý AI - ',
+            'Just ask': 'Chỉ cần hỏi',
+            'Just Ask': 'Chỉ cần hỏi',
+            'Uses intext and': 'Sử dụng dữ liệu',
+            'outsource information': 'trong văn bản & mở rộng',
+            'outsourced information': 'trong văn bản & mở rộng',
+            'outsource data': 'trong văn bản & mở rộng',
+            'Your Di động AI Assistant': 'Trợ lý AI di động của bạn',
+            'Your Mobile AI Assistant': 'Trợ lý AI di động của bạn',
+            'Kính lúp thông minh with AI Assistant': 'Kính lúp thông minh tích hợp Trợ lý AI',
+            'The Kính lúp thông minh\'s "Just Ask" feature allows for intuitive interaction with the AI assistant for instant responses to all questions text-related or otherwise.': 'Tính năng "Chỉ cần hỏi" của Kính lúp thông minh cho phép bạn tương tác trực quan với trợ lý AI để nhận câu trả lời tức thì cho mọi câu hỏi, dù là về văn bản hay các chủ đề khác.',
+            'The Kính lúp thông minh\'s  "Just Ask" feature allows for intuitive interaction with the AI assistant for instant responses to all questions text-related or otherwise.': 'Tính năng "Chỉ cần hỏi" của Kính lúp thông minh cho phép bạn tương tác trực quan với trợ lý AI để nhận câu trả lời tức thì cho mọi câu hỏi, dù là về văn bản hay các chủ đề khác.',
+            'Discover the "Just Ask" feature while using OrCam\'s Kính lúp thông minh. Interact naturally with the AI assistant and receive immediate responses to all your questions, whether related to text or other subjects.': 'Khám phá tính năng "Chỉ cần hỏi" khi sử dụng Kính lúp thông minh của OrCam. Tương tác tự nhiên với trợ lý AI và nhận câu trả lời tức thì cho mọi câu hỏi của bạn, dù liên quan đến văn bản hay các chủ đề khác.',
+            'Take advantage of the "Just Ask" Feature while using OrCam\'s Smart magnifier. Engage with the AI assistant naturally and get instant answers to your questions, whether about text or other topics.': 'Tận dụng tính năng "Chỉ cần hỏi" khi sử dụng Kính lúp thông minh của OrCam. Tương tác tự nhiên với trợ lý AI và nhận câu trả lời tức thì cho mọi thắc mắc của bạn, từ văn bản đến các chủ đề khác.',
+            'United States / English / USD': 'Việt Nam / Tiếng Việt / VND',
+            'United States / Tiếng Anh / USD': 'Việt Nam / Tiếng Việt / VND'
+        };
+
         var scope = root instanceof Element ? root : document;
-        var headerSelector = '#header a[href], header a[href]';
-        var links = scope.matches && scope.matches(headerSelector)
+
+        // 1. Dịch các đường link bằng URL hoặc text map
+        var links = scope.matches && scope.matches('a[href]')
             ? [scope]
-            : Array.prototype.slice.call(scope.querySelectorAll(headerSelector));
+            : Array.prototype.slice.call(scope.querySelectorAll('a[href]'));
 
         links.forEach(function (link) {
             if (link.matches('.desktop-header__logo, .mobile-header__logo')) {
@@ -52,81 +172,202 @@
             } catch (error) {
                 return;
             }
-            var label = labelsByPath[url.pathname.replace(/\/$/, '')];
-            if (label && link.textContent.trim() !== label) {
+            var pathKey = url.pathname.replace(/\/$/, '');
+            var label = labelsByPath[pathKey];
+            if (label && link.textContent.trim() !== label && !link.querySelector('img, svg')) {
                 link.textContent = label;
+                return;
             }
             if (url.hostname === 'careers.orcam.com' && link.textContent.trim() !== 'Tuyển dụng') {
                 link.textContent = 'Tuyển dụng';
+                return;
+            }
+            var rawText = link.textContent.trim();
+            if (textDict[rawText] && !link.querySelector('img, svg')) {
+                link.textContent = textDict[rawText];
+            }
+        });
+
+        // 2. Dịch các button, heading, text trong Mobile drawer, Submenu và Footer
+        var textTargets = scope.matches && scope.matches('button, p, span, h1, h2, h3, h4, h5, h6')
+            ? [scope]
+            : Array.prototype.slice.call(scope.querySelectorAll(
+                '.mobile-header__menu button, .mobile-header__menu p, .mobile-header__menu span, ' +
+                '.mobile-submenu-item p, .mobile-submenu-item button, ' +
+                '.mobile-footer button, .mobile-footer p, .mobile-footer a, .mobile-footer span, ' +
+                '.desktop-submenu p, .desktop-submenu button, ' +
+                '.desktop-footer p, .desktop-footer span, .desktop-footer a, ' +
+                'button, .p1, .p2, .p3, .p4, .h1, .h2, .h3, .h4, .h5, .h6'
+            ));
+
+        textTargets.forEach(function (el) {
+            if (el.querySelector && el.querySelector('img, svg, iframe, input, textarea, form')) {
+                return;
+            }
+            var text = el.textContent.trim();
+            if (textDict[text]) {
+                var icon = el.querySelector ? el.querySelector('.material-icons, i') : null;
+                if (icon) {
+                    Array.prototype.slice.call(el.childNodes).forEach(function (child) {
+                        if (child.nodeType === 3 && child.textContent.trim() && textDict[child.textContent.trim()]) {
+                            child.textContent = textDict[child.textContent.trim()];
+                        }
+                    });
+                } else {
+                    el.textContent = textDict[text];
+                }
             }
         });
     }
 
     /** Restore WooCommerce products after Svelte hydration rebuilds submenu for Low Vision. */
     function syncDynamicProductSubmenu() {
-        var submenu = document.querySelector('.desktop-submenu');
-        if (!submenu) return;
-
-        var logoEl = submenu.querySelector('.desktop-submenu__logo p');
-        var logoText = logoEl ? logoEl.textContent.trim() : '';
-        var isLowVision = (logoText === 'Thị lực kém' || logoText === 'Low Vision');
-
-        if (!isLowVision) {
-            // Remove any erroneously injected shop link from non-low-vision submenus (like Tài nguyên, Trường học, Learn)
-            var strayLinks = submenu.querySelectorAll('.desktop-submenu__items a');
-            Array.prototype.slice.call(strayLinks).forEach(function (link) {
-                if (link.textContent.trim() === 'Tất cả sản phẩm' || (link.getAttribute('href') && link.getAttribute('href').indexOf('/shop') !== -1)) {
-                    var parent = link.closest('.d-flex') || link;
-                    parent.remove();
-                }
-            });
-            return;
-        }
-
-        var container = submenu.querySelector('.desktop-submenu__items');
-        if (!container) return;
-
         var shopUrl = window.orcamShopUrl || (window.location.origin + '/vi/shop/');
-        var allLink = Array.prototype.find.call(container.querySelectorAll('a[href]'), function (link) {
-            try { return new URL(link.href, document.baseURI).href === new URL(shopUrl, document.baseURI).href; }
-            catch (error) { return false; }
-        });
-        if (!allLink) {
-            var allItem = document.createElement('div');
-            allItem.className = 'd-flex';
-            allLink = document.createElement('a');
-            allLink.className = 'p3 desktop-submenu__submenu-link svelte-alcb1y';
-            allLink.href = shopUrl;
-            allLink.target = '_self';
-            allLink.textContent = 'Tất cả sản phẩm';
-            allItem.appendChild(allLink);
-            container.insertBefore(allItem, container.firstChild);
-        } else if (allLink.parentElement !== container.firstElementChild) {
-            container.insertBefore(allLink.parentElement, container.firstChild);
+        var products = Array.isArray(window.orcamDynamicProducts) ? window.orcamDynamicProducts : [];
+        var isCurrentShop = false;
+        try {
+            isCurrentShop = (window.location.pathname.replace(/\/$/, '') === new URL(shopUrl, document.baseURI).pathname.replace(/\/$/, ''));
+        } catch (e) {
+            isCurrentShop = false;
         }
 
-        var products = Array.isArray(window.orcamDynamicProducts) ? window.orcamDynamicProducts : [];
-        products.forEach(function (product) {
-            var exists = Array.prototype.some.call(container.querySelectorAll('a[href]'), function (link) {
+        // 1. Desktop Submenu
+        var desktopSubmenu = document.querySelector('.desktop-submenu');
+        if (desktopSubmenu) {
+            var logoEl = desktopSubmenu.querySelector('.desktop-submenu__logo p');
+            var logoText = logoEl ? logoEl.textContent.trim() : '';
+            var isLowVision = (logoText === 'Thị lực kém' || logoText === 'Low Vision');
+
+            if (!isLowVision) {
+                // Remove any erroneously injected shop link from non-low-vision submenus (like Tài nguyên, Trường học, Learn)
+                var strayLinks = desktopSubmenu.querySelectorAll('.desktop-submenu__items a');
+                Array.prototype.slice.call(strayLinks).forEach(function (link) {
+                    if (link.textContent.trim() === 'Tất cả sản phẩm' || (link.getAttribute('href') && link.getAttribute('href').indexOf('/shop') !== -1)) {
+                        var parent = link.closest('.d-flex') || link;
+                        parent.remove();
+                    }
+                });
+            } else {
+                var container = desktopSubmenu.querySelector('.desktop-submenu__items');
+                if (container) {
+                    var allLink = Array.prototype.find.call(container.querySelectorAll('a[href]'), function (link) {
+                        try { return new URL(link.href, document.baseURI).pathname.replace(/\/$/, '') === new URL(shopUrl, document.baseURI).pathname.replace(/\/$/, ''); }
+                        catch (error) { return false; }
+                    });
+                    if (!allLink) {
+                        var allItem = document.createElement('div');
+                        allItem.className = 'd-flex';
+                        allLink = document.createElement('a');
+                        allLink.className = 'p3 desktop-submenu__submenu-link svelte-alcb1y' + (isCurrentShop ? ' orcam-submenu__active' : '');
+                        allLink.href = shopUrl;
+                        allLink.target = '_self';
+                        allLink.textContent = 'Tất cả sản phẩm';
+                        allItem.appendChild(allLink);
+                        container.insertBefore(allItem, container.firstChild);
+                    } else {
+                        var parentEl = allLink.closest('.d-flex') || allLink;
+                        if (parentEl !== container.firstElementChild) {
+                            container.insertBefore(parentEl, container.firstChild);
+                        }
+                    }
+
+                    products.forEach(function (product) {
+                        var exists = Array.prototype.some.call(container.querySelectorAll('a[href]'), function (link) {
+                            try {
+                                return new URL(link.href, document.baseURI).pathname.replace(/\/$/, '') === new URL(product.url, document.baseURI).pathname.replace(/\/$/, '');
+                            } catch (error) {
+                                return false;
+                            }
+                        });
+                        if (exists) {
+                            return;
+                        }
+
+                        var item = document.createElement('div');
+                        item.className = 'd-flex';
+                        var link = document.createElement('a');
+                        link.className = 'p3 desktop-submenu__submenu-link svelte-alcb1y';
+                        link.href = product.url;
+                        link.target = '_self';
+                        link.textContent = product.title;
+                        item.appendChild(link);
+                        container.appendChild(item);
+                    });
+                }
+            }
+        }
+
+        // 2. Mobile Submenu (.mobile-submenu-item)
+        var mobileSubmenus = document.querySelectorAll('.mobile-submenu-item');
+        Array.prototype.slice.call(mobileSubmenus).forEach(function (mobileSubmenu) {
+            var headerEl = mobileSubmenu.querySelector('.smui-accordion__header, .h5, p');
+            var headerText = headerEl ? headerEl.textContent.trim() : '';
+            var isMobileLowVision = (headerText.indexOf('Thị lực kém') !== -1 || headerText.indexOf('Low Vision') !== -1);
+
+            if (!isMobileLowVision) {
+                return;
+            }
+
+            var links = mobileSubmenu.querySelectorAll('a[href]');
+            var firstItemLink = Array.prototype.find.call(links, function (link) {
+                return link.matches('.mobile-submenu-item__item') || link.closest('.smui-paper__content') || link.closest('.smui-accordion__panel');
+            }) || links[0];
+
+            var mobileContainer = firstItemLink
+                ? firstItemLink.parentElement
+                : (mobileSubmenu.querySelector('.smui-paper__content') || mobileSubmenu.querySelector('.smui-accordion__panel') || mobileSubmenu);
+
+            if (!mobileContainer) {
+                return;
+            }
+
+            var allMobileLink = Array.prototype.find.call(mobileSubmenu.querySelectorAll('a[href]'), function (link) {
                 try {
-                    return new URL(link.href, document.baseURI).href === new URL(product.url, document.baseURI).href;
+                    return new URL(link.href, document.baseURI).pathname.replace(/\/$/, '') === new URL(shopUrl, document.baseURI).pathname.replace(/\/$/, '');
                 } catch (error) {
                     return false;
                 }
             });
-            if (exists) {
-                return;
+
+            if (!allMobileLink) {
+                allMobileLink = document.createElement('a');
+                allMobileLink.className = 'd-block black-text mobile-submenu-item__item fill-width p2 px-0 py-6 text-start svelte-1kk8lqw' + (isCurrentShop ? ' orcam-submenu__active' : '');
+                allMobileLink.href = shopUrl;
+                allMobileLink.target = '_self';
+                allMobileLink.textContent = 'Tất cả sản phẩm';
+
+                if (firstItemLink && firstItemLink.parentElement === mobileContainer) {
+                    mobileContainer.insertBefore(allMobileLink, firstItemLink);
+                } else if (mobileContainer.firstChild) {
+                    mobileContainer.insertBefore(allMobileLink, mobileContainer.firstChild);
+                } else {
+                    mobileContainer.appendChild(allMobileLink);
+                }
+            } else {
+                if (firstItemLink && allMobileLink !== mobileContainer.firstElementChild) {
+                    mobileContainer.insertBefore(allMobileLink, mobileContainer.firstElementChild);
+                }
             }
 
-            var item = document.createElement('div');
-            item.className = 'd-flex';
-            var link = document.createElement('a');
-            link.className = 'p3 desktop-submenu__submenu-link svelte-alcb1y';
-            link.href = product.url;
-            link.target = '_self';
-            link.textContent = product.title;
-            item.appendChild(link);
-            container.appendChild(item);
+            products.forEach(function (product) {
+                var exists = Array.prototype.some.call(mobileSubmenu.querySelectorAll('a[href]'), function (link) {
+                    try {
+                        return new URL(link.href, document.baseURI).pathname.replace(/\/$/, '') === new URL(product.url, document.baseURI).pathname.replace(/\/$/, '');
+                    } catch (error) {
+                        return false;
+                    }
+                });
+                if (exists) {
+                    return;
+                }
+
+                var productLink = document.createElement('a');
+                productLink.className = 'd-block black-text mobile-submenu-item__item fill-width p2 px-0 py-6 text-start svelte-1kk8lqw';
+                productLink.href = product.url;
+                productLink.target = '_self';
+                productLink.textContent = product.title;
+                mobileContainer.appendChild(productLink);
+            });
         });
     }
 
