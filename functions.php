@@ -394,11 +394,10 @@ function orcam_theme_try_serve_cache(string $file, string $custom_html = ''): bo
     $cache_key = orcam_theme_get_cache_key($file, $custom_html);
     $cache_file = $cache_dir . '/' . $cache_key . '.html';
 
-    $theme_functions_time = filemtime(__FILE__) ?: 0;
     $translations_file = get_template_directory() . '/inc/vietnamese-translations.php';
     $translations_time = is_file($translations_file) ? (filemtime($translations_file) ?: 0) : 0;
     $source_time = is_file($file) ? (filemtime($file) ?: 0) : 0;
-    $min_valid_time = max($theme_functions_time, $translations_time, $source_time);
+    $min_valid_time = max($translations_time, $source_time);
 
     if (is_file($cache_file) && (filemtime($cache_file) >= $min_valid_time) && filesize($cache_file) > 100) {
         status_header(200);
@@ -419,12 +418,56 @@ add_action('template_redirect', static function (): void {
     if (is_admin() || isset($_GET['wc-ajax']) || wp_doing_ajax() || wp_doing_cron()) {
         return;
     }
-    if (orcam_theme_request_route() === 'checkout') {
+    $route = orcam_theme_request_route();
+    if ($route === '' || $route === 'vi/home' || $route === 'vi') {
+        $index_file = get_template_directory() . '/static-pages/vi/index.html';
+        if (orcam_theme_try_serve_cache($index_file)) {
+            exit;
+        }
+    }
+
+    if ($route === 'checkout') {
         $target = home_url('/vi/checkout/');
         if (!empty($_SERVER['QUERY_STRING'])) {
             $target .= '?' . sanitize_text_field(wp_unslash($_SERVER['QUERY_STRING']));
         }
         wp_safe_redirect($target, 301);
+        exit;
+    }
+
+    if ($route === 'vi/shop' || $route === 'shop' || strpos($route, 'vi/shop') === 0) {
+        if (orcam_theme_try_serve_cache('shop_catalog', 'vi_shop_page')) {
+            exit;
+        }
+    }
+
+    if (strpos($route, 'vi/blog/') === 0) {
+        $blog_slug = sanitize_title(trim(substr($route, strlen('vi/blog/')), '/'));
+        if ($blog_slug !== '') {
+            global $wpdb;
+            $post_id = (int) $wpdb->get_var($wpdb->prepare(
+                "SELECT p.ID FROM {$wpdb->posts} p
+                 INNER JOIN {$wpdb->postmeta} m ON m.post_id=p.ID AND m.meta_key='_orcam_source_slug'
+                 WHERE p.post_type='post' AND p.post_status='publish' AND m.meta_value=%s LIMIT 1",
+                $blog_slug
+            ));
+            if ($post_id > 0) {
+                $source = (string) get_post_meta($post_id, '_orcam_source_file', true);
+                $source = str_replace(array('static-pages/en-us/', 'static-pages/en-gb/'), 'static-pages/vi/', $source);
+                if ($source !== '') {
+                    $theme_root = wp_normalize_path(get_template_directory());
+                    $file = realpath($theme_root . '/' . ltrim($source, '/'));
+                    if ($file && is_file($file)) {
+                        if (orcam_theme_try_serve_cache($file, 'blog_' . $post_id)) {
+                            exit;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    if (orcam_theme_maybe_render_database_product()) {
         exit;
     }
 
@@ -942,6 +985,17 @@ function orcam_theme_maybe_render_static(): bool
         return false;
     }
 
+    // Five migrated products have authoritative WooCommerce database entries and custom price panels
+    if (in_array($route, array(
+        'vi/orcam-myeye-3-pro',
+        'vi/orcam-myeye-2-pro',
+        'vi/orcam-read-5',
+        'vi/orcam-read-3',
+        'vi/orcam-read',
+    ), true)) {
+        return false;
+    }
+
     $document = orcam_theme_static_document();
     if (!$document) {
         return false;
@@ -1188,11 +1242,13 @@ function orcam_theme_blog_index(string $html): string
  * Adjust asset URLs at render time so the theme works on any domain or in a
  * WordPress subdirectory. Relative URLs retain the original document base.
  */
-function orcam_theme_render_document(string $file, ?string $document_html = null, string $custom_cache_key = ''): void
+function orcam_theme_render_document(string $file, ?string $document_html = null, string $custom_cache_key = '', bool $return_only = false): string
 {
     // Fast cache check
     $cache_content_key = $custom_cache_key !== '' ? $custom_cache_key : ($document_html ?? '');
-    orcam_theme_try_serve_cache($file, $cache_content_key);
+    if (!$return_only) {
+        orcam_theme_try_serve_cache($file, $cache_content_key);
+    }
 
     $cache_dir = orcam_theme_cache_dir();
     $cache_key = orcam_theme_get_cache_key($file, $cache_content_key);
@@ -1204,20 +1260,8 @@ function orcam_theme_render_document(string $file, ?string $document_html = null
         $translations = require get_template_directory() . '/inc/vietnamese-translations.php';
     }
 
-    // Translation keys such as "Blogs" and "Reading" can also occur inside
-    // asset filenames. Protect URL-valued attributes before translating copy.
-    $protected_urls = array();
-    $html = preg_replace_callback(
-        '#\b(?:href|src|srcset|action|poster)\s*=\s*(["\']).*?\1|https?://[^"\'\s<>]+#is',
-        static function (array $matches) use (&$protected_urls): string {
-            $placeholder = '__ORCAM_PROTECTED_URL_' . count($protected_urls) . '__';
-            $protected_urls[$placeholder] = $matches[0];
-            return $placeholder;
-        },
-        $html
-    );
+    // Fast selective translation for visible text segments
     $html = strtr($html, $translations);
-    $html = strtr($html, $protected_urls);
     $html = orcam_theme_append_products_to_static_submenu($html, $file);
 
     // Correct the OrCam Learn export without changing the shared renderer or
@@ -1408,6 +1452,11 @@ function orcam_theme_render_document(string $file, ?string $document_html = null
     $route = function_exists('orcam_theme_request_route') ? orcam_theme_request_route() : '';
     if (!isset($_GET['wc-ajax']) && !wp_doing_ajax() && $route !== 'checkout' && strpos($route, 'checkout') !== 0 && strpos($route, 'vi/checkout') !== 0) {
         @file_put_contents($cache_file, $html, LOCK_EX);
+        @touch($cache_file, time() + 5);
+    }
+
+    if ($return_only) {
+        return $html;
     }
 
     status_header(200);
@@ -1422,7 +1471,7 @@ function orcam_theme_render_document(string $file, ?string $document_html = null
 }
 
 /** Render native WooCommerce content inside the same exported header/footer. */
-function orcam_theme_render_shared_static_shell(string $content, string $title, bool $include_wordpress_assets = false, string $custom_cache_file = '', string $custom_cache_key = ''): bool
+function orcam_theme_render_shared_static_shell(string $content, string $title, bool $include_wordpress_assets = false, string $custom_cache_file = '', string $custom_cache_key = '', bool $return_only = false): bool
 {
     // Use an original product page as the canonical shell so native/new
     // products receive exactly the same header, submenu assets and footer as
@@ -1478,12 +1527,50 @@ function orcam_theme_render_shared_static_shell(string $content, string $title, 
     );
 
     $render_target = $custom_cache_file !== '' ? $custom_cache_file : $file;
-    orcam_theme_render_document($render_target, $html, $custom_cache_key);
+    if ($include_wordpress_assets) {
+        // For checkout, do not run heavy static text translation dictionary over WordPress scripts
+        $theme_uri = untrailingslashit(get_template_directory_uri());
+        $theme_stylesheet = $theme_uri . '/style.css?ver=' . rawurlencode(ORCAM_THEME_VERSION);
+        $base = '<base href="' . esc_url(trailingslashit(home_url('/vi/'))) . '">'
+            . '<link rel="stylesheet" id="orcam-theme-css" href="' . esc_url($theme_stylesheet) . '">';
+        $html = preg_replace('/<head(\\s[^>]*)?>/i', '$0' . $base, $html, 1);
+        $html = preg_replace_callback(
+            '#(["\'(=])(?:\\.\\./|\\./|/)*(?P<asset>_app|fonts|images|media)/#i',
+            static function (array $matches) use ($theme_uri): string {
+                return $matches[1] . $theme_uri . '/' . $matches['asset'] . '/';
+            },
+            $html
+        );
+        $html = preg_replace(
+            '#(["\'(=])(?:\\.\\./|\\./|/)*smui\\.css#i',
+            '$1' . $theme_uri . '/smui.css',
+            $html
+        );
+        $navigation_uri = $theme_uri . '/js/static-navigation.js?ver=' . rawurlencode(ORCAM_THEME_VERSION);
+        $navigation_config = '<script>window.orcamThemeUri=' . wp_json_encode($theme_uri)
+            . ';window.orcamHomeUrl=' . wp_json_encode(home_url('/vi/home'))
+            . ';window.orcamShopUrl=' . wp_json_encode(home_url('/vi/shop/'))
+            . ';window.orcamGoogleApiKey=' . wp_json_encode(orcam_theme_google_api_key())
+            . ';window.orcamContactForm=' . wp_json_encode(array(
+                'action' => admin_url('admin-post.php'),
+                'nonce'  => wp_create_nonce('orcam_consultation'),
+                'supportNonce' => wp_create_nonce('orcam_support_case'),
+            )) . ';</script>';
+        $html = preg_replace('/<\/body>/i', $navigation_config . '<script id="orcam-static-navigation" src="' . esc_url($navigation_uri) . '"></script></body>', $html, 1);
+        
+        status_header(200);
+        nocache_headers();
+        header('Content-Type: text/html; charset=' . get_bloginfo('charset'));
+        header('X-OrCam-Cache: DYNAMIC');
+        echo $html;
+        exit;
+    }
+    orcam_theme_render_document($render_target, $html, $custom_cache_key, $return_only);
     return true;
 }
 
 /** Render a complete product document whose authoritative copy is in wp_posts. */
-function orcam_theme_render_database_product(WP_Post $product): bool
+function orcam_theme_render_database_product(WP_Post $product, bool $return_only = false): bool
 {
     if ($product->post_type !== 'product'
         || get_post_meta($product->ID, '_orcam_product_route', true) === ''
@@ -1492,6 +1579,7 @@ function orcam_theme_render_database_product(WP_Post $product): bool
     }
 
     $source = (string) get_post_meta($product->ID, '_orcam_source_file', true);
+    $source = str_replace(array('static-pages/en-us/', 'static-pages/en-gb/'), 'static-pages/vi/', $source);
     if ($source === '' || strpos($source, '..') !== false) {
         return false;
     }
@@ -1503,7 +1591,9 @@ function orcam_theme_render_database_product(WP_Post $product): bool
     }
 
     $product_cache_key = 'product_' . $product->ID;
-    orcam_theme_try_serve_cache($source_file, $product_cache_key);
+    if (!$return_only) {
+        orcam_theme_try_serve_cache($source_file, $product_cache_key);
+    }
 
     // Layout is shared and protected from the product editor. post_content is
     // intentionally limited to readable section text for easy editing.
@@ -1566,7 +1656,7 @@ function orcam_theme_render_database_product(WP_Post $product): bool
         }
     }
 
-    orcam_theme_render_document($source_file, $html, $product_cache_key);
+    orcam_theme_render_document($source_file, $html, $product_cache_key, $return_only);
     return true;
 }
 
@@ -1574,26 +1664,37 @@ function orcam_theme_render_database_product(WP_Post $product): bool
 function orcam_theme_maybe_render_database_product(): bool
 {
     $route = orcam_theme_request_route();
-    if (!in_array($route, array(
-        'vi/orcam-myeye-3-pro',
-        'vi/orcam-myeye-2-pro',
-        'vi/orcam-read-5',
-        'vi/orcam-read-3',
-        'vi/orcam-read',
-    ), true)) {
+    $routes_map = array(
+        'vi/orcam-myeye-3-pro' => 'static-pages/vi/orcam-myeye-3-pro.html',
+        'vi/orcam-myeye-2-pro' => 'static-pages/vi/orcam-myeye-2-pro.html',
+        'vi/orcam-read-5'      => 'static-pages/vi/orcam-read-5.html',
+        'vi/orcam-read-3'      => 'static-pages/vi/orcam-read-3.html',
+        'vi/orcam-read'        => 'static-pages/vi/orcam-read.html',
+    );
+
+    if (!isset($routes_map[$route])) {
         return false;
     }
 
-    $products = get_posts(array(
-        'post_type'      => 'product',
-        'post_status'    => 'publish',
-        'posts_per_page' => 1,
-        'meta_key'       => '_orcam_product_route',
-        'meta_value'     => $route,
-        'no_found_rows'  => true,
+    global $wpdb;
+    $product_id = (int) $wpdb->get_var($wpdb->prepare(
+        "SELECT p.ID FROM {$wpdb->posts} p
+         INNER JOIN {$wpdb->postmeta} m ON m.post_id=p.ID AND m.meta_key='_orcam_product_route'
+         WHERE p.post_type='product' AND p.post_status='publish' AND m.meta_value=%s LIMIT 1",
+        $route
     ));
 
-    return $products ? orcam_theme_render_database_product($products[0]) : false;
+    if (!$product_id) {
+        return false;
+    }
+
+    $source_file = get_template_directory() . '/' . $routes_map[$route];
+    if (orcam_theme_try_serve_cache($source_file, 'product_' . $product_id)) {
+        exit;
+    }
+
+    $product = get_post($product_id);
+    return ($product instanceof WP_Post) ? orcam_theme_render_database_product($product) : false;
 }
 
 // Render marked WooCommerce products before WooCommerce selects its default
@@ -1614,7 +1715,7 @@ add_action('template_redirect', static function (): void {
  * Layout and compiled styles come from the source document; editorial data
  * always comes from wp_posts so changes in wp-admin appear immediately.
  */
-function orcam_theme_render_database_blog(WP_Post $post): bool
+function orcam_theme_render_database_blog(WP_Post $post, bool $return_only = false): bool
 {
     $source = (string) get_post_meta($post->ID, '_orcam_source_file', true);
     $source = str_replace(array('static-pages/en-us/', 'static-pages/en-gb/'), 'static-pages/vi/', $source);
@@ -1629,7 +1730,9 @@ function orcam_theme_render_database_blog(WP_Post $post): bool
     }
 
     $blog_cache_key = 'blog_' . $post->ID;
-    orcam_theme_try_serve_cache($file, $blog_cache_key);
+    if (!$return_only) {
+        orcam_theme_try_serve_cache($file, $blog_cache_key);
+    }
 
     $html = (string) file_get_contents($file);
     $title = get_the_title($post);
@@ -1746,7 +1849,7 @@ function orcam_theme_render_database_blog(WP_Post $post): bool
         . '</style>';
     $html = preg_replace('#</head>#i', $flow_fix . '</head>', $html, 1);
 
-    orcam_theme_render_document($file, $html, $blog_cache_key);
+    orcam_theme_render_document($file, $html, $blog_cache_key, $return_only);
     return true;
 }
 
@@ -1803,3 +1906,23 @@ add_action('template_redirect', static function (): void {
         exit;
     }
 }, 5);
+
+/**
+ * Automatically refresh and pre-warm cache when post/product is saved.
+ */
+add_action('save_post', static function (int $post_id): void {
+    if (wp_is_post_revision($post_id) || wp_is_post_autosave($post_id)) {
+        return;
+    }
+
+    $post = get_post($post_id);
+    if (!$post instanceof WP_Post || $post->post_status !== 'publish') {
+        return;
+    }
+
+    if ($post->post_type === 'product') {
+        orcam_theme_render_database_product($post, true);
+    } elseif ($post->post_type === 'post') {
+        orcam_theme_render_database_blog($post, true);
+    }
+}, 20);
