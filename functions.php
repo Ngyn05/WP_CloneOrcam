@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('ORCAM_THEME_VERSION', '2.1.3');
+define('ORCAM_THEME_VERSION', '2.1.8');
 define('ORCAM_USERWAY_ACCOUNT', 't2KpHXGp9h');
 
 add_action('after_setup_theme', static function () {
@@ -93,6 +93,126 @@ add_filter('tiny_mce_before_init', static function (array $settings): array {
     $settings['content_style'] = ($settings['content_style'] ?? '')
         . 'body{max-width:900px;margin:0 auto;padding:32px;}';
     return $settings;
+});
+
+/** Load the same compiled styles used by the public product into TinyMCE. */
+add_filter('mce_css', static function (string $stylesheets): string {
+    $post_id = isset($_GET['post']) ? absint($_GET['post']) : 0;
+    if ($post_id < 1
+        || get_post_type($post_id) !== 'product'
+        || get_post_meta($post_id, '_orcam_full_document', true) !== 'yes') {
+        return $stylesheets;
+    }
+
+    $source = (string) get_post_meta($post_id, '_orcam_source_file', true);
+    $file = $source !== '' ? get_template_directory() . '/' . ltrim($source, '/') : '';
+    $css_urls = array(
+        get_template_directory_uri() . '/editor-style.css',
+        get_template_directory_uri() . '/style.css',
+    );
+
+    if ($file !== '' && is_readable($file)) {
+        $html = (string) file_get_contents($file);
+        if (preg_match_all('#<link\b[^>]*>#i', $html, $matches)) {
+            foreach ($matches[0] as $link_tag) {
+                if (!preg_match('#\brel=["\'][^"\']*stylesheet[^"\']*["\']#i', $link_tag)
+                    || !preg_match('#\bhref=["\']([^"\']+)["\']#i', $link_tag, $href_match)) {
+                    continue;
+                }
+                $href = $href_match[1];
+                if (str_starts_with($href, '../')) {
+                    $relative = substr($href, 3);
+                    if (is_file(get_template_directory() . '/' . rawurldecode($relative))) {
+                        $css_urls[] = get_template_directory_uri() . '/' . $relative;
+                    }
+                }
+            }
+        }
+    }
+
+    $css_urls = array_values(array_unique(array_map(static function (string $url): string {
+        return add_query_arg('ver', ORCAM_THEME_VERSION, $url);
+    }, $css_urls)));
+
+    return implode(',', array_filter(array_merge(
+        $stylesheets !== '' ? explode(',', $stylesheets) : array(),
+        $css_urls
+    )));
+});
+
+/** Give the product Visual editor enough room to resemble the public page. */
+add_action('admin_head-post.php', static function (): void {
+    $post_id = isset($_GET['post']) ? absint($_GET['post']) : 0;
+    if ($post_id < 1 || get_post_meta($post_id, '_orcam_full_document', true) !== 'yes') {
+        return;
+    }
+    echo '<style id="orcam-product-editor-admin-style">'
+        . '#postdivrich{width:100%;max-width:none}'
+        . '#postdivrich .mce-edit-area iframe{min-height:900px!important;background:#fff}'
+        . '#postdivrich .wp-editor-container{border-color:#8c8f94}'
+        . '</style>';
+});
+
+// Product descriptions now contain text only. Remove the old live preview
+// box and use the normal lightweight editor stylesheet.
+add_action('add_meta_boxes_product', static function (): void {
+    remove_meta_box('orcam-product-live-preview', 'product', 'normal');
+}, 100);
+
+add_filter('mce_css', static function (string $stylesheets): string {
+    $post_id = isset($_GET['post']) ? absint($_GET['post']) : 0;
+    if ($post_id > 0 && get_post_type($post_id) === 'product'
+        && get_post_meta($post_id, '_orcam_full_document', true) === 'yes') {
+        return add_query_arg('ver', ORCAM_THEME_VERSION, get_template_directory_uri() . '/editor-style.css');
+    }
+    return $stylesheets;
+}, 1000);
+
+/**
+ * TinyMCE cannot execute the compiled Svelte application. Provide an exact,
+ * live rendering beside the editor so visual changes can be checked without
+ * leaving the WooCommerce product screen.
+ */
+add_action('add_meta_boxes_product', static function (): void {
+    global $post;
+    if (!$post instanceof WP_Post || get_post_meta($post->ID, '_orcam_full_document', true) !== 'yes') {
+        return;
+    }
+
+    add_meta_box(
+        'orcam-product-live-preview',
+        __('Xem trước giao diện thật', 'orcam-theme'),
+        static function (WP_Post $product): void {
+            $url = get_permalink($product);
+            echo '<div class="orcam-product-preview-toolbar">';
+            echo '<strong>Trang WooCommerce đang hiển thị thực tế</strong>';
+            echo '<span>Nhấn Cập nhật rồi Tải lại bản xem trước để kiểm tra thay đổi.</span>';
+            echo '<button type="button" class="button" id="orcam-refresh-product-preview">Tải lại bản xem trước</button>';
+            echo '<a class="button button-primary" href="' . esc_url($url) . '" target="_blank" rel="noopener">Mở trang thật</a>';
+            echo '</div>';
+            echo '<iframe id="orcam-product-live-preview-frame" src="' . esc_url(add_query_arg('orcam_admin_preview', '1', $url)) . '"'
+                . ' title="Xem trước ' . esc_attr(get_the_title($product)) . '" loading="eager"></iframe>';
+            echo '<script>(function(){var button=document.getElementById("orcam-refresh-product-preview"),frame=document.getElementById("orcam-product-live-preview-frame");'
+                . 'if(button&&frame){button.addEventListener("click",function(){var url=new URL(frame.src);url.searchParams.set("preview_refresh",Date.now());frame.src=url.toString();});}})();</script>';
+        },
+        'product',
+        'normal',
+        'high'
+    );
+});
+
+add_action('admin_head-post.php', static function (): void {
+    $post_id = isset($_GET['post']) ? absint($_GET['post']) : 0;
+    if ($post_id < 1 || get_post_meta($post_id, '_orcam_full_document', true) !== 'yes') {
+        return;
+    }
+    echo '<style id="orcam-product-live-preview-style">'
+        . '#orcam-product-live-preview .inside{margin:0;padding:0}'
+        . '.orcam-product-preview-toolbar{align-items:center;background:#f6f7f7;border-bottom:1px solid #c3c4c7;display:flex;flex-wrap:wrap;gap:10px;padding:12px}'
+        . '.orcam-product-preview-toolbar strong{font-size:14px}'
+        . '.orcam-product-preview-toolbar span{color:#646970;margin-right:auto}'
+        . '#orcam-product-live-preview-frame{background:#fff;border:0;display:block;height:900px;width:100%}'
+        . '</style>';
 });
 
 add_action('wp_enqueue_scripts', static function () {
@@ -188,6 +308,420 @@ function orcam_theme_handle_support_case(): void
 add_action('admin_post_nopriv_orcam_support_case', 'orcam_theme_handle_support_case');
 add_action('admin_post_orcam_support_case', 'orcam_theme_handle_support_case');
 
+/** Keep every WooCommerce product and shop below the public /vi route. */
+add_action('init', static function (): void {
+    add_rewrite_rule('^vi/shop/?$', 'index.php?orcam_shop=1', 'top');
+    add_rewrite_rule('^vi/checkout/?$', 'index.php?orcam_checkout=1', 'top');
+    add_rewrite_rule('^vi/checkout/order-pay/([0-9]+)/?$', 'index.php?orcam_checkout=1&order-pay=$matches[1]', 'top');
+    add_rewrite_rule('^vi/checkout/order-received/([0-9]+)/?$', 'index.php?orcam_checkout=1&order-received=$matches[1]', 'top');
+
+    $slugs = array('orcam-myeye-3-pro', 'orcam-myeye-2-pro', 'orcam-read-5', 'orcam-read-3', 'orcam-read');
+    $published_products = get_posts(array(
+        'post_type'      => 'product',
+        'post_status'    => 'publish',
+        'posts_per_page' => -1,
+        'fields'         => 'ids',
+    ));
+    foreach ($published_products as $product_id) {
+        $slug = get_post_field('post_name', $product_id);
+        if ($slug !== '') {
+            $slugs[] = $slug;
+        }
+    }
+
+    foreach (array_unique($slugs) as $slug) {
+        add_rewrite_rule(
+            '^vi/' . preg_quote($slug, '#') . '/?$',
+            'index.php?post_type=product&name=' . $slug,
+            'top'
+        );
+    }
+});
+
+add_filter('post_type_link', static function (string $url, WP_Post $post): string {
+    if ($post->post_type !== 'product') {
+        return $url;
+    }
+
+    $route = trim((string) get_post_meta($post->ID, '_orcam_product_route', true), '/');
+    return $route !== ''
+        ? home_url('/' . $route . '/')
+        : home_url('/vi/' . $post->post_name . '/');
+}, 10, 2);
+
+/** Keep the complete WooCommerce checkout flow below /vi. */
+add_filter('woocommerce_get_checkout_url', static function (): string {
+    return home_url('/vi/checkout/');
+});
+
+add_filter('page_link', static function (string $url, int $post_id): string {
+    return function_exists('wc_get_page_id') && $post_id === wc_get_page_id('checkout')
+        ? home_url('/vi/checkout/')
+        : $url;
+}, 10, 2);
+
+add_action('template_redirect', static function (): void {
+    if (orcam_theme_request_route() !== 'checkout') {
+        return;
+    }
+    $target = home_url('/vi/checkout/');
+    if (!empty($_SERVER['QUERY_STRING'])) {
+        $target .= '?' . sanitize_text_field(wp_unslash($_SERVER['QUERY_STRING']));
+    }
+    wp_safe_redirect($target, 301);
+    exit;
+});
+
+/**
+ * Streamlined Vietnamese checkout: Phone first (required), then Email, Name, Address.
+ */
+add_filter('woocommerce_checkout_fields', static function (array $fields): array {
+    $fields['billing'] = array(
+        'billing_phone' => array(
+            'label'        => 'Số điện thoại',
+            'placeholder'  => 'Nhập số điện thoại (bắt buộc)',
+            'required'     => true,
+            'class'        => array('form-row-wide'),
+            'clear'        => true,
+            'priority'     => 10,
+            'validate'     => array('phone'),
+        ),
+        'billing_email' => array(
+            'label'        => 'Email',
+            'placeholder'  => 'Nhập địa chỉ email (không bắt buộc)',
+            'required'     => false,
+            'class'        => array('form-row-wide'),
+            'clear'        => true,
+            'priority'     => 20,
+        ),
+        'billing_first_name' => array(
+            'label'        => 'Họ và tên',
+            'placeholder'  => 'Nhập họ và tên',
+            'required'     => false,
+            'class'        => array('form-row-wide'),
+            'clear'        => true,
+            'priority'     => 30,
+        ),
+        'billing_address_1' => array(
+            'label'        => 'Địa chỉ',
+            'placeholder'  => 'Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành',
+            'required'     => false,
+            'class'        => array('form-row-wide'),
+            'clear'        => true,
+            'priority'     => 40,
+        ),
+    );
+
+    unset($fields['shipping']);
+
+    $fields['order']['customer_intent'] = array(
+        'type'        => 'radio',
+        'label'       => 'Hình thức phục vụ mong muốn',
+        'class'       => array('form-row-wide', 'orcam-checkout-intent'),
+        'required'    => false,
+        'default'     => 'cod',
+        'options'     => array(
+            'cod'     => 'Giao hàng và thanh toán khi nhận hàng (COD)',
+            'consult' => 'Tư vấn chuyên sâu về sản phẩm & hỗ trợ phương thức thanh toán',
+        ),
+        'priority'    => 5,
+    );
+
+    if (isset($fields['order']['order_comments'])) {
+        $fields['order']['order_comments']['label'] = 'Ghi chú đơn hàng';
+        $fields['order']['order_comments']['placeholder'] = 'Ghi chú thêm về đơn hàng hoặc thời gian giao hàng...';
+        $fields['order']['order_comments']['required'] = false;
+        $fields['order']['order_comments']['class'] = array('form-row-wide');
+        $fields['order']['order_comments']['priority'] = 15;
+    }
+
+    return $fields;
+}, 99);
+
+/** Save chosen intent option into order metadata */
+add_action('woocommerce_checkout_update_order_meta', static function (int $order_id): void {
+    if (!empty($_POST['customer_intent'])) {
+        $intent_key = sanitize_text_field(wp_unslash($_POST['customer_intent']));
+        $intent_label = $intent_key === 'consult'
+            ? 'Tư vấn chuyên sâu về sản phẩm & hỗ trợ phương thức thanh toán'
+            : 'Giao hàng và thanh toán khi nhận hàng (COD)';
+        update_post_meta($order_id, '_customer_intent', $intent_label);
+    }
+});
+
+add_action('woocommerce_admin_order_data_after_billing_address', static function (WC_Order $order): void {
+    $intent = get_post_meta($order->get_id(), '_customer_intent', true);
+    if ($intent) {
+        echo '<p><strong>Hình thức yêu cầu:</strong> ' . esc_html($intent) . '</p>';
+    }
+});
+
+add_filter('woocommerce_billing_fields', static function (array $fields): array {
+    return array(
+        'billing_phone' => array(
+            'label'        => 'Số điện thoại',
+            'placeholder'  => 'Nhập số điện thoại (bắt buộc)',
+            'required'     => true,
+            'class'        => array('form-row-wide'),
+            'clear'        => true,
+            'priority'     => 10,
+        ),
+        'billing_email' => array(
+            'label'        => 'Email',
+            'placeholder'  => 'Nhập địa chỉ email (không bắt buộc)',
+            'required'     => false,
+            'class'        => array('form-row-wide'),
+            'clear'        => true,
+            'priority'     => 20,
+        ),
+        'billing_first_name' => array(
+            'label'        => 'Họ và tên',
+            'placeholder'  => 'Nhập họ và tên',
+            'required'     => false,
+            'class'        => array('form-row-wide'),
+            'clear'        => true,
+            'priority'     => 30,
+        ),
+        'billing_address_1' => array(
+            'label'        => 'Địa chỉ',
+            'placeholder'  => 'Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành',
+            'required'     => false,
+            'class'        => array('form-row-wide'),
+            'clear'        => true,
+            'priority'     => 40,
+        ),
+    );
+}, 99);
+
+add_filter('woocommerce_default_address_fields', static function (array $fields): array {
+    $fields['first_name']['required'] = false;
+    $fields['last_name']['required'] = false;
+    $fields['address_1']['required'] = false;
+    $fields['city']['required'] = false;
+    $fields['state']['required'] = false;
+    $fields['postcode']['required'] = false;
+    $fields['country']['required'] = false;
+    return $fields;
+}, 99);
+
+// Render clean non-nested Voucher box inside Additional Information
+remove_action('woocommerce_before_checkout_form', 'woocommerce_checkout_coupon_form', 10);
+add_action('woocommerce_after_order_notes', static function (): void {
+    ?>
+    <div class="orcam-voucher-box">
+        <label for="orcam_coupon_input" class="orcam-voucher-box__label">Mã ưu đãi / Voucher</label>
+        <div class="orcam-voucher-box__group">
+            <input type="text" id="orcam_coupon_input" name="orcam_coupon_code" placeholder="Nhập mã giảm giá..." />
+            <button type="button" id="orcam_apply_coupon_btn">Áp dụng</button>
+        </div>
+    </div>
+    <script>
+    (function() {
+        function setupVoucher() {
+            var btn = document.getElementById('orcam_apply_coupon_btn');
+            var input = document.getElementById('orcam_coupon_input');
+            if (!btn || !input || btn.dataset.bound) return;
+            btn.dataset.bound = 'true';
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                var code = (input.value || '').trim();
+                if (!code) {
+                    alert('Vui lòng nhập mã ưu đãi.');
+                    return;
+                }
+                btn.disabled = true;
+                btn.textContent = 'Đang áp dụng...';
+                if (window.jQuery && window.wc_checkout_params) {
+                    window.jQuery.ajax({
+                        type: 'POST',
+                        url: window.wc_checkout_params.wc_ajax_url.toString().replace('%%endpoint%%', 'apply_coupon'),
+                        data: {
+                            security: window.wc_checkout_params.apply_coupon_nonce,
+                            coupon_code: code
+                        },
+                        success: function(res) {
+                            window.jQuery('.woocommerce-error, .woocommerce-message').remove();
+                            window.jQuery('form.woocommerce-checkout').before(res);
+                            window.jQuery(document.body).trigger('update_checkout', { update_shipping_method: false });
+                        },
+                        complete: function() {
+                            btn.disabled = false;
+                            btn.textContent = 'Áp dụng';
+                        },
+                        dataType: 'html'
+                    });
+                }
+            });
+        }
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', setupVoucher);
+        } else {
+            setupVoucher();
+        }
+        document.addEventListener('ajaxComplete', setupVoucher);
+    })();
+    </script>
+    <?php
+}, 10);
+
+/** Vietnamese privacy policy and payment methods notices */
+add_filter('woocommerce_checkout_privacy_policy_text', static function (): string {
+    return 'Thông tin cá nhân của bạn sẽ được sử dụng để xử lý đơn hàng, hỗ trợ trải nghiệm của bạn trên website và cho các mục đích khác theo <a href="' . esc_url(home_url('/vi/privacy-policy/')) . '" class="woocommerce-privacy-policy-link" target="_blank">chính sách bảo mật</a>.';
+});
+
+add_filter('woocommerce_no_available_payment_methods_message', static function (): string {
+    return 'Hiện tại đơn hàng sẽ được nhân viên của OrCam liên hệ trực tiếp để xác nhận và hướng dẫn thanh toán chi tiết cho bạn.';
+});
+
+add_filter('woocommerce_coupon_message', static function (string $msg, int $msg_code, $coupon = null): string {
+    if ($coupon instanceof WC_Coupon) {
+        return sprintf('Áp dụng mã ưu đãi "%s" thành công.', $coupon->get_code());
+    }
+    return 'Áp dụng mã ưu đãi thành công.';
+}, 20, 3);
+
+add_filter('woocommerce_coupon_error', static function (string $err, int $err_code, $coupon = null): string {
+    static $errors = array(
+        100 => 'Mã giảm giá không tồn tại!',
+        101 => 'Mã giảm giá này đã được áp dụng trước đó!',
+        102 => 'Mã giảm giá này không thể dùng chung với các mã khác.',
+        103 => 'Mã giảm giá này không áp dụng cho sản phẩm trong đơn hàng.',
+        104 => 'Mã giảm giá này đã hết lượt sử dụng.',
+        105 => 'Mã giảm giá này đã hết hạn sử dụng.',
+        106 => 'Đơn hàng chưa đạt giá trị tối thiểu để áp dụng mã này.',
+        107 => 'Đơn hàng đã vượt quá giá trị tối đa để áp dụng mã này.',
+        108 => 'Mã giảm giá này không áp dụng cho các sản phẩm đang giảm giá.',
+        109 => 'Vui lòng nhập mã giảm giá.',
+        110 => 'Mã giảm giá không hợp lệ và đã bị gỡ bỏ.',
+    );
+    return $errors[$err_code] ?? 'Mã giảm giá không hợp lệ hoặc đã hết hạn sử dụng.';
+}, 20, 3);
+
+/** Complete Vietnamese translations for WooCommerce checkout & order details. */
+add_filter('gettext', static function (string $translation, string $text, string $domain): string {
+    static $translations = array(
+        'Checkout' => 'Thanh toán',
+        'Billing details' => 'Thông tin người nhận',
+        'Billing Details' => 'Thông tin người nhận',
+        'Customer details' => 'Thông tin khách hàng',
+        'Additional information' => 'Hình thức phục vụ & Ghi chú',
+        'Additional Information' => 'Hình thức phục vụ & Ghi chú',
+        'Your order' => 'Đơn hàng của bạn',
+        'Your Order' => 'Đơn hàng của bạn',
+        'Product' => 'Sản phẩm',
+        'Subtotal' => 'Tạm tính',
+        'Total' => 'Tổng cộng',
+        'Place order' => 'Xác nhận đặt hàng',
+        'Place Order' => 'Xác nhận đặt hàng',
+        'Order notes' => 'Ghi chú đơn hàng',
+        'Order notes (optional)' => 'Ghi chú đơn hàng (không bắt buộc)',
+        'Notes about your order, e.g. special notes for delivery.' => 'Ghi chú thêm về đơn hàng hoặc thời gian nhận hàng...',
+        'Have a coupon?' => 'Bạn có mã ưu đãi / voucher?',
+        'Click here to enter your code' => 'Nhấn vào đây để nhập mã',
+        'Coupon code' => 'Mã ưu đãi / Voucher',
+        'Apply coupon' => 'Áp dụng',
+        'Apply Coupon' => 'Áp dụng',
+        'Coupon:' => 'Mã giảm giá:',
+        'If you have a coupon code, please apply it below.' => 'Nếu bạn có mã giảm giá hoặc Voucher, vui lòng nhập bên dưới:',
+        'Ship to a different address?' => 'Giao hàng đến địa chỉ khác?',
+        'Returning customer?' => 'Bạn đã từng mua hàng?',
+        'Click here to login' => 'Nhấn vào đây để đăng nhập',
+        'Payment' => 'Phương thức thanh toán',
+        'Payment methods' => 'Phương thức thanh toán',
+        'Payment Methods' => 'Phương thức thanh toán',
+        'Cash on delivery' => 'Thanh toán khi nhận hàng (COD)',
+        'Pay with cash upon delivery.' => 'Thanh toán bằng tiền mặt trực tiếp khi nhận hàng.',
+        'Direct bank transfer' => 'Chuyển khoản ngân hàng',
+        'Make your payment directly into our bank account. Please use your Order ID as the payment reference. Your order will not be shipped until the funds have cleared in our account.' => 'Vui lòng chuyển khoản trực tiếp vào tài khoản ngân hàng của chúng tôi với nội dung là Mã đơn hàng. Đơn hàng sẽ được nhân viên liên hệ xác nhận ngay.',
+        'Sorry, it seems that there are no available payment methods. Please contact us if you require assistance or wish to make alternate arrangements.' => 'Hiện tại đơn hàng sẽ được nhân viên liên hệ trực tiếp để xác nhận và hướng dẫn thanh toán chi tiết cho bạn.',
+        'Sorry, it seems that there are no available payment methods.' => 'Hiện tại đơn hàng sẽ được nhân viên liên hệ trực tiếp để xác nhận và hướng dẫn thanh toán chi tiết cho bạn.',
+        'Your personal data will be used to process your order, support your experience throughout this website, and for other purposes described in our %s.' => 'Thông tin cá nhân của bạn sẽ được sử dụng để xử lý đơn hàng, hỗ trợ trải nghiệm của bạn trên website và cho các mục đích khác theo %s.',
+        'privacy policy' => 'chính sách bảo mật',
+        'Privacy Policy' => 'Chính sách bảo mật',
+        'Please enter a valid phone number.' => 'Vui lòng nhập số điện thoại hợp lệ.',
+        'Billing Phone is a required field.' => 'Vui lòng nhập Số điện thoại.',
+        'Phone is a required field.' => 'Vui lòng nhập Số điện thoại.',
+        '%s is a required field.' => '%s là thông tin bắt buộc.',
+        'optional' => 'không bắt buộc',
+        '(optional)' => '(không bắt buộc)',
+        'First name' => 'Họ và tên',
+        'Last name' => 'Tên',
+        'Phone' => 'Số điện thoại',
+        'Email address' => 'Email',
+        'Email Address' => 'Email',
+        'Street address' => 'Địa chỉ',
+        'Order received' => 'Đặt hàng thành công',
+        'Thank you. Your order has been received.' => 'Cảm ơn bạn! Đơn hàng đã được tiếp nhận thành công. Chúng tôi sẽ liên hệ trong thời gian sớm nhất.',
+        'Order number:' => 'Mã đơn hàng:',
+        'Date:' => 'Ngày đặt:',
+        'Email:' => 'Email:',
+        'Total:' => 'Tổng thanh toán:',
+        'Payment method:' => 'Phương thức thanh toán:',
+        'Order details' => 'Chi tiết đơn hàng',
+        'Billing address' => 'Địa chỉ nhận hàng',
+        'Shipping' => 'Giao hàng',
+        'Free shipping' => 'Miễn phí giao hàng',
+        'Flat rate' => 'Phí cố định',
+        'Cart' => 'Giỏ hàng',
+        'Update cart' => 'Cập nhật',
+        'Apply' => 'Áp dụng',
+        'Enter code' => 'Nhập mã',
+        'Coupon code applied successfully.' => 'Đã áp dụng mã giảm giá thành công.',
+        'Coupon "%s" does not exist!' => 'Mã giảm giá "%s" không tồn tại!',
+        'Coupon code already applied!' => 'Mã giảm giá này đã được áp dụng trước đó!',
+        'Coupon code "%s" already applied!' => 'Mã giảm giá "%s" đã được áp dụng trước đó!',
+        'Please enter a coupon code.' => 'Vui lòng nhập mã giảm giá.',
+        'Coupon usage limit has been reached.' => 'Mã giảm giá này đã hết lượt sử dụng.',
+        'This coupon has expired.' => 'Mã giảm giá này đã hết hạn sử dụng.',
+        'The minimum spend for this coupon is %s.' => 'Giá trị đơn hàng tối thiểu để dùng mã này là %s.',
+        'The maximum spend for this coupon is %s.' => 'Giá trị đơn hàng tối đa để dùng mã này là %s.',
+        'Sorry, this coupon is not applicable to selected products.' => 'Mã giảm giá này không áp dụng cho sản phẩm đã chọn.',
+        'Sorry, this coupon is not applicable to your cart contents.' => 'Mã giảm giá này không áp dụng cho đơn hàng của bạn.',
+        'Coupon code removed successfully.' => 'Đã xóa mã giảm giá thành công.',
+        '[Remove]' => '[Xóa]',
+        'Remove' => 'Xóa',
+        'Browse products' => 'Xem sản phẩm',
+        'Return to shop' => 'Quay lại cửa hàng',
+        'Your cart is currently empty.' => 'Bạn chưa chọn sản phẩm nào để thanh toán.',
+        'Description' => 'Mô tả',
+        'Reviews' => 'Đánh giá',
+        'Related products' => 'Sản phẩm tương tự',
+        'In stock' => 'Còn hàng',
+        'Out of stock' => 'Hết hàng',
+        'Sale!' => 'Ưu đãi!',
+    );
+    return $translations[$text] ?? $translation;
+}, 20, 3);
+
+add_filter('gettext_with_context', static function (string $translation, string $text, string $context, string $domain): string {
+    return apply_filters('gettext', $translation, $text, $domain);
+}, 20, 4);
+
+add_filter('ngettext', static function (string $translation, string $single, string $plural, int $number, string $domain): string {
+    return apply_filters('gettext', $translation, $single, $domain);
+}, 20, 5);
+
+/** Give new WooCommerce products a useful catalog summary when none is entered. */
+add_action('save_post_product', static function (int $post_id, WP_Post $post): void {
+    static $updating = false;
+    if ($updating || wp_is_post_revision($post_id) || trim($post->post_excerpt) !== '') {
+        return;
+    }
+
+    $plain_content = trim(wp_strip_all_tags($post->post_content));
+    $summary = $plain_content !== ''
+        ? wp_trim_words($plain_content, 30, '…')
+        : sprintf(
+            /* translators: %s: product name. */
+            __('Khám phá %s với thiết kế tiện dụng và công nghệ hỗ trợ tiên tiến từ OrCam.', 'orcam-theme'),
+            $post->post_title
+        );
+
+    $updating = true;
+    wp_update_post(array('ID' => $post_id, 'post_excerpt' => $summary));
+    $updating = false;
+}, 20, 2);
+
 /** Publish every imported Vietnamese blog post below the single /vi route. */
 add_action('init', static function () {
     add_rewrite_rule(
@@ -200,8 +734,30 @@ add_action('init', static function () {
 add_filter('query_vars', static function (array $vars): array {
     $vars[] = 'orcam_locale';
     $vars[] = 'orcam_slug';
+    $vars[] = 'orcam_shop';
+    $vars[] = 'orcam_checkout';
     return $vars;
 });
+
+/** Use the shared catalog template for the Vietnamese WooCommerce alias. */
+add_filter('template_include', static function (string $template): string {
+    $route = orcam_theme_request_route();
+    if ((string) get_query_var('orcam_checkout') === '1' || $route === 'vi/checkout' || strpos($route, 'vi/checkout/') === 0 || $route === 'checkout') {
+        $checkout_template = get_template_directory() . '/page-checkout.php';
+        if (is_file($checkout_template)) {
+            return $checkout_template;
+        }
+    }
+
+    if ((string) get_query_var('orcam_shop') === '1' || $route === 'vi/shop' || strpos($route, 'vi/shop/') === 0 || $route === 'shop') {
+        $shop_template = get_template_directory() . '/archive-product.php';
+        if (is_file($shop_template)) {
+            return $shop_template;
+        }
+    }
+
+    return $template;
+}, 99);
 
 /** Resolve locale + original slug to the exact imported post before 404 fallback. */
 add_filter('request', static function (array $query_vars): array {
@@ -298,6 +854,98 @@ function orcam_theme_maybe_render_static(): bool
 
     orcam_theme_render_document($document);
     return true;
+}
+
+/** Return published WooCommerce products in the shared navigation order. */
+function orcam_theme_product_navigation_products(): array
+{
+    if (!post_type_exists('product')) {
+        return array();
+    }
+
+    $products = get_posts(array(
+        'post_type'      => 'product',
+        'post_status'    => 'publish',
+        'posts_per_page' => -1,
+        'orderby'        => array('menu_order' => 'ASC', 'title' => 'ASC'),
+        'order'          => 'ASC',
+    ));
+    $fixed_order = array(
+        'orcam-myeye-3-pro' => 0,
+        'orcam-myeye-2-pro' => 1,
+        'orcam-read-5'      => 2,
+        'orcam-read-3'      => 3,
+        'orcam-read'        => 4,
+    );
+
+    usort($products, static function (WP_Post $left, WP_Post $right) use ($fixed_order): int {
+        $left_order = $fixed_order[$left->post_name] ?? (100 + (int) $left->menu_order);
+        $right_order = $fixed_order[$right->post_name] ?? (100 + (int) $right->menu_order);
+        return $left_order === $right_order
+            ? strcasecmp($left->post_title, $right->post_title)
+            : $left_order <=> $right_order;
+    });
+
+    return $products;
+}
+
+/** Render the full shared product bar for normal WooCommerce product pages. */
+function orcam_theme_product_navigation_bar(int $current_product_id = 0): string
+{
+    $links = '<a class="orcam-product-bar__link" href="' . esc_url(home_url('/vi/shop/'))
+        . '">Tất cả sản phẩm</a>';
+    foreach (orcam_theme_product_navigation_products() as $product) {
+        $active = $product->ID === $current_product_id ? ' is-active' : '';
+        $links .= '<a class="orcam-product-bar__link' . $active . '" href="'
+            . esc_url(get_permalink($product)) . '">' . esc_html(get_the_title($product)) . '</a>';
+    }
+
+    return '<nav class="orcam-product-bar" aria-label="Sản phẩm"><strong>Thị lực kém</strong>'
+        . '<div class="orcam-product-bar__items">' . $links . '</div></nav>';
+}
+
+/** Append only newly created products to the original Svelte submenu for Low Vision category. */
+function orcam_theme_append_products_to_static_submenu(string $html, string $file = ''): string
+{
+    $is_low_vision = false;
+    if ($file !== '') {
+        $filename = basename($file);
+        $low_vision_files = array(
+            'low-vision.html',
+            'orcam-myeye-3-pro.html',
+            'orcam-myeye-2-pro.html',
+            'orcam-read-5.html',
+            'orcam-read-3.html',
+            'orcam-read.html',
+        );
+        $is_low_vision = in_array($filename, $low_vision_files, true);
+    }
+    if (!$is_low_vision && strpos($html, 'desktop-submenu') !== false) {
+        if (preg_match('#<div[^>]*class="[^"]*desktop-submenu__logo[^"]*"[^>]*>\s*<p[^>]*>\s*(?:Thị lực kém|Low Vision)\s*</p>#iu', $html)) {
+            $is_low_vision = true;
+        }
+    }
+
+    if (!$is_low_vision) {
+        return $html;
+    }
+
+    $all_products_link = '<div class="d-flex"><a class="p3 desktop-submenu__submenu-link svelte-alcb1y" href="'
+        . esc_url(home_url('/vi/shop/')) . '" target="_self">Tất cả sản phẩm</a> </div>';
+    $extra_links = '';
+    foreach (orcam_theme_product_navigation_products() as $product) {
+        if (get_post_meta($product->ID, '_orcam_product_route', true) !== '') {
+            continue;
+        }
+        $extra_links .= '<div class="d-flex"><a class="p3 desktop-submenu__submenu-link svelte-alcb1y" href="'
+            . esc_url(get_permalink($product)) . '" target="_self">' . esc_html(get_the_title($product)) . '</a> </div>';
+    }
+    return preg_replace(
+        '#(<div class="desktop-submenu__items svelte-alcb1y">)(.*?)(</div>\s*<div class="desktop-submenu__buttons svelte-alcb1y">)#s',
+        '$1' . $all_products_link . '$2' . $extra_links . '$3',
+        $html,
+        1
+    ) ?: $html;
 }
 
 /**
@@ -423,6 +1071,7 @@ function orcam_theme_render_document(string $file, ?string $document_html = null
     );
     $html = strtr($html, $translations);
     $html = strtr($html, $protected_urls);
+    $html = orcam_theme_append_products_to_static_submenu($html, $file);
 
     // Correct the OrCam Learn export without changing the shared renderer or
     // downloading the rest of the media library.
@@ -576,9 +1225,20 @@ function orcam_theme_render_document(string $file, ?string $document_html = null
     // compatibility handler before the client router can intercept links.
     $navigation_uri = $theme_uri . '/js/static-navigation.js?ver=' . rawurlencode(ORCAM_THEME_VERSION);
     $google_api_key = orcam_theme_google_api_key();
+    $dynamic_product_items = array();
+    foreach (orcam_theme_product_navigation_products() as $navigation_product) {
+        if (get_post_meta($navigation_product->ID, '_orcam_product_route', true) === '') {
+            $dynamic_product_items[] = array(
+                'title' => get_the_title($navigation_product),
+                'url'   => get_permalink($navigation_product),
+            );
+        }
+    }
     $navigation_config = '<script>window.orcamThemeUri=' . wp_json_encode($theme_uri)
         . ';window.orcamHomeUrl=' . wp_json_encode(home_url('/vi/home'))
+        . ';window.orcamShopUrl=' . wp_json_encode(home_url('/vi/shop/'))
         . ';window.orcamGoogleApiKey=' . wp_json_encode($google_api_key)
+        . ';window.orcamDynamicProducts=' . wp_json_encode($dynamic_product_items)
         . ';window.orcamContactForm=' . wp_json_encode(array(
             'action' => admin_url('admin-post.php'),
             'nonce'  => wp_create_nonce('orcam_consultation'),
@@ -592,6 +1252,190 @@ function orcam_theme_render_document(string $file, ?string $document_html = null
     header('Content-Type: text/html; charset=' . get_bloginfo('charset'));
     echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- trusted bundled documents.
 }
+
+/** Render native WooCommerce content inside the same exported header/footer. */
+function orcam_theme_render_shared_static_shell(string $content, string $title, bool $include_wordpress_assets = false): bool
+{
+    // Use an original product page as the canonical shell so native/new
+    // products receive exactly the same header, submenu assets and footer as
+    // the five migrated product pages.
+    $file = get_template_directory() . '/static-pages/vi/orcam-myeye-3-pro.html';
+    if (!is_readable($file)) {
+        return false;
+    }
+
+    $html = (string) file_get_contents($file);
+    $replacement_count = 0;
+    $html = preg_replace_callback(
+        '#(<article\b[^>]*\bid=["\']mainBody["\'][^>]*>).*?(<nav\b[^>]*\bclass=["\'][^"\']*orcam-footer)#is',
+        static function (array $match) use ($content): string {
+            return $match[1] . $content . $match[2];
+        },
+        $html,
+        1,
+        $replacement_count
+    );
+    if (!$replacement_count) {
+        return false;
+    }
+
+    // The shell page marks MyEye 3 Pro active. Native products receive their
+    // own dynamic item, so do not leave a different product highlighted.
+    $html = str_replace(' orcam-submenu__active', '', $html);
+
+    $full_title = esc_html($title) . ' - OrCam';
+    $html = preg_replace('#<title>.*?</title>#is', '<title>' . $full_title . '</title>', $html, 1);
+    $html = preg_replace('#<meta\s+property=["\']og:title["\']\s+content=["\'][^"\']*["\']>#i', '<meta property="og:title" content="' . esc_attr($full_title) . '">', $html, 1);
+    $html = preg_replace('#<meta\s+name=["\']twitter:title["\']\s+content=["\'][^"\']*["\']>#i', '<meta name="twitter:title" content="' . esc_attr($full_title) . '">', $html, 1);
+
+    if ($include_wordpress_assets) {
+        ob_start();
+        wp_head();
+        $wordpress_head = (string) ob_get_clean();
+        ob_start();
+        wp_footer();
+        $wordpress_footer = (string) ob_get_clean();
+        $html = preg_replace('#</head>#i', $wordpress_head . '</head>', $html, 1);
+        $html = preg_replace('#</body>#i', $wordpress_footer . '</body>', $html, 1);
+    }
+    // Hydrate the original Svelte header/footer. static-navigation.js keeps
+    // the WooCommerce main body authoritative after hydration rebuilds DOM.
+    $title_tag = '<script>window.orcamHydratedChrome=true;window.orcamAuthoritativeTitle='
+        . wp_json_encode($full_title) . ';document.title=window.orcamAuthoritativeTitle;</script></head>';
+    $html = preg_replace(
+        '#</head>#i',
+        $title_tag,
+        $html,
+        1
+    );
+
+    orcam_theme_render_document($file, $html);
+    return true;
+}
+
+/** Render a complete product document whose authoritative copy is in wp_posts. */
+function orcam_theme_render_database_product(WP_Post $product): bool
+{
+    if ($product->post_type !== 'product'
+        || get_post_meta($product->ID, '_orcam_product_route', true) === ''
+        || $product->post_status !== 'publish') {
+        return false;
+    }
+
+    $source = (string) get_post_meta($product->ID, '_orcam_source_file', true);
+    if ($source === '' || strpos($source, '..') !== false) {
+        return false;
+    }
+
+    $theme_root = wp_normalize_path(get_template_directory());
+    $source_file = realpath($theme_root . '/' . ltrim($source, '/'));
+    if (!$source_file || strpos(wp_normalize_path($source_file), $theme_root . '/') !== 0) {
+        return false;
+    }
+
+    // Layout is shared and protected from the product editor. post_content is
+    // intentionally limited to readable section text for easy editing.
+    $html = (string) get_post_meta($product->ID, '_orcam_layout_html', true);
+    if ($html === '') {
+        $html = $product->post_content;
+    }
+    if (function_exists('wc_get_product')) {
+        $wc_product = wc_get_product($product->ID);
+        if ($wc_product && $wc_product->get_price() !== '') {
+            $currency = get_woocommerce_currency_symbol(get_woocommerce_currency());
+            $display_price = $currency . number_format((float) $wc_product->get_price(), 0, '.', '');
+            $image_ids = array_values(array_filter(array_merge(
+                array($wc_product->get_image_id()),
+                $wc_product->get_gallery_image_ids()
+            )));
+            $details_markup = '<section class="orcam-woocommerce-product-panel" data-product-id="'
+                . esc_attr((string) $product->ID) . '"><div class="orcam-woocommerce-product-panel__inner">';
+            if ($image_ids) {
+                $main_url = wp_get_attachment_image_url($image_ids[0], 'large');
+                $details_markup .= '<div class="orcam-woocommerce-gallery"><div class="orcam-woocommerce-gallery__stage">'
+                    . '<img class="orcam-woocommerce-product-image" src="' . esc_url((string) $main_url)
+                    . '" alt="' . esc_attr($wc_product->get_name()) . '" loading="eager" decoding="async"></div>'
+                    . '<div class="orcam-woocommerce-gallery__thumbs">';
+                foreach ($image_ids as $index => $image_id) {
+                    $large_url = wp_get_attachment_image_url($image_id, 'large');
+                    $thumbnail_url = wp_get_attachment_image_url($image_id, 'thumbnail') ?: $large_url;
+                    if (!$large_url) {
+                        continue;
+                    }
+                    $details_markup .= '<button type="button" class="orcam-woocommerce-gallery__thumb'
+                        . ($index === 0 ? ' is-active' : '') . '" data-large="' . esc_url($large_url) . '"'
+                        . ' aria-label="Xem ảnh ' . esc_attr((string) ($index + 1)) . '"><img src="'
+                        . esc_url((string) $thumbnail_url) . '" alt=""></button>';
+                }
+                $details_markup .= '</div></div>';
+            }
+            $details_markup .= '<div class="orcam-woocommerce-product-summary"><h2>'
+                . esc_html($wc_product->get_name()) . '</h2><div class="orcam-woocommerce-product-price">'
+                . esc_html($display_price) . '</div></div></div></section>';
+            $replaced = 0;
+            $html = preg_replace('#</section>#i', '</section>' . $details_markup, $html, 1, $replaced);
+            if (!$replaced) {
+                $html = preg_replace('#</header>#i', '</header>' . $details_markup, $html, 1);
+            }
+            $price_style = '<style id="orcam-woocommerce-product-price-style">'
+                . '.orcam-woocommerce-product-panel{background:#fff;box-sizing:border-box;color:#111;padding:48px 5%;width:100%}'
+                . '.orcam-woocommerce-product-panel__inner{align-items:center;display:grid;gap:48px;grid-template-columns:minmax(0,1fr) minmax(280px,.65fr);margin:0 auto;max-width:1200px}'
+                . '.orcam-woocommerce-gallery__stage{align-items:center;background:#f8f8fa;border-radius:12px;display:flex;justify-content:center;min-height:360px;padding:28px}'
+                . '.orcam-woocommerce-product-image{display:block;height:300px;max-width:100%;object-fit:contain;width:100%}'
+                . '.orcam-woocommerce-gallery__thumbs{display:flex;flex-wrap:wrap;gap:12px;margin-top:14px}'
+                . '.orcam-woocommerce-gallery__thumb{background:#fff;border:2px solid transparent;border-radius:8px;cursor:pointer;height:76px;padding:5px;width:76px}'
+                . '.orcam-woocommerce-gallery__thumb.is-active{border-color:#111}.orcam-woocommerce-gallery__thumb img{height:100%;object-fit:contain;width:100%}'
+                . '.orcam-woocommerce-product-summary h2{font-size:38px;line-height:1.15;margin:0 0 20px}.orcam-woocommerce-product-price{font-size:28px;font-weight:700;line-height:1.25}'
+                . '@media(max-width:767px){.orcam-woocommerce-product-panel{padding:32px 20px}.orcam-woocommerce-product-panel__inner{gap:28px;grid-template-columns:1fr}.orcam-woocommerce-gallery__stage{min-height:260px}.orcam-woocommerce-product-image{height:230px}.orcam-woocommerce-product-summary h2{font-size:30px}}'
+                . '</style>';
+            $html = preg_replace('#</head>#i', $price_style . '</head>', $html, 1);
+            $gallery_script = '<script id="orcam-woocommerce-gallery-script">document.addEventListener("click",function(event){var button=event.target.closest(".orcam-woocommerce-gallery__thumb");if(!button)return;var gallery=button.closest(".orcam-woocommerce-gallery"),image=gallery&&gallery.querySelector(".orcam-woocommerce-product-image");if(image&&button.dataset.large){image.src=button.dataset.large;gallery.querySelectorAll(".orcam-woocommerce-gallery__thumb").forEach(function(item){item.classList.toggle("is-active",item===button);});}});</script>';
+            $html = preg_replace('#</body>#i', $gallery_script . '</body>', $html, 1);
+        }
+    }
+
+    orcam_theme_render_document($source_file, $html);
+    return true;
+}
+
+/** Database fallback also works immediately before permalink rules are flushed. */
+function orcam_theme_maybe_render_database_product(): bool
+{
+    $route = orcam_theme_request_route();
+    if (!in_array($route, array(
+        'vi/orcam-myeye-3-pro',
+        'vi/orcam-myeye-2-pro',
+        'vi/orcam-read-5',
+        'vi/orcam-read-3',
+        'vi/orcam-read',
+    ), true)) {
+        return false;
+    }
+
+    $products = get_posts(array(
+        'post_type'      => 'product',
+        'post_status'    => 'publish',
+        'posts_per_page' => 1,
+        'meta_key'       => '_orcam_product_route',
+        'meta_value'     => $route,
+        'no_found_rows'  => true,
+    ));
+
+    return $products ? orcam_theme_render_database_product($products[0]) : false;
+}
+
+// Render marked WooCommerce products before WooCommerce selects its default
+// single-product template. The stored document remains byte-for-byte intact.
+add_action('template_redirect', static function (): void {
+    if (!is_singular('product')) {
+        return;
+    }
+
+    $product = get_queried_object();
+    if ($product instanceof WP_Post && orcam_theme_render_database_product($product)) {
+        exit;
+    }
+}, 0);
 
 /**
  * Render an imported WordPress post inside its original exported blog shell.
@@ -730,3 +1574,57 @@ function orcam_theme_render_database_blog(WP_Post $post): bool
     orcam_theme_render_document($file, $html);
     return true;
 }
+
+/**
+ * WooCommerce Direct Buy: Completely eliminate Cart and redirect straight to Checkout.
+ */
+add_filter('woocommerce_add_to_cart_redirect', static function (): string {
+    return function_exists('wc_get_checkout_url') ? wc_get_checkout_url() : home_url('/vi/checkout/');
+});
+
+// Map any cart URL request directly to checkout
+add_filter('woocommerce_get_cart_url', static function (): string {
+    return function_exists('wc_get_checkout_url') ? wc_get_checkout_url() : home_url('/vi/checkout/');
+});
+
+// Enforce 1-item instant purchase: clear cart before adding the new product
+add_filter('woocommerce_add_to_cart_validation', static function (bool $passed, int $product_id, int $quantity): bool {
+    if ($passed && function_exists('WC') && WC()->cart) {
+        WC()->cart->empty_cart();
+    }
+    return $passed;
+}, 10, 3);
+
+// Enforce single quantity for all products (removes quantity selector box)
+add_filter('woocommerce_is_sold_individually', '__return_true');
+
+// Rename all button texts to "Mua ngay"
+add_filter('woocommerce_product_single_add_to_cart_text', static function (): string {
+    return __('Mua ngay', 'orcam-theme');
+});
+
+add_filter('woocommerce_product_add_to_cart_text', static function (): string {
+    return __('Mua ngay', 'orcam-theme');
+});
+
+// Remove cart messages and notices
+add_filter('wc_add_to_cart_message_html', '__return_empty_string');
+add_filter('woocommerce_cart_item_removed_title', '__return_empty_string');
+add_filter('woocommerce_cart_item_restored_title', '__return_empty_string');
+
+// Disable WooCommerce AJAX cart fragments script to speed up site and remove cart polling
+add_action('wp_enqueue_scripts', static function (): void {
+    wp_dequeue_script('wc-cart-fragments');
+}, 100);
+
+// Redirect any attempt to view the cart page directly to checkout or shop
+add_action('template_redirect', static function (): void {
+    if (function_exists('is_cart') && is_cart()) {
+        if (function_exists('WC') && WC()->cart && WC()->cart->is_empty()) {
+            wp_safe_redirect(home_url('/vi/shop/'));
+        } else {
+            wp_safe_redirect(function_exists('wc_get_checkout_url') ? wc_get_checkout_url() : home_url('/vi/checkout/'));
+        }
+        exit;
+    }
+}, 5);

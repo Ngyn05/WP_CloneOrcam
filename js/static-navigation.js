@@ -2,6 +2,9 @@
     'use strict';
 
     var themeUri = window.orcamThemeUri || '';
+    if (window.orcamAuthoritativeTitle) {
+        document.title = window.orcamAuthoritativeTitle;
+    }
     var initialBlogIndex = document.querySelector('.orcam-blog-index');
     var savedBlogIndex = initialBlogIndex ? initialBlogIndex.cloneNode(true) : null;
     var initialBlogArticle = document.querySelector('.orcam-blog');
@@ -10,6 +13,9 @@
         ? (savedBlogArticle.textContent || '').replace(/\s+/g, ' ').trim().length
         : 0;
     var preserveBlogScheduled = false;
+    var nativeWooContent = document.querySelector('article#mainBody > .orcam-shop, article#mainBody > .orcam-default-product, article#mainBody > .orcam-checkout');
+    var savedNativeWooContent = nativeWooContent ? nativeWooContent.cloneNode(true) : null;
+    var preserveNativeWooScheduled = false;
 
     /** Keep exported and hydrated headers on one Vietnamese navigation copy. */
     function normalizeHeaderNavigation(root) {
@@ -54,6 +60,143 @@
                 link.textContent = 'Tuyển dụng';
             }
         });
+    }
+
+    /** Restore WooCommerce products after Svelte hydration rebuilds submenu for Low Vision. */
+    function syncDynamicProductSubmenu() {
+        var submenu = document.querySelector('.desktop-submenu');
+        if (!submenu) return;
+
+        var logoEl = submenu.querySelector('.desktop-submenu__logo p');
+        var logoText = logoEl ? logoEl.textContent.trim() : '';
+        var isLowVision = (logoText === 'Thị lực kém' || logoText === 'Low Vision');
+
+        if (!isLowVision) {
+            // Remove any erroneously injected shop link from non-low-vision submenus (like Tài nguyên, Trường học, Learn)
+            var strayLinks = submenu.querySelectorAll('.desktop-submenu__items a');
+            Array.prototype.slice.call(strayLinks).forEach(function (link) {
+                if (link.textContent.trim() === 'Tất cả sản phẩm' || (link.getAttribute('href') && link.getAttribute('href').indexOf('/shop') !== -1)) {
+                    var parent = link.closest('.d-flex') || link;
+                    parent.remove();
+                }
+            });
+            return;
+        }
+
+        var container = submenu.querySelector('.desktop-submenu__items');
+        if (!container) return;
+
+        var shopUrl = window.orcamShopUrl || (window.location.origin + '/vi/shop/');
+        var allLink = Array.prototype.find.call(container.querySelectorAll('a[href]'), function (link) {
+            try { return new URL(link.href, document.baseURI).href === new URL(shopUrl, document.baseURI).href; }
+            catch (error) { return false; }
+        });
+        if (!allLink) {
+            var allItem = document.createElement('div');
+            allItem.className = 'd-flex';
+            allLink = document.createElement('a');
+            allLink.className = 'p3 desktop-submenu__submenu-link svelte-alcb1y';
+            allLink.href = shopUrl;
+            allLink.target = '_self';
+            allLink.textContent = 'Tất cả sản phẩm';
+            allItem.appendChild(allLink);
+            container.insertBefore(allItem, container.firstChild);
+        } else if (allLink.parentElement !== container.firstElementChild) {
+            container.insertBefore(allLink.parentElement, container.firstChild);
+        }
+
+        var products = Array.isArray(window.orcamDynamicProducts) ? window.orcamDynamicProducts : [];
+        products.forEach(function (product) {
+            var exists = Array.prototype.some.call(container.querySelectorAll('a[href]'), function (link) {
+                try {
+                    return new URL(link.href, document.baseURI).href === new URL(product.url, document.baseURI).href;
+                } catch (error) {
+                    return false;
+                }
+            });
+            if (exists) {
+                return;
+            }
+
+            var item = document.createElement('div');
+            item.className = 'd-flex';
+            var link = document.createElement('a');
+            link.className = 'p3 desktop-submenu__submenu-link svelte-alcb1y';
+            link.href = product.url;
+            link.target = '_self';
+            link.textContent = product.title;
+            item.appendChild(link);
+            container.appendChild(item);
+        });
+    }
+
+    /** Manage header navigation and clean up any duplicate dropdowns. */
+    function ensureHeaderDropdowns() {
+        // Remove any duplicate or legacy dropdown boxes injected into header
+        var oldDropdowns = document.querySelectorAll('.orcam-header-dropdown');
+        Array.prototype.slice.call(oldDropdowns).forEach(function (el) {
+            el.remove();
+        });
+
+        // Ensure "Đọc và học tập" is a direct link without dropdown
+        var wrappers = document.querySelectorAll('.desktop-header__menu-items > .d-flex.flex-column');
+        wrappers.forEach(function (wrapper) {
+            var btn = wrapper.querySelector(':scope > button');
+            var btnText = btn ? btn.textContent.trim() : '';
+
+            if (btn && (btnText === 'Đọc và học tập' || btnText.indexOf('Đọc') === 0)) {
+                var directLink = document.createElement('a');
+                directLink.className = 'p3 white-text svelte-12kzc4m';
+                directLink.href = window.location.origin + '/vi/orcam-learn';
+                directLink.target = '_self';
+                directLink.textContent = 'Đọc và học tập';
+                wrapper.replaceChild(directLink, btn);
+                var oldDd = wrapper.querySelector('.desktop-header__sub-menu');
+                if (oldDd) oldDd.remove();
+            }
+        });
+    }
+
+    /** Keep WooCommerce body while allowing Svelte to hydrate header/footer. */
+    function preserveNativeWooBody() {
+        if (!savedNativeWooContent) return;
+        var main = document.querySelector('article#mainBody');
+        if (!main) return;
+
+        // Clean out any Svelte product sections injected into mainBody during client hydration
+        var children = Array.prototype.slice.call(main.children);
+        children.forEach(function (child) {
+            if (!child.matches('.orcam-shop, .orcam-default-product, .orcam-checkout, nav.orcam-footer, section#bottomPage')) {
+                child.remove();
+            }
+        });
+
+        // Also clean any rogue sections injected into body
+        var rogue = document.querySelectorAll('body > section:not(#header):not(#bottomPage)');
+        Array.prototype.slice.call(rogue).forEach(function (el) {
+            if (!el.closest('.orcam-shop, .orcam-default-product, .orcam-checkout, nav.orcam-footer, #header')) {
+                el.remove();
+            }
+        });
+
+        var current = main.querySelector(':scope > .orcam-shop, :scope > .orcam-default-product, :scope > .orcam-checkout');
+        if (!current) {
+            var footer = main.querySelector(':scope > nav.orcam-footer');
+            main.insertBefore(savedNativeWooContent.cloneNode(true), footer || main.firstChild);
+        }
+
+        if (window.orcamAuthoritativeTitle && document.title !== window.orcamAuthoritativeTitle) {
+            document.title = window.orcamAuthoritativeTitle;
+        }
+    }
+
+    function scheduleNativeWooPreservation() {
+        if (!savedNativeWooContent || preserveNativeWooScheduled) return;
+        preserveNativeWooScheduled = true;
+        window.setTimeout(function () {
+            preserveNativeWooScheduled = false;
+            preserveNativeWooBody();
+        }, 0);
     }
 
     /** Replace unavailable blog thumbnails with a bundled image. */
@@ -386,6 +529,16 @@
     replaceGoogleContactForm(document);
     renderSupportCaseForm();
     normalizeHeaderNavigation(document);
+    syncDynamicProductSubmenu();
+    ensureHeaderDropdowns();
+    preserveNativeWooBody();
+    window.setTimeout(syncDynamicProductSubmenu, 100);
+    window.setTimeout(syncDynamicProductSubmenu, 600);
+    window.setTimeout(ensureHeaderDropdowns, 100);
+    window.setTimeout(ensureHeaderDropdowns, 600);
+    window.setTimeout(preserveNativeWooBody, 100);
+    window.setTimeout(preserveNativeWooBody, 600);
+    window.setTimeout(preserveNativeWooBody, 1500);
 
     if ('MutationObserver' in window) {
         new MutationObserver(function (mutations) {
@@ -402,6 +555,7 @@
                     if (node instanceof Element) {
                         repairBlogImages(node);
                         normalizeHeaderNavigation(node);
+                        ensureHeaderDropdowns();
                         replaceGoogleContactForm(node);
                     }
                 });
@@ -409,6 +563,10 @@
 
             placeBlogIndex();
             renderSupportCaseForm();
+            if (hasChildListChanges) {
+                syncDynamicProductSubmenu();
+                scheduleNativeWooPreservation();
+            }
             if (hasChildListChanges) {
                 scheduleBlogPreservation();
             }
