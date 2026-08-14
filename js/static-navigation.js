@@ -455,6 +455,56 @@
         });
     }
 
+    /** Keep prices and product images across Comparison tables & Cards in sync with WooCommerce. */
+    function syncDynamicProductPricesAndImages() {
+        var dataMap = window.orcamProductDataMap || {};
+        if (!dataMap || typeof dataMap !== 'object') return;
+
+        var priceReplacements = [
+            { pattern: /\$4490\s*\$4250|\$4,490\s*\$4,250|\$4490|\$4,490/g, slug: 'orcam-myeye-3-pro' },
+            { pattern: /\$4250|\$4,250/g, slug: 'orcam-myeye-2-pro' },
+            { pattern: /\$2790|\$2,790|\$2490|\$2,490/g, slug: 'orcam-read-3' },
+            { pattern: /\$3990|\$3,990/g, slug: 'orcam-read-5' },
+            { pattern: /\$1990|\$1,990/g, slug: 'orcam-read' },
+            { pattern: /\$599/g, slug: 'orcam-learn' }
+        ];
+
+        var monthlyPattern = /\s*or\s+\$\d+\s*\/\s*mo\.?/gi;
+
+        // Scan all text nodes / elements
+        var elements = document.querySelectorAll('.orcam-flex, .orcam-tile, .desktop-submenu, .comparison-table, .orcam-pricing-card, table, p, span, h1, h2, h3, h4, h5');
+        elements.forEach(function (el) {
+            if (el.children.length === 0 && el.textContent) {
+                var text = el.textContent;
+                if (monthlyPattern.test(text)) {
+                    el.textContent = text.replace(monthlyPattern, '');
+                }
+                priceReplacements.forEach(function (rep) {
+                    if (dataMap[rep.slug] && dataMap[rep.slug].formattedPrice) {
+                        if (rep.pattern.test(el.textContent)) {
+                            el.textContent = el.textContent.replace(rep.pattern, dataMap[rep.slug].formattedPrice);
+                        }
+                    }
+                });
+            }
+        });
+
+        // Sync comparison table product images
+        Object.keys(dataMap).forEach(function (slug) {
+            var prod = dataMap[slug];
+            if (prod && prod.imageUrl) {
+                if (slug === 'orcam-myeye-3-pro') {
+                    var myeyeImages = document.querySelectorAll('img[src*="MYEYE_on%20floor"], img[src*="MYEYE_on floor"]');
+                    myeyeImages.forEach(function (img) {
+                        if (img.src !== prod.imageUrl) {
+                            img.src = prod.imageUrl;
+                        }
+                    });
+                }
+            }
+        });
+    }
+
     /** Manage header navigation and clean up any duplicate dropdowns. */
     function ensureHeaderDropdowns() {
         // Remove any duplicate or legacy dropdown boxes injected into header
@@ -855,6 +905,7 @@
     renderSupportCaseForm();
     normalizeHeaderNavigation(document);
     syncDynamicProductSubmenu();
+    syncDynamicProductPricesAndImages();
     ensureHeaderDropdowns();
     preserveNativeWooBody();
 
@@ -866,6 +917,7 @@
             mutationScheduled = false;
             normalizeHeaderNavigation(document);
             syncDynamicProductSubmenu();
+            syncDynamicProductPricesAndImages();
             ensureHeaderDropdowns();
             repairBlogImages(document);
             replaceGoogleContactForm(document);

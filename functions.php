@@ -1117,7 +1117,138 @@ function orcam_theme_append_products_to_static_submenu(string $html, string $fil
         '$1{label:"Tất cả sản phẩm",pageUrl:"' . esc_js(home_url('/vi/shop/')) . '",id:"all-products",blockName:"All Products",blockType:"internalNavigation"},',
         $html,
         1
-    ) ?: $html;
+/**
+ * Synchronize real WooCommerce prices and product images into static page comparison tables,
+ * pricing cards, and product landing pages.
+ */
+function orcam_theme_sync_woocommerce_product_data_into_html(string $html, string $file = ''): string
+{
+    if (!function_exists('wc_get_product')) {
+        return $html;
+    }
+
+    $products = orcam_theme_product_navigation_products();
+    if (empty($products)) {
+        return $html;
+    }
+
+    $product_data_map = array();
+    $currency_symbol = function_exists('get_woocommerce_currency_symbol') ? get_woocommerce_currency_symbol(get_woocommerce_currency()) : '₫';
+
+    foreach ($products as $post_item) {
+        $wc_prod = wc_get_product($post_item->ID);
+        if (!$wc_prod) {
+            continue;
+        }
+        $price = $wc_prod->get_price();
+        if ($price === '') {
+            continue;
+        }
+
+        $reg_price = $wc_prod->get_regular_price();
+        $sale_price = $wc_prod->get_sale_price();
+        $formatted_price = number_format((float) $price, 0, ',', '.') . ' ' . $currency_symbol;
+        $formatted_reg = ($reg_price && $sale_price) ? (number_format((float) $reg_price, 0, ',', '.') . ' ' . $currency_symbol) : '';
+        $img_id = $wc_prod->get_image_id();
+        $img_url = $img_id ? wp_get_attachment_image_url($img_id, 'large') : '';
+
+        $product_data_map[$post_item->post_name] = array(
+            'id'              => $post_item->ID,
+            'slug'            => $post_item->post_name,
+            'title'           => get_the_title($post_item),
+            'price'           => $price,
+            'formatted_price' => $formatted_price,
+            'formatted_reg'   => $formatted_reg,
+            'image_url'       => $img_url,
+            'checkout_url'    => add_query_arg('add-to-cart', $post_item->ID, wc_get_checkout_url()),
+        );
+    }
+
+    if (empty($product_data_map)) {
+        return $html;
+    }
+
+    // 1. MyEye 3 Pro
+    if (isset($product_data_map['orcam-myeye-3-pro'])) {
+        $p3 = $product_data_map['orcam-myeye-3-pro'];
+        if ($p3['formatted_reg']) {
+            $replacement = '{bold:true,text:"' . esc_js($p3['formatted_reg']) . '",strikethrough:true},{bold:true,text:" ' . esc_js($p3['formatted_price']) . '"}';
+        } else {
+            $replacement = '{bold:true,text:"' . esc_js($p3['formatted_price']) . '"}';
+        }
+        $html = str_replace(
+            '{bold:true,text:"$4490",strikethrough:true},{bold:true,text:" $4250"}',
+            $replacement,
+            $html
+        );
+        $html = str_replace(
+            array('$4490 $4250', '$4,490 $4,250', '$4490', '$4,490'),
+            $p3['formatted_price'],
+            $html
+        );
+        if (!empty($p3['image_url'])) {
+            $html = str_replace('MYEYE_on%20floor%20Flip%201-1.png', esc_url($p3['image_url']), $html);
+            $html = str_replace('MYEYE_on floor Flip 1-1.png', esc_url($p3['image_url']), $html);
+        }
+    }
+
+    // 2. MyEye 2 Pro
+    if (isset($product_data_map['orcam-myeye-2-pro'])) {
+        $p2 = $product_data_map['orcam-myeye-2-pro'];
+        $html = str_replace(
+            '{bold:true,text:"$4250"}',
+            '{bold:true,text:"' . esc_js($p2['formatted_price']) . '"}',
+            $html
+        );
+        $html = str_replace(
+            array('$4250 or $165/mo.', '$4,250 or $165/mo.', '$4250', '$4,250'),
+            $p2['formatted_price'],
+            $html
+        );
+    }
+
+    // 3. Read 3
+    if (isset($product_data_map['orcam-read-3'])) {
+        $r3 = $product_data_map['orcam-read-3'];
+        $html = str_replace(
+            array('$2790 or $104/mo.', '$2,790 or $104/mo.', '$2790', '$2,790', '$2490', '$2,490'),
+            $r3['formatted_price'],
+            $html
+        );
+    }
+
+    // 4. Read 5
+    if (isset($product_data_map['orcam-read-5'])) {
+        $r5 = $product_data_map['orcam-read-5'];
+        $html = str_replace(
+            array('$3990 or $150/mo.', '$3,990 or $150/mo.', '$3990', '$3,990'),
+            $r5['formatted_price'],
+            $html
+        );
+    }
+
+    // 5. Read (Standard)
+    if (isset($product_data_map['orcam-read'])) {
+        $r = $product_data_map['orcam-read'];
+        $html = str_replace(
+            array('$1990 or $71/mo.', '$1,990 or $71/mo.', '$1990', '$1,990'),
+            $r['formatted_price'],
+            $html
+        );
+    }
+
+    // 6. Learn
+    if (isset($product_data_map['orcam-learn'])) {
+        $l = $product_data_map['orcam-learn'];
+        $html = str_replace(
+            array('$599 or $34/mo.', '$599', '$34/mo.'),
+            $l['formatted_price'],
+            $html
+        );
+    }
+
+    // Remove old monthly installment texts
+    $html = preg_replace('/or\s+\$\d+\s*\/\s*mo\.?/i', '', $html);
 
     return $html;
 }
@@ -1424,19 +1555,50 @@ function orcam_theme_render_document(string $file, ?string $document_html = null
     $navigation_uri = $theme_uri . '/js/static-navigation.js?ver=' . rawurlencode(ORCAM_THEME_VERSION);
     $google_api_key = orcam_theme_google_api_key();
     $dynamic_product_items = array();
+    $product_data_map = array();
+    $currency_symbol = function_exists('get_woocommerce_currency_symbol') ? get_woocommerce_currency_symbol(get_woocommerce_currency()) : '₫';
+
     foreach (orcam_theme_product_navigation_products() as $navigation_product) {
+        $wc_p = function_exists('wc_get_product') ? wc_get_product($navigation_product->ID) : null;
+        $price_val = $wc_p ? $wc_p->get_price() : '';
+        $reg_val = $wc_p ? $wc_p->get_regular_price() : '';
+        $sale_val = $wc_p ? $wc_p->get_sale_price() : '';
+        $formatted_p = $price_val !== '' ? (number_format((float) $price_val, 0, ',', '.') . ' ' . $currency_symbol) : '';
+        $formatted_r = ($reg_val && $sale_val) ? (number_format((float) $reg_val, 0, ',', '.') . ' ' . $currency_symbol) : '';
+        $img_id = $wc_p ? $wc_p->get_image_id() : 0;
+        $img_url = $img_id ? (string) wp_get_attachment_image_url($img_id, 'large') : '';
+
         if (get_post_meta($navigation_product->ID, '_orcam_product_route', true) === '') {
             $dynamic_product_items[] = array(
                 'title' => get_the_title($navigation_product),
                 'url'   => get_permalink($navigation_product),
             );
         }
+
+        if ($price_val !== '') {
+            $product_data_map[$navigation_product->post_name] = array(
+                'id'               => $navigation_product->ID,
+                'slug'             => $navigation_product->post_name,
+                'title'            => get_the_title($navigation_product),
+                'price'            => $price_val,
+                'formattedPrice'   => $formatted_p,
+                'formattedRegular' => $formatted_r,
+                'imageUrl'         => $img_url,
+                'permalink'        => get_permalink($navigation_product),
+                'checkoutUrl'      => function_exists('wc_get_checkout_url') ? add_query_arg('add-to-cart', $navigation_product->ID, wc_get_checkout_url()) : home_url('/vi/checkout/'),
+            );
+        }
     }
+
+    // Synchronize actual WooCommerce prices and product imagery into HTML
+    $html = orcam_theme_sync_woocommerce_product_data_into_html($html, $file);
+
     $navigation_config = '<script>window.orcamThemeUri=' . wp_json_encode($theme_uri)
         . ';window.orcamHomeUrl=' . wp_json_encode(home_url('/vi/home'))
         . ';window.orcamShopUrl=' . wp_json_encode(home_url('/vi/shop/'))
         . ';window.orcamGoogleApiKey=' . wp_json_encode($google_api_key)
         . ';window.orcamDynamicProducts=' . wp_json_encode($dynamic_product_items)
+        . ';window.orcamProductDataMap=' . wp_json_encode($product_data_map)
         . ';window.orcamContactForm=' . wp_json_encode(array(
             'action' => admin_url('admin-post.php'),
             'nonce'  => wp_create_nonce('orcam_consultation'),
