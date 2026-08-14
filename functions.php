@@ -397,7 +397,10 @@ function orcam_theme_try_serve_cache(string $file, string $custom_html = ''): bo
     $translations_file = get_template_directory() . '/inc/vietnamese-translations.php';
     $translations_time = is_file($translations_file) ? (filemtime($translations_file) ?: 0) : 0;
     $source_time = is_file($file) ? (filemtime($file) ?: 0) : 0;
-    $min_valid_time = max($translations_time, $source_time);
+
+    $products_tracker = (defined('WP_CONTENT_DIR') ? WP_CONTENT_DIR : (get_template_directory() . '/../..')) . '/cache/orcam_products.timestamp';
+    $products_time = is_file($products_tracker) ? (filemtime($products_tracker) ?: 0) : 0;
+    $min_valid_time = max($translations_time, $source_time, $products_time);
 
     if (is_file($cache_file) && (filemtime($cache_file) >= $min_valid_time) && filesize($cache_file) > 100) {
         status_header(200);
@@ -1006,10 +1009,10 @@ function orcam_theme_maybe_render_static(): bool
 }
 
 /** Return published WooCommerce products in the shared navigation order. */
-function orcam_theme_product_navigation_products(): array
+function orcam_theme_product_navigation_products(bool $force_refresh = false): array
 {
     static $cached_products = null;
-    if ($cached_products !== null) {
+    if (!$force_refresh && $cached_products !== null) {
         return $cached_products;
     }
 
@@ -1902,21 +1905,142 @@ add_action('template_redirect', static function (): void {
 }, 5);
 
 /**
- * Automatically refresh and pre-warm cache when post/product is saved.
+ * Warmup Shop Catalog page in static cache.
  */
-add_action('save_post', static function (int $post_id): void {
+function orcam_theme_warmup_shop_catalog(): void
+{
+    if (!function_exists('orcam_theme_render_shared_static_shell') || !function_exists('wc_get_product')) {
+        return;
+    }
+    ob_start();
+    ?>
+    <main class="orcam-shop" id="primary">
+        <header class="orcam-shop__header">
+            <div><p><?php esc_html_e('OrCam Việt Nam', 'orcam-theme'); ?></p><h1><?php esc_html_e('Tất cả sản phẩm', 'orcam-theme'); ?></h1></div>
+        </header>
+        <section class="orcam-shop__catalog" aria-label="<?php esc_attr_e('Danh sách sản phẩm', 'orcam-theme'); ?>">
+            <div class="orcam-shop__grid">
+                <?php foreach (orcam_theme_product_navigation_products(true) as $p_post) :
+                    $p_obj = wc_get_product($p_post->ID);
+                    if (!$p_obj) continue;
+                    $p_img = $p_obj->get_image_id() ? wp_get_attachment_image_url($p_obj->get_image_id(), 'medium_large') : wc_placeholder_img_src('medium_large');
+                    $p_sum = trim($p_obj->get_short_description()) ?: sprintf(__('Khám phá %s với công nghệ hỗ trợ tiên tiến từ OrCam.', 'orcam-theme'), get_the_title($p_post));
+                    ?>
+                    <article class="orcam-shop-card">
+                        <div class="orcam-shop-card__inner">
+                            <a class="orcam-shop-card__media-link" href="<?php echo esc_url(get_permalink($p_post)); ?>">
+                                <span class="orcam-shop-card__media">
+                                    <?php if ($p_obj->is_on_sale()) : ?><span class="orcam-shop-card__badge"><?php esc_html_e('Ưu đãi', 'orcam-theme'); ?></span><?php endif; ?>
+                                    <img src="<?php echo esc_url($p_img); ?>" alt="<?php echo esc_attr(get_the_title($p_post)); ?>" loading="lazy">
+                                </span>
+                            </a>
+                            <div class="orcam-shop-card__body">
+                                <a class="orcam-shop-card__title-link" href="<?php echo esc_url(get_permalink($p_post)); ?>">
+                                    <h2><?php echo esc_html(get_the_title($p_post)); ?></h2>
+                                </a>
+                                <?php if ($p_obj->get_price() !== '') : ?>
+                                    <div class="orcam-shop-card__price"><?php echo wp_kses_post($p_obj->get_price_html()); ?></div>
+                                <?php endif; ?>
+                                <p class="orcam-shop-card__description"><?php echo esc_html(wp_trim_words(wp_strip_all_tags($p_sum), 22, '…')); ?></p>
+                                <div class="orcam-shop-card__actions">
+                                    <a class="orcam-shop-card__btn orcam-shop-card__btn--detail" href="<?php echo esc_url(get_permalink($p_post)); ?>">
+                                        <?php esc_html_e('Xem chi tiết', 'orcam-theme'); ?>
+                                    </a>
+                                    <a class="orcam-shop-card__btn orcam-shop-card__btn--buy" href="<?php echo esc_url($p_obj->is_purchasable() && $p_obj->is_in_stock() ? add_query_arg('add-to-cart', $p_obj->get_id(), wc_get_checkout_url()) : get_permalink($p_post)); ?>">
+                                        <?php esc_html_e('Mua ngay', 'orcam-theme'); ?>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+        </section>
+    </main>
+    <?php
+    $shop_html = (string) ob_get_clean();
+    orcam_theme_render_shared_static_shell($shop_html, 'Tất cả sản phẩm', false, 'shop_catalog', 'vi_shop_page', true);
+}
+
+/**
+ * Automatically invalidate and warm up cache on WooCommerce product & post CRUD events.
+ * Guarantees 100% real-time frontend updates WITHOUT sacrificing ultra-fast page speeds.
+ */
+function orcam_theme_on_product_change($product_id = 0): void
+{
+    static $is_processing = false;
+    if ($is_processing) {
+        return;
+    }
+    $is_processing = true;
+
+    // 1. Touch products tracker file with fresh timestamp
+    $cache_dir = orcam_theme_cache_dir();
+    $tracker_file = dirname($cache_dir) . '/orcam_products.timestamp';
+    @touch($tracker_file);
+
+    // 2. Force refresh product cache in-memory
+    orcam_theme_product_navigation_products(true);
+
+    // 3. Pre-warm Shop Catalog immediately in static cache
+    orcam_theme_warmup_shop_catalog();
+
+    // 4. Pre-warm key submenu & home pages
+    $low_vision_file = get_template_directory() . '/static-pages/vi/low-vision.html';
+    if (is_file($low_vision_file)) {
+        orcam_theme_render_document($low_vision_file, null, '', true);
+    }
+    $index_file = get_template_directory() . '/static-pages/vi/index.html';
+    if (is_file($index_file)) {
+        orcam_theme_render_document($index_file, null, '', true);
+    }
+
+    // 5. Pre-warm the specific product if published
+    $int_product_id = (int) $product_id;
+    if ($int_product_id > 0) {
+        $p = get_post($int_product_id);
+        if ($p instanceof WP_Post && $p->post_status === 'publish') {
+            orcam_theme_render_database_product($p, true);
+        }
+    }
+
+    $is_processing = false;
+}
+
+// Hook all WooCommerce & WordPress Product CRUD actions:
+add_action('save_post_product', 'orcam_theme_on_product_change', 20, 1);
+add_action('woocommerce_update_product', 'orcam_theme_on_product_change', 20, 1);
+add_action('woocommerce_new_product', 'orcam_theme_on_product_change', 20, 1);
+add_action('woocommerce_product_quick_edit_save', 'orcam_theme_on_product_change', 20, 1);
+add_action('woocommerce_product_set_stock_status', 'orcam_theme_on_product_change', 20, 1);
+add_action('woocommerce_variation_set_stock_status', 'orcam_theme_on_product_change', 20, 1);
+
+add_action('delete_post', static function ($post_id): void {
+    if (get_post_type($post_id) === 'product') {
+        orcam_theme_on_product_change((int) $post_id);
+    }
+}, 20, 1);
+
+add_action('wp_trash_post', static function ($post_id): void {
+    if (get_post_type($post_id) === 'product') {
+        orcam_theme_on_product_change((int) $post_id);
+    }
+}, 20, 1);
+
+add_action('untrash_post', static function ($post_id): void {
+    if (get_post_type($post_id) === 'product') {
+        orcam_theme_on_product_change((int) $post_id);
+    }
+}, 20, 1);
+
+// Blog Post CRUD Auto-invalidation & Warmup
+add_action('save_post_post', static function ($post_id): void {
     if (wp_is_post_revision($post_id) || wp_is_post_autosave($post_id)) {
         return;
     }
-
     $post = get_post($post_id);
-    if (!$post instanceof WP_Post || $post->post_status !== 'publish') {
-        return;
-    }
-
-    if ($post->post_type === 'product') {
-        orcam_theme_render_database_product($post, true);
-    } elseif ($post->post_type === 'post') {
+    if ($post instanceof WP_Post && $post->post_status === 'publish') {
         orcam_theme_render_database_blog($post, true);
     }
-}, 20);
+}, 20, 1);
+
