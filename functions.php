@@ -1222,9 +1222,7 @@ function orcam_theme_sync_woocommerce_product_data_into_html(string $html, strin
             $html = str_replace(
                 array(
                     'https://www.orcam.com/media/MYEYE_2_Pro.png',
-                    'MYEYE_2_Pro.png',
-                    'orcam%200165%20(1)%20(1).webp',
-                    'orcam 0165 (1) (1).webp'
+                    'MYEYE_2_Pro.png'
                 ),
                 esc_url($p2['image_url']),
                 $html
