@@ -5,6 +5,23 @@
     if (window.orcamAuthoritativeTitle) {
         document.title = window.orcamAuthoritativeTitle;
     }
+    // Block and remove UserWay widget
+    function removeUserWayElements() {
+        var elements = document.querySelectorAll('iframe[src*="userway"], #userwayAccessibilityIcon, .userway_p1, #userway_p1, [id^="userway"], .uai, script[src*="userway"], script[data-account="t2KpHXGp9h"]');
+        for (var u = 0; u < elements.length; u++) {
+            elements[u].remove();
+        }
+    }
+    removeUserWayElements();
+    if (window.MutationObserver) {
+        var userwayObserver = new MutationObserver(function () {
+            removeUserWayElements();
+        });
+        if (document.documentElement) {
+            userwayObserver.observe(document.documentElement, { childList: true, subtree: true });
+        }
+    }
+
     var initialBlogIndex = document.querySelector('.orcam-blog-index');
     var savedBlogIndex = initialBlogIndex ? initialBlogIndex.cloneNode(true) : null;
     var initialBlogArticle = document.querySelector('.orcam-blog');
@@ -13,7 +30,7 @@
         ? (savedBlogArticle.textContent || '').replace(/\s+/g, ' ').trim().length
         : 0;
     var preserveBlogScheduled = false;
-    var nativeWooContent = document.querySelector('article#mainBody > .orcam-shop, article#mainBody > .orcam-default-product, article#mainBody > .orcam-checkout');
+    var nativeWooContent = document.querySelector('article#mainBody > .orcam-shop, article#mainBody > .orcam-default-product, article#mainBody > .orcam-checkout, article#mainBody > .orcam-pdp, article#mainBody .orcam-pdp');
     var savedNativeWooContent = nativeWooContent ? nativeWooContent.cloneNode(true) : null;
     var preserveNativeWooScheduled = false;
 
@@ -578,7 +595,7 @@
         // Clean out any Svelte product sections injected into mainBody during client hydration
         var children = Array.prototype.slice.call(main.children);
         children.forEach(function (child) {
-            if (!child.matches('.orcam-shop, .orcam-default-product, .orcam-checkout, nav.orcam-footer, section#bottomPage')) {
+            if (!child.matches('.orcam-shop, .orcam-default-product, .orcam-checkout, .orcam-pdp, nav.orcam-footer, section#bottomPage, #orcam-vn-support-block, style, script, .orcam-vn-support-section')) {
                 child.remove();
             }
         });
@@ -586,12 +603,12 @@
         // Also clean any rogue sections injected into body
         var rogue = document.querySelectorAll('body > section:not(#header):not(#bottomPage)');
         Array.prototype.slice.call(rogue).forEach(function (el) {
-            if (!el.closest('.orcam-shop, .orcam-default-product, .orcam-checkout, nav.orcam-footer, #header')) {
+            if (!el.closest('.orcam-shop, .orcam-default-product, .orcam-checkout, .orcam-pdp, nav.orcam-footer, #header, #orcam-vn-support-block')) {
                 el.remove();
             }
         });
 
-        var current = main.querySelector(':scope > .orcam-shop, :scope > .orcam-default-product, :scope > .orcam-checkout');
+        var current = main.querySelector(':scope > .orcam-shop, :scope > .orcam-default-product, :scope > .orcam-checkout, :scope > .orcam-pdp');
         if (!current) {
             var footer = main.querySelector(':scope > nav.orcam-footer');
             main.insertBefore(savedNativeWooContent.cloneNode(true), footer || main.firstChild);

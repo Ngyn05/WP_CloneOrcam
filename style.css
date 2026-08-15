@@ -9,6 +9,24 @@ Requires PHP: 7.4
 Text Domain: orcam-theme
 */
 
+/* Hide and block UserWay accessibility widget */
+#userwayAccessibilityIcon,
+.userway_p1,
+#userway_p1,
+[id^="userway"],
+iframe[src*="userway"],
+.uai {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    position: absolute !important;
+    top: -9999px !important;
+    left: -9999px !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
 .orcam-wp-content {
     box-sizing: border-box;
     margin: 0 auto;
@@ -1345,3 +1363,838 @@ form.cart .quantity,
     font-weight: 500 !important;
     text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7) !important;
 }
+
+/* ==========================================================================
+   Single Product Theme (OrCam PDP) Styles
+   ========================================================================== */
+.orcam-pdp {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+    color: #1e293b !important;
+    background: #f8fafc !important;
+    padding-bottom: 60px !important;
+    width: 100% !important;
+    display: block !important;
+    box-sizing: border-box !important;
+}
+.orcam-pdp * {
+    box-sizing: border-box !important;
+}
+.orcam-pdp__container {
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    padding: 0 20px !important;
+}
+.orcam-pdp__breadcrumb {
+    padding: 18px 0 !important;
+    font-size: 13.5px !important;
+    color: #64748b !important;
+}
+.orcam-pdp__breadcrumb a {
+    color: #64748b !important;
+    text-decoration: none !important;
+    transition: color .2s !important;
+}
+.orcam-pdp__breadcrumb a:hover {
+    color: #2563eb !important;
+}
+.orcam-pdp__breadcrumb .sep {
+    margin: 0 8px !important;
+    color: #cbd5e1 !important;
+}
+.orcam-pdp__breadcrumb .current {
+    color: #0f172a !important;
+    font-weight: 600 !important;
+}
+.orcam-pdp__hero {
+    padding: 20px 0 40px !important;
+}
+.orcam-pdp__grid {
+    display: grid !important;
+    grid-template-columns: 1.1fr 0.9fr !important;
+    gap: 48px !important;
+    align-items: start !important;
+}
+.orcam-pdp__gallery {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+}
+.orcam-pdp__stage {
+    position: relative !important;
+    background: #ffffff !important;
+    border-radius: 16px !important;
+    padding: 32px !important;
+    text-align: center !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.03) !important;
+    min-height: 400px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+.orcam-pdp__stage img {
+    max-width: 100% !important;
+    max-height: 350px !important;
+    width: auto !important;
+    height: auto !important;
+    object-fit: contain !important;
+    display: block !important;
+    margin: 0 auto !important;
+    transition: transform .3s ease !important;
+}
+.orcam-pdp__badge {
+    position: absolute !important;
+    top: 16px !important;
+    left: 16px !important;
+    background: #2563eb !important;
+    color: #fff !important;
+    font-size: 11px !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.8px !important;
+    padding: 4px 10px !important;
+    border-radius: 6px !important;
+}
+.orcam-pdp__thumbs {
+    display: flex !important;
+    gap: 12px !important;
+    overflow-x: auto !important;
+    padding-bottom: 4px !important;
+}
+.orcam-pdp__thumb {
+    width: 76px !important;
+    height: 76px !important;
+    border-radius: 10px !important;
+    background: #ffffff !important;
+    border: 2px solid #e2e8f0 !important;
+    padding: 6px !important;
+    cursor: pointer !important;
+    transition: all .2s !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+.orcam-pdp__thumb.is-active, .orcam-pdp__thumb:hover {
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 2px rgba(37,99,235,0.2) !important;
+}
+.orcam-pdp__thumb img {
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
+}
+.orcam-pdp__trust-bar {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 10px !important;
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    padding: 16px !important;
+    margin-top: 8px !important;
+}
+.trust-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    color: #334155 !important;
+}
+.orcam-pdp__summary {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 18px !important;
+}
+.orcam-pdp__rating {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    font-size: 13px !important;
+    color: #64748b !important;
+    flex-wrap: wrap !important;
+}
+.orcam-pdp__rating .stars {
+    color: #f59e0b !important;
+    font-size: 16px !important;
+    letter-spacing: 2px !important;
+}
+.orcam-pdp__rating .sku {
+    margin-left: auto !important;
+    background: #f1f5f9 !important;
+    padding: 2px 8px !important;
+    border-radius: 4px !important;
+    font-size: 11.5px !important;
+    font-weight: 600 !important;
+}
+.orcam-pdp__title {
+    font-size: 32px !important;
+    font-weight: 800 !important;
+    color: #0f172a !important;
+    line-height: 1.25 !important;
+    margin: 0 !important;
+}
+.orcam-pdp__price-wrap {
+    display: flex !important;
+    align-items: baseline !important;
+    gap: 14px !important;
+    padding: 16px 0 !important;
+    border-top: 1px solid #e2e8f0 !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+.orcam-pdp__price {
+    font-size: 34px !important;
+    font-weight: 800 !important;
+    color: #2563eb !important;
+    letter-spacing: -0.5px !important;
+}
+.orcam-pdp__regular-price {
+    font-size: 18px !important;
+    color: #94a3b8 !important;
+    text-decoration: line-through !important;
+}
+.orcam-pdp__discount-tag {
+    background: #ef4444 !important;
+    color: #fff !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    padding: 3px 8px !important;
+    border-radius: 4px !important;
+}
+.orcam-pdp__highlights h3 {
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+    margin: 0 0 12px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+}
+.orcam-pdp__highlights ul {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+}
+.orcam-pdp__highlights li {
+    display: flex !important;
+    align-items: flex-start !important;
+    gap: 10px !important;
+    font-size: 14.5px !important;
+    line-height: 1.5 !important;
+    color: #334155 !important;
+}
+.orcam-pdp__highlights li svg {
+    flex-shrink: 0 !important;
+    margin-top: 2px !important;
+}
+.orcam-pdp__actions {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    margin-top: 8px !important;
+}
+.orcam-pdp__btn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 10px !important;
+    padding: 16px 24px !important;
+    border-radius: 10px !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    text-decoration: none !important;
+    transition: all .2s !important;
+}
+.orcam-pdp__btn--buy {
+    background: #2563eb !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(37,99,235,0.3) !important;
+}
+.orcam-pdp__btn--buy:hover {
+    background: #1d4ed8 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 20px rgba(37,99,235,0.4) !important;
+}
+.orcam-pdp__btn--call {
+    background: #0f172a !important;
+    color: #ffffff !important;
+}
+.orcam-pdp__btn--call:hover {
+    background: #1e293b !important;
+}
+.orcam-pdp__details {
+    margin-top: 40px !important;
+}
+.orcam-pdp__tabs {
+    display: flex !important;
+    gap: 8px !important;
+    border-bottom: 2px solid #e2e8f0 !important;
+    margin-bottom: 28px !important;
+}
+.orcam-tab-btn {
+    background: none !important;
+    border: none !important;
+    padding: 14px 22px !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    color: #64748b !important;
+    cursor: pointer !important;
+    border-bottom: 3px solid transparent !important;
+    margin-bottom: -2px !important;
+    transition: all .2s !important;
+}
+.orcam-tab-btn.is-active, .orcam-tab-btn:hover {
+    color: #2563eb !important;
+    border-bottom-color: #2563eb !important;
+}
+.orcam-tab-content {
+    display: none !important;
+    background: #ffffff !important;
+    border-radius: 14px !important;
+    padding: 32px !important;
+    border: 1px solid #e2e8f0 !important;
+}
+.orcam-tab-content.is-active {
+    display: block !important;
+}
+.orcam-specs-table {
+    width: 100% !important;
+    border-collapse: collapse !important;
+}
+.orcam-specs-table th, .orcam-specs-table td {
+    padding: 14px 18px !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    text-align: left !important;
+    font-size: 14.5px !important;
+}
+.orcam-specs-table th {
+    width: 30% !important;
+    color: #64748b !important;
+    font-weight: 600 !important;
+    background: #f8fafc !important;
+}
+.orcam-specs-table td {
+    color: #0f172a !important;
+    font-weight: 600 !important;
+}
+.orcam-inbox-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+    gap: 16px !important;
+}
+.inbox-card {
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
+    padding: 16px 20px !important;
+    background: #f8fafc !important;
+    border-radius: 10px !important;
+    border: 1px solid #e2e8f0 !important;
+}
+.inbox-idx {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 50% !important;
+    background: #2563eb !important;
+    color: #fff !important;
+    font-weight: 800 !important;
+    font-size: 14px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+}
+.inbox-text {
+    font-size: 14.5px !important;
+    font-weight: 600 !important;
+    color: #1e293b !important;
+}
+.orcam-pdp__consultation {
+    margin-top: 40px !important;
+}
+.consultation-card {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) !important;
+    border-radius: 16px !important;
+    padding: 36px 40px !important;
+    color: #ffffff !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 32px !important;
+    flex-wrap: wrap !important;
+}
+.consultation-info h2 {
+    font-size: 22px !important;
+    font-weight: 800 !important;
+    margin: 0 0 10px !important;
+    color: #ffffff !important;
+}
+.consultation-info p {
+    color: #94a3b8 !important;
+    font-size: 14px !important;
+    margin: 0 0 16px !important;
+    line-height: 1.6 !important;
+}
+.branches {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 6px !important;
+    font-size: 13.5px !important;
+    color: #cbd5e1 !important;
+}
+.btn-hotline {
+    display: inline-block !important;
+    background: #2563eb !important;
+    color: #ffffff !important;
+    padding: 16px 28px !important;
+    border-radius: 10px !important;
+    font-weight: 800 !important;
+    font-size: 17px !important;
+    text-decoration: none !important;
+    letter-spacing: 0.5px !important;
+    box-shadow: 0 4px 16px rgba(37,99,235,0.4) !important;
+    white-space: nowrap !important;
+}
+.btn-hotline:hover {
+    background: #1d4ed8 !important;
+}
+
+/* Reviews & Rating System */
+.orcam-pdp__rating-link {
+    text-decoration: none !important;
+    display: inline-flex !important;
+    cursor: pointer !important;
+    transition: transform 0.2s !important;
+}
+.orcam-pdp__rating-link:hover {
+    transform: translateY(-1px) !important;
+}
+.orcam-pdp__rating-link .score {
+    text-decoration: underline !important;
+    text-underline-offset: 3px !important;
+}
+.orcam-reviews-container {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 32px !important;
+}
+.orcam-review-summary-card {
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    padding: 28px 32px !important;
+    display: grid !important;
+    grid-template-columns: 200px 1fr 240px !important;
+    gap: 32px !important;
+    align-items: center !important;
+}
+.orcam-rating-score-box {
+    text-align: center !important;
+    border-right: 1px solid #e2e8f0 !important;
+    padding-right: 24px !important;
+}
+.score-number {
+    font-size: 48px !important;
+    font-weight: 900 !important;
+    color: #1e293b !important;
+    line-height: 1 !important;
+    margin-bottom: 6px !important;
+}
+.score-stars {
+    color: #f59e0b !important;
+    font-size: 20px !important;
+    letter-spacing: 2px !important;
+    margin-bottom: 6px !important;
+}
+.score-note {
+    font-size: 12.5px !important;
+    color: #64748b !important;
+    font-weight: 500 !important;
+}
+.orcam-rating-bars {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+}
+.rating-bar-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    font-size: 13px !important;
+    color: #475569 !important;
+}
+.star-label {
+    width: 45px !important;
+    font-weight: 600 !important;
+}
+.bar-track {
+    flex: 1 !important;
+    height: 8px !important;
+    background: #e2e8f0 !important;
+    border-radius: 4px !important;
+    overflow: hidden !important;
+}
+.bar-fill {
+    height: 100% !important;
+    background: #f59e0b !important;
+    border-radius: 4px !important;
+}
+.percent-label {
+    width: 35px !important;
+    text-align: right !important;
+    font-weight: 700 !important;
+    color: #1e293b !important;
+}
+.orcam-review-cta-box {
+    text-align: center !important;
+    border-left: 1px solid #e2e8f0 !important;
+    padding-left: 24px !important;
+}
+.orcam-review-cta-box p {
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    color: #1e293b !important;
+    margin: 0 0 12px 0 !important;
+}
+.btn-open-review-form {
+    background: #2563eb !important;
+    color: #ffffff !important;
+    border: none !important;
+    padding: 12px 20px !important;
+    border-radius: 8px !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    cursor: pointer !important;
+    transition: background 0.2s !important;
+}
+.btn-open-review-form:hover {
+    background: #1d4ed8 !important;
+}
+.orcam-reviews-feed {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+}
+.review-item {
+    background: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    padding: 22px 24px !important;
+}
+.review-item__header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+    margin-bottom: 14px !important;
+}
+.review-avatar {
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 50% !important;
+    background: #eff6ff !important;
+    color: #2563eb !important;
+    font-weight: 800 !important;
+    font-size: 16px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex-shrink: 0 !important;
+}
+.review-meta {
+    flex: 1 !important;
+}
+.review-author {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    flex-wrap: wrap !important;
+    margin-bottom: 4px !important;
+}
+.review-author strong {
+    color: #0f172a !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+}
+.verified-badge {
+    background: #ecfdf5 !important;
+    color: #059669 !important;
+    font-size: 11.5px !important;
+    font-weight: 700 !important;
+    padding: 2px 8px !important;
+    border-radius: 12px !important;
+    border: 1px solid rgba(5,150,105,0.2) !important;
+}
+.review-rating {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+.review-rating .stars {
+    color: #f59e0b !important;
+    font-size: 14px !important;
+    letter-spacing: 1px !important;
+}
+.review-rating .date {
+    color: #94a3b8 !important;
+    font-size: 12px !important;
+}
+.review-body p {
+    color: #334155 !important;
+    font-size: 14.5px !important;
+    line-height: 1.65 !important;
+    margin: 0 !important;
+}
+.orcam-write-review-card {
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    padding: 28px 32px !important;
+}
+.orcam-write-review-card h3 {
+    color: #0f172a !important;
+    font-size: 18px !important;
+    font-weight: 800 !important;
+    margin: 0 0 6px 0 !important;
+}
+.form-sub {
+    color: #64748b !important;
+    font-size: 13.5px !important;
+    margin: 0 0 20px 0 !important;
+}
+.orcam-write-review-card .form-group {
+    margin-bottom: 16px !important;
+}
+.orcam-write-review-card label {
+    display: block !important;
+    font-size: 13.5px !important;
+    font-weight: 700 !important;
+    color: #334155 !important;
+    margin-bottom: 6px !important;
+}
+.orcam-write-review-card input,
+.orcam-write-review-card textarea {
+    width: 100% !important;
+    padding: 12px 14px !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 8px !important;
+    background: #ffffff !important;
+    font-size: 14px !important;
+    color: #1e293b !important;
+    box-sizing: border-box !important;
+    outline: none !important;
+    transition: border-color 0.2s !important;
+}
+.orcam-write-review-card input:focus,
+.orcam-write-review-card textarea:focus {
+    border-color: #2563eb !important;
+}
+.orcam-write-review-card .form-row {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 16px !important;
+}
+.btn-submit-review {
+    background: #1e293b !important;
+    color: #ffffff !important;
+    border: none !important;
+    padding: 14px 28px !important;
+    border-radius: 8px !important;
+    font-weight: 800 !important;
+    font-size: 15px !important;
+    cursor: pointer !important;
+    transition: background 0.2s !important;
+}
+.btn-submit-review:hover {
+    background: #0f172a !important;
+}
+@media (max-width: 768px) {
+    .orcam-review-summary-card { grid-template-columns: 1fr !important; gap: 20px !important; text-align: center !important; }
+    .orcam-rating-score-box { border-right: none !important; border-bottom: 1px solid #e2e8f0 !important; padding-right: 0 !important; padding-bottom: 16px !important; }
+    .orcam-review-cta-box { border-left: none !important; border-top: 1px solid #e2e8f0 !important; padding-left: 0 !important; padding-top: 16px !important; }
+    .orcam-write-review-card .form-row { grid-template-columns: 1fr !important; }
+}
+
+@media (max-width: 900px) {
+    .orcam-pdp__grid { grid-template-columns: 1fr !important; gap: 28px !important; }
+    .orcam-pdp__title { font-size: 26px !important; }
+    .consultation-card { flex-direction: column !important; text-align: center !important; }
+    .branches { text-align: left !important; }
+}
+
+/* ==========================================================================
+   OrCam Vietnam Support Block (Global Canonical Footer)
+   ========================================================================== */
+#orcam-vn-support-block {
+    background: var(--orcam-07-solid-gray, #1a1a1a) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    display: block !important;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+}
+#orcam-vn-support-block * {
+    box-sizing: border-box !important;
+}
+.ovn-top-row {
+    max-width: 1400px !important;
+    margin: 0 auto !important;
+    padding: 36px var(--orcam-sides-padding, 5%) 28px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+    border-bottom: 1px solid rgba(255,255,255,.07) !important;
+}
+.ovn-brand {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+.ovn-brand-name {
+    color: #38bdf8 !important;
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    letter-spacing: 1.5px !important;
+    text-transform: uppercase !important;
+}
+.ovn-desc {
+    color: #64748b !important;
+    font-size: 12.5px !important;
+    line-height: 1.6 !important;
+    margin: 0 !important;
+    max-width: 340px !important;
+    text-align: right !important;
+}
+.ovn-cards-wrap {
+    max-width: 1400px !important;
+    margin: 0 auto !important;
+    padding: 24px var(--orcam-sides-padding, 5%) 32px !important;
+}
+.ovn-section-label {
+    color: #475569 !important;
+    font-size: 10.5px !important;
+    font-weight: 700 !important;
+    letter-spacing: 2px !important;
+    text-transform: uppercase !important;
+    margin: 0 0 16px 0 !important;
+}
+.ovn-cards {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
+    gap: 14px !important;
+}
+.ovn-card {
+    border-radius: 10px !important;
+    padding: 18px 20px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+    transition: border-color 0.2s !important;
+}
+.ovn-card-regular {
+    background: rgba(255,255,255,.03) !important;
+    border: 1px solid rgba(255,255,255,.07) !important;
+}
+.ovn-card-regular:hover {
+    border-color: rgba(56,189,248,0.25) !important;
+}
+.ovn-card-hotline {
+    background: rgba(37,99,235,.08) !important;
+    border: 1px solid rgba(37,99,235,.25) !important;
+}
+.ovn-card-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin-bottom: 14px !important;
+}
+.ovn-card-icon {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 7px !important;
+    background: rgba(56,189,248,.08) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    color: #38bdf8 !important;
+}
+.ovn-card-hotline .ovn-card-icon {
+    background: rgba(37,99,235,.15) !important;
+    color: #60a5fa !important;
+}
+.ovn-badge {
+    font-size: 9.5px !important;
+    font-weight: 700 !important;
+    letter-spacing: .8px !important;
+    padding: 2px 9px !important;
+    border-radius: 20px !important;
+    text-transform: uppercase !important;
+}
+.ovn-badge-blue {
+    color: #38bdf8 !important;
+    background: rgba(56,189,248,.08) !important;
+    border: 1px solid rgba(56,189,248,.18) !important;
+}
+.ovn-badge-indigo {
+    color: #818cf8 !important;
+    background: rgba(99,102,241,.1) !important;
+    border: 1px solid rgba(99,102,241,.2) !important;
+}
+.ovn-card-title {
+    color: #e2e8f0 !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    margin: 0 0 5px 0 !important;
+    line-height: 1.3 !important;
+}
+.ovn-card-addr {
+    color: #64748b !important;
+    font-size: 12px !important;
+    line-height: 1.55 !important;
+    margin: 0 0 14px 0 !important;
+}
+.ovn-card-phone {
+    display: flex !important;
+    align-items: center !important;
+    gap: 7px !important;
+    color: #38bdf8 !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    text-decoration: none !important;
+    padding-top: 12px !important;
+    border-top: 1px solid rgba(255,255,255,.05) !important;
+    margin-top: auto !important;
+}
+.ovn-hotline-btn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    background: #1d4ed8 !important;
+    color: #ffffff !important;
+    padding: 11px 14px !important;
+    border-radius: 7px !important;
+    font-size: 18px !important;
+    font-weight: 800 !important;
+    text-decoration: none !important;
+    letter-spacing: .5px !important;
+    margin: 4px 0 10px !important;
+}
+.ovn-hotline-btn:hover {
+    background: #2563eb !important;
+    color: #ffffff !important;
+}
+.ovn-hotline-note {
+    color: #64748b !important;
+    font-size: 11.5px !important;
+    text-align: center !important;
+    margin: 0 !important;
+    line-height: 1.4 !important;
+}
+@media (max-width: 600px) {
+    .ovn-desc { text-align: left !important; }
+    .ovn-cards { grid-template-columns: 1fr !important; }
+}
+

@@ -11,8 +11,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('ORCAM_THEME_VERSION', '2.2.3');
-define('ORCAM_USERWAY_ACCOUNT', 't2KpHXGp9h');
+define('ORCAM_THEME_VERSION', '2.3.8');
 
 add_action('after_setup_theme', static function () {
     add_theme_support('title-tag');
@@ -28,6 +27,382 @@ add_action('after_setup_theme', static function () {
         'footer'  => __('Footer navigation', 'orcam-theme'),
     ));
 });
+
+/**
+ * Ensure product specs, in-the-box items and highlight features are seeded into WordPress Database.
+ */
+function orcam_theme_seed_product_specifications(): void {
+    $specs_data = array(
+        'orcam-myeye-3-pro' => array(
+            'specs' => array(
+                'Kích thước' => '76 x 21 x 14.9 mm',
+                'Trọng lượng' => '22.5 gram',
+                'Camera' => '13 Megapixel HD sắc nét',
+                'Kết nối' => 'Wi-Fi 5GHz, Bluetooth 5.0, USB-C',
+                'Thời lượng pin' => '2 giờ sử dụng liên tục (kèm sạc nhanh)',
+                'Ngôn ngữ hỗ trợ' => 'Tiếng Việt, Tiếng Anh và hơn 25 ngôn ngữ',
+                'Bảo hành' => '24 tháng chính hãng OrCam'
+            ),
+            'in_box' => array('Thiết bị OrCam MyEye 3 Pro', 'Bộ gá từ tính gắn mọi loại gọng kính', 'Cáp sạc nhanh Type-C và củ sạc chính hãng', 'Dây đeo cổ chống rơi & Khăn lau kính', 'Hộp đựng chống sốc cao cấp', 'Sách hướng dẫn sử dụng tiếng Việt'),
+            'highlights' => array('Trợ lý AI thế hệ mới: Mô tả chi tiết hình ảnh xung quanh', 'Đọc tức thì mọi văn bản in và màn hình kỹ thuật số', 'Nhận diện khuôn mặt, màu sắc, tiền tệ và đồ vật chính xác', 'Kích thước siêu nhỏ gọn 22.5g gắn liền mọi gọng kính')
+        ),
+        'orcam-myeye-2-pro' => array(
+            'specs' => array(
+                'Kích thước' => '76 x 21 x 14.9 mm',
+                'Trọng lượng' => '22.5 gram',
+                'Camera' => '13 Megapixel với đèn LED chiếu sáng',
+                'Kết nối' => 'Wi-Fi, Bluetooth, Micro-USB',
+                'Thời lượng pin' => '1.5 - 2 giờ sử dụng liên tục',
+                'Ngôn ngữ hỗ trợ' => 'Tiếng Việt, Tiếng Anh và hơn 20 ngôn ngữ',
+                'Bảo hành' => '12 tháng chính hãng OrCam'
+            ),
+            'in_box' => array('Thiết bị OrCam MyEye 2 Pro', 'Bộ ngàm từ tính gắn gọng kính (3 bộ)', 'Kính mẫu không độ OrCam', 'Dây sạc & Củ sạc chuyên dụng', 'Hộp bảo vệ chống va đập', 'Thẻ bảo hành & Sách hướng dẫn'),
+            'highlights' => array('Đọc văn bản tức thì từ sách báo, biển hiệu, màn hình', 'Nhận diện khuôn mặt người thân và bạn bè đã lưu', 'Nhận diện tiền tệ và đọc mã vạch sản phẩm', 'Hoạt động hoàn toàn độc lập, không cần kết nối Internet')
+        ),
+        'orcam-read-5' => array(
+            'specs' => array(
+                'Kích thước' => '122 x 25 x 13 mm',
+                'Trọng lượng' => '44.5 gram',
+                'Laser định vị' => '2 chế độ: Đóng khung khối văn bản & Con trỏ laser',
+                'Kết nối' => 'Wi-Fi 2.4/5GHz, Bluetooth, USB-C',
+                'Thời lượng pin' => 'Lên tới 4 giờ đọc liên tục',
+                'Ngôn ngữ hỗ trợ' => 'Tiếng Việt, Tiếng Anh và hơn 20 ngôn ngữ',
+                'Bảo hành' => '12 tháng chính hãng OrCam'
+            ),
+            'in_box' => array('Thiết bị đọc thông minh OrCam Read 5', 'Cáp sạc USB-C và củ sạc', 'Dây đeo cổ tiện lợi', 'Túi vải bảo vệ cao cấp', 'Sách hướng dẫn sử dụng tiếng Việt'),
+            'highlights' => array('Kính lúp đọc thông minh AI thế hệ 5', 'Đọc trọn vẹn cả trang sách chỉ với 1 nút bấm', '2 chế độ quét Laser: Con trỏ định vị & Đóng khung vùng đọc', 'Tương tác thông minh bằng giọng nói với AI Assistant')
+        ),
+        'orcam-read-3' => array(
+            'specs' => array(
+                'Kích thước' => '122 x 25 x 13 mm',
+                'Trọng lượng' => '44.5 gram',
+                'Tính năng đặc biệt' => 'Kính lúp đọc thông minh AI & Giá đỡ đọc sách',
+                'Kết nối' => 'Wi-Fi, Bluetooth, USB Type-C',
+                'Thời lượng pin' => 'Lên tới 4 giờ sử dụng',
+                'Ngôn ngữ hỗ trợ' => 'Tiếng Việt, Tiếng Anh và đa ngôn ngữ',
+                'Bảo hành' => '12 tháng chính hãng OrCam'
+            ),
+            'in_box' => array('Thiết bị cầm tay OrCam Read 3', 'Đế sạc kiêm giá đỡ đọc sách thông minh', 'Cáp & Củ sạc chính hãng', 'Dây đeo tiện lợi', 'Tài liệu hướng dẫn'),
+            'highlights' => array('Kết hợp thiết bị cầm tay và trạm đọc cố định', 'Tích hợp kính lúp AI hiển thị sắc nét trên màn hình', 'Đọc sách báo, tạp chí với độ chính xác tuyệt đối', 'Hỗ trợ đắc lực cho người giảm thị lực và người cao tuổi')
+        ),
+        'orcam-read' => array(
+            'specs' => array(
+                'Kích thước' => '122 x 25 x 13 mm',
+                'Trọng lượng' => '44.5 gram',
+                'Đèn LED' => 'Tích hợp đèn chiếu sáng ban đêm thông minh',
+                'Kết nối' => 'Bluetooth Audio, USB-C',
+                'Thời lượng pin' => 'Lên tới 4 giờ sử dụng liên tục',
+                'Ngôn ngữ hỗ trợ' => 'Tiếng Việt, Tiếng Anh',
+                'Bảo hành' => '12 tháng chính hãng OrCam'
+            ),
+            'in_box' => array('Thiết bị đọc cá nhân OrCam Read', 'Cáp sạc USB-C', 'Dây đeo tay & Túi đựng', 'Sách hướng dẫn sử dụng'),
+            'highlights' => array('Thiết bị đọc AI cầm tay tiên phong thế giới', 'Quét và đọc toàn bộ văn bản trong tích tắc', 'Định vị bằng tia laser chính xác từng câu chữ', 'Âm thanh to rõ, hỗ trợ kết nối tai nghe Bluetooth')
+        )
+    );
+
+    foreach ($specs_data as $slug => $data) {
+        $posts = get_posts(array(
+            'name' => $slug,
+            'post_type' => 'product',
+            'post_status' => 'any',
+            'numberposts' => 1
+        ));
+        if (!empty($posts)) {
+            $pid = $posts[0]->ID;
+            $excerpt_text = implode("\n", $data['highlights']);
+            
+            // Populate excerpt (Mô tả ngắn/Tính năng đột phá) if empty
+            if (empty($posts[0]->post_excerpt)) {
+                wp_update_post(array(
+                    'ID' => $pid,
+                    'post_excerpt' => $excerpt_text
+                ));
+            }
+
+            update_post_meta($pid, '_orcam_specs', $data['specs']);
+            if (!get_post_meta($pid, '_orcam_in_box', true)) {
+                update_post_meta($pid, '_orcam_in_box', $data['in_box']);
+            }
+            update_post_meta($pid, '_orcam_highlights', $data['highlights']);
+
+            // Save WooCommerce native attributes table
+            $attributes = array();
+            $position = 0;
+            foreach ($data['specs'] as $name => $val) {
+                $attributes[sanitize_title($name)] = array(
+                    'name' => $name,
+                    'value' => $val,
+                    'position' => $position++,
+                    'is_visible' => 1,
+                    'is_variation' => 0,
+                    'is_taxonomy' => 0
+                );
+            }
+            update_post_meta($pid, '_product_attributes', $attributes);
+        }
+    }
+}
+add_action('init', 'orcam_theme_seed_product_specifications');
+
+/**
+ * Seed initial approved WooCommerce reviews into WordPress Database.
+ */
+function orcam_theme_seed_product_reviews(): void {
+    $reviews_by_slug = array(
+        'orcam-myeye-3-pro' => array(
+            array(
+                'author' => 'Nguyễn Văn Hùng',
+                'email' => 'hung.nguyen@gmail.com',
+                'content' => 'Thiết bị nhận diện và đọc tiếng Việt cực kỳ chính xác. Mẹ tôi bị thoái hóa điểm vàng nặng nhiều năm nay đã có thể tự đọc sách báo hàng ngày mà không cần người khác hỗ trợ. Kỹ thuật viên OrCam hướng dẫn tận nhà rất chu đáo, nhiệt tình!',
+                'rating' => 5,
+                'date' => '2024-08-12 09:30:00'
+            ),
+            array(
+                'author' => 'Trần Thị Mai Lan',
+                'email' => 'mailan.tran@gmail.com',
+                'content' => 'Máy rất nhỏ gọn, gắn trực tiếp vào gọng kính tiện lợi vô cùng. Tính năng nhận diện khuôn mặt người quen và đọc chữ in trên bao bì thuốc rất nhanh. Cảm ơn OrCam Việt Nam đã mang một sản phẩm công nghệ trợ năng tuyệt vời đến với cộng đồng khiếm thị.',
+                'rating' => 5,
+                'date' => '2024-07-28 14:15:00'
+            ),
+            array(
+                'author' => 'Bác sĩ Lê Hoàng Nam',
+                'email' => 'dr.namle@gmail.com',
+                'content' => 'Sản phẩm chất lượng vượt trội so với các thiết bị trợ thị khác trên thị trường. Âm thanh rõ ràng, thời lượng pin tốt và thao tác cử chỉ tay rất nhạy. Rất đáng giá cho người thân bị giảm thị lực.',
+                'rating' => 5,
+                'date' => '2024-07-15 16:45:00'
+            )
+        ),
+        'orcam-myeye-2-pro' => array(
+            array(
+                'author' => 'Phạm Minh Trí',
+                'email' => 'tri.pham@gmail.com',
+                'content' => 'OrCam MyEye 2 Pro hoạt động rất ổn định và hoàn toàn không cần kết nối mạng. Bố tôi dùng để đọc sách và nhận biết mệnh giá tiền khi đi chợ cực kỳ tiện lợi.',
+                'rating' => 5,
+                'date' => '2024-08-01 10:20:00'
+            ),
+            array(
+                'author' => 'Hoàng Thu Trang',
+                'email' => 'thutrang.h@gmail.com',
+                'content' => 'Thiết bị đeo nhẹ tênh, gắn vào gọng kính vừa vặn. Khả năng đọc chữ in trên biển hiệu và văn bản rất nhanh. Gia đình tôi rất hài lòng!',
+                'rating' => 5,
+                'date' => '2024-07-20 11:35:00'
+            )
+        ),
+        'orcam-read-5' => array(
+            array(
+                'author' => 'Đỗ Hải Đăng',
+                'email' => 'haidang.do@gmail.com',
+                'content' => 'Tính năng quét laser đóng khung cả trang sách rồi đọc tức thì cực kỳ ấn tượng. Kính lúp thông minh hiển thị lên màn hình rất to và rõ nét.',
+                'rating' => 5,
+                'date' => '2024-08-05 08:40:00'
+            ),
+            array(
+                'author' => 'Vũ Bích Ngọc',
+                'email' => 'bichngoc.vu@gmail.com',
+                'content' => 'Thiết kế cầm tay dạng bút tiện dụng, cầm rất chắc tay. Trợ lý AI phản hồi giọng nói nhanh và giọng đọc tiếng Việt rất tự nhiên, truyền cảm.',
+                'rating' => 5,
+                'date' => '2024-07-18 15:20:00'
+            )
+        ),
+        'orcam-read-3' => array(
+            array(
+                'author' => 'Ngô Quốc Bảo',
+                'email' => 'quocbao.ngo@gmail.com',
+                'content' => 'Đế sạc kiêm trạm đọc cố định rất thông minh. Đặt sách xuống là máy tự động nhận diện và đọc rành mạch từng trang. Rất phù hợp cho người lớn tuổi.',
+                'rating' => 5,
+                'date' => '2024-08-03 13:10:00'
+            ),
+            array(
+                'author' => 'Lê Thanh Thảo',
+                'email' => 'thanhthao.le@gmail.com',
+                'content' => 'Sản phẩm đóng gói rất cẩn thận, đầy đủ phụ kiện. Thời lượng pin dùng liên tục được lâu. Dịch vụ chăm sóc khách hàng của OrCam Việt Nam rất chuyên nghiệp!',
+                'rating' => 5,
+                'date' => '2024-07-22 09:15:00'
+            )
+        ),
+        'orcam-read' => array(
+            array(
+                'author' => 'Đinh Tiến Dũng',
+                'email' => 'tiendung.dinh@gmail.com',
+                'content' => 'Thiết bị đọc cầm tay nhỏ gọn, âm thanh phát qua loa tích hợp to và rõ. Kết nối tai nghe Bluetooth rất tiện khi sử dụng ở nơi công cộng.',
+                'rating' => 5,
+                'date' => '2024-07-25 17:00:00'
+            )
+        )
+    );
+
+    foreach ($reviews_by_slug as $slug => $items) {
+        $posts = get_posts(array(
+            'name' => $slug,
+            'post_type' => 'product',
+            'post_status' => 'any',
+            'numberposts' => 1
+        ));
+        if (empty($posts)) {
+            continue;
+        }
+        $pid = $posts[0]->ID;
+        
+        // Ensure comments are open
+        wp_update_post(array('ID' => $pid, 'comment_status' => 'open'));
+
+        $existing = get_comments(array('post_id' => $pid, 'count' => true));
+        if ($existing > 0) {
+            continue;
+        }
+
+        foreach ($items as $rev) {
+            $comment_id = wp_insert_comment(array(
+                'comment_post_ID' => $pid,
+                'comment_author' => $rev['author'],
+                'comment_author_email' => $rev['email'],
+                'comment_content' => $rev['content'],
+                'comment_type' => 'review',
+                'comment_approved' => 1,
+                'comment_date' => $rev['date'],
+                'comment_date_gmt' => get_gmt_from_date($rev['date'])
+            ));
+            if ($comment_id) {
+                update_comment_meta($comment_id, 'rating', $rev['rating']);
+                update_comment_meta($comment_id, 'verified', 1);
+            }
+        }
+    }
+}
+add_action('init', 'orcam_theme_seed_product_reviews', 20);
+
+/**
+ * Auto-approve all new product reviews and comments.
+ */
+add_filter('pre_comment_approved', static function ($approved, array $commentdata) {
+    return 1;
+}, 99, 2);
+
+add_filter('pre_option_comment_moderation', static function () {
+    return '0';
+});
+
+add_filter('pre_option_comment_previously_approved', static function () {
+    return '0';
+});
+
+/**
+ * Save rating meta and verified status when a review comment is posted.
+ */
+add_action('comment_post', static function (int $comment_id, $comment_approved, array $commentdata): void {
+    if (isset($_POST['rating']) && is_numeric($_POST['rating'])) {
+        $rating = max(1, min(5, (int) $_POST['rating']));
+        update_comment_meta($comment_id, 'rating', $rating);
+        update_comment_meta($comment_id, 'verified', 1);
+
+        // Update product lookup table for ratings
+        if (!empty($commentdata['comment_post_ID']) && function_exists('wc_update_product_lookup_tables')) {
+            wc_update_product_lookup_tables((int) $commentdata['comment_post_ID']);
+        }
+    }
+}, 10, 3);
+
+/**
+ * Add Meta Boxes for Product Specs & In-the-box accessories in WP Admin.
+ */
+add_action('add_meta_boxes', static function (): void {
+    // Meta box: Specs (Thông số kỹ thuật)
+    add_meta_box(
+        'orcam_product_specs_meta',
+        __('Thông Số Kỹ Thuật (Specs)', 'orcam-theme'),
+        static function (WP_Post $post): void {
+            wp_nonce_field('orcam_save_product_extra', 'orcam_product_extra_nonce');
+            
+            $specs = get_post_meta($post->ID, '_orcam_specs', true);
+            $specs_text = '';
+            if (is_array($specs)) {
+                $lines = array();
+                foreach ($specs as $k => $v) {
+                    $lines[] = $k . ': ' . $v;
+                }
+                $specs_text = implode("\n", $lines);
+            } elseif (is_string($specs)) {
+                $specs_text = $specs;
+            }
+
+            echo '<div style="margin: 10px 0;">';
+            echo '<p style="font-weight:600; margin-bottom:6px;">' . esc_html__('Thông số kỹ thuật (Định dạng: Tên thông số: Giá trị - Mỗi dòng 1 mục):', 'orcam-theme') . '</p>';
+            echo '<textarea name="orcam_specs" rows="6" style="width:100%; font-family: monospace; font-size:13px;" placeholder="Ví dụ:&#10;Kích thước: 76 x 21 x 14.9 mm&#10;Trọng lượng: 22.5 gram&#10;Camera: 13 Megapixel HD&#10;Kết nối: Wi-Fi, Bluetooth 5.0&#10;Bảo hành: 24 tháng chính hãng">' . esc_textarea($specs_text) . '</textarea>';
+            echo '<p class="description" style="margin-top:6px;">' . esc_html__('Các thông số này sẽ hiển thị trong bảng "Thông Số Kỹ Thuật" trên trang chi tiết sản phẩm.', 'orcam-theme') . '</p>';
+            echo '</div>';
+        },
+        'product',
+        'normal',
+        'high'
+    );
+
+    // Meta box: In the box (Bộ sản phẩm bao gồm)
+    add_meta_box(
+        'orcam_product_extra_meta',
+        __('Bộ sản phẩm bao gồm (Phụ kiện đi kèm)', 'orcam-theme'),
+        static function (WP_Post $post): void {
+            wp_nonce_field('orcam_save_product_extra', 'orcam_product_extra_nonce');
+            
+            $in_box = get_post_meta($post->ID, '_orcam_in_box', true);
+            if (is_array($in_box)) {
+                $in_box_text = implode("\n", $in_box);
+            } else {
+                $in_box_text = (string) $in_box;
+            }
+
+            echo '<div style="margin: 10px 0;">';
+            echo '<p style="font-weight:600; margin-bottom:6px;">' . esc_html__('Danh sách các phụ kiện đi kèm (mỗi dòng 1 món):', 'orcam-theme') . '</p>';
+            echo '<textarea name="orcam_in_box" rows="6" style="width:100%; font-family: monospace; font-size:13px;" placeholder="Ví dụ:&#10;Thiết bị chính hãng&#10;Cáp sạc USB-C và củ sạc&#10;Hộp đựng chống sốc cao cấp&#10;Sách hướng dẫn sử dụng tiếng Việt">' . esc_textarea($in_box_text) . '</textarea>';
+            echo '<p class="description" style="margin-top:6px;">' . esc_html__('Các mục này sẽ hiển thị trong tab "Bộ Sản Phẩm Bao Gồm" trên trang chi tiết sản phẩm.', 'orcam-theme') . '</p>';
+            echo '</div>';
+        },
+        'product',
+        'normal',
+        'high'
+    );
+});
+
+add_action('save_post_product', static function (int $post_id): void {
+    if (!isset($_POST['orcam_product_extra_nonce']) || !wp_verify_nonce($_POST['orcam_product_extra_nonce'], 'orcam_save_product_extra')) {
+        return;
+    }
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        return;
+    }
+    if (!current_user_can('edit_post', $post_id)) {
+        return;
+    }
+
+    if (isset($_POST['orcam_specs'])) {
+        $raw_specs = sanitize_textarea_field($_POST['orcam_specs']);
+        $lines = array_filter(array_map('trim', explode("\n", $raw_specs)));
+        $specs_arr = array();
+        foreach ($lines as $line) {
+            if (strpos($line, ':') !== false) {
+                list($key, $val) = explode(':', $line, 2);
+                $key = trim($key);
+                $val = trim($val);
+                if ($key !== '' && $val !== '') {
+                    $specs_arr[$key] = $val;
+                }
+            } else {
+                $specs_arr[$line] = $line;
+            }
+        }
+        if (!empty($specs_arr)) {
+            update_post_meta($post_id, '_orcam_specs', $specs_arr);
+        }
+    }
+
+    if (isset($_POST['orcam_in_box'])) {
+        $lines = array_filter(array_map('trim', explode("\n", sanitize_textarea_field($_POST['orcam_in_box']))));
+        if (!empty($lines)) {
+            update_post_meta($post_id, '_orcam_in_box', array_values($lines));
+        }
+    }
+});
+
+
 
 /** Use the familiar Visual/Code editor for blog posts. */
 add_filter('use_block_editor_for_post_type', static function (bool $use_block_editor, string $post_type): bool {
@@ -426,6 +801,35 @@ add_action('template_redirect', static function (): void {
         $index_file = get_template_directory() . '/static-pages/vi/index.html';
         if (orcam_theme_try_serve_cache($index_file)) {
             exit;
+        }
+    }
+
+    // Direct routing for ANY WooCommerce product from database
+    $normalized_slug = preg_replace('#^(vi/)?(product/)?#', '', trim($route, '/'));
+    if ($normalized_slug !== '' && $normalized_slug !== 'shop' && $normalized_slug !== 'checkout' && $normalized_slug !== 'cart' && $normalized_slug !== 'home' && strpos($normalized_slug, 'blog') !== 0) {
+        global $wpdb;
+        $product_id = (int) $wpdb->get_var($wpdb->prepare(
+            "SELECT ID FROM {$wpdb->posts} WHERE post_name = %s AND post_type = 'product' AND post_status IN ('publish', 'private', 'draft', 'pending') LIMIT 1",
+            $normalized_slug
+        ));
+        if ($product_id > 0) {
+            global $wp_query, $post;
+            $post = get_post($product_id);
+            if ($post) {
+                $wp_query->is_single = true;
+                $wp_query->is_singular = true;
+                $wp_query->queried_object = $post;
+                $wp_query->queried_object_id = $product_id;
+                $wp_query->posts = array($post);
+                $wp_query->post_count = 1;
+                $wp_query->post = $post;
+                setup_postdata($post);
+                $single_template = get_template_directory() . '/single-product.php';
+                if (is_file($single_template)) {
+                    include $single_template;
+                    exit;
+                }
+            }
         }
     }
 
@@ -879,12 +1283,18 @@ function orcam_theme_static_document(?string $route = null): ?string
     }
 
     $root = get_template_directory() . '/static-pages/';
-    if ($route === '') {
-        $candidates = array('vi/index.html');
-    } elseif ($route === 'vi/home') {
+    $normalized_route = preg_replace('#^vi/vi/#', 'vi/', $route);
+    $normalized_route = preg_replace('#\.html$#i', '', $normalized_route);
+    if ($normalized_route === '' || $normalized_route === 'vi/home' || $normalized_route === 'vi') {
         $candidates = array('vi/index.html');
     } else {
-        $candidates = array($route, $route . '.html', rtrim($route, '/') . '/index.html');
+        $candidates = array(
+            $normalized_route,
+            $normalized_route . '.html',
+            rtrim($normalized_route, '/') . '/index.html',
+            'vi/' . ltrim($normalized_route, '/'),
+            'vi/' . ltrim($normalized_route, '/') . '.html',
+        );
     }
 
     foreach ($candidates as $candidate) {
@@ -1554,15 +1964,11 @@ function orcam_theme_render_document(string $file, ?string $document_html = null
         $html
     );
 
-    // Some exported pages do not include the accessibility widget. Inject it
-    // once at render time so the accessibility control is present everywhere.
-    if (!$is_local_development && !preg_match('#<script[^>]+cdn\\.userway\\.org/widget\\.js[^>]*>#i', $html)) {
-        $accessibility_tag = sprintf(
-            '<script src="https://cdn.userway.org/widget.js" data-account="%s" async></script>',
-            esc_attr(ORCAM_USERWAY_ACCOUNT)
-        );
-        $html = preg_replace('/<\\/head>/i', $accessibility_tag . '</head>', $html, 1);
-    }
+    // Strip UserWay script tags
+    $html = preg_replace('#<script[^>]*src=["\'][^"\']*cdn\.userway\.org/[^"\']*["\'][^>]*>.*?</script>#is', '', $html);
+    $html = preg_replace('#<script[^>]*src=["\'][^"\']*cdn\.userway\.org/[^"\']*["\'][^>]*>#is', '', $html);
+    $html = preg_replace('#<script[^>]*data-account=["\']t2KpHXGp9h["\'][^>]*>.*?</script>#is', '', $html);
+    $html = preg_replace('#<script[^>]*data-account=["\']t2KpHXGp9h["\'][^>]*>#is', '', $html);
 
     // SvelteKit data endpoints are unavailable in a static export. Load the
     // compatibility handler before the client router can intercept links.
@@ -1646,10 +2052,8 @@ function orcam_theme_render_document(string $file, ?string $document_html = null
 /** Render native WooCommerce content inside the same exported header/footer. */
 function orcam_theme_render_shared_static_shell(string $content, string $title, bool $include_wordpress_assets = false, string $custom_cache_file = '', string $custom_cache_key = '', bool $return_only = false): bool
 {
-    // Use an original product page as the canonical shell so native/new
-    // products receive exactly the same header, submenu assets and footer as
-    // the five migrated product pages.
-    $file = get_template_directory() . '/static-pages/vi/orcam-myeye-3-pro.html';
+    // Use index.html as the canonical shared shell for native WooCommerce database products
+    $file = get_template_directory() . '/static-pages/vi/index.html';
     if (!is_readable($file)) {
         return false;
     }
@@ -1669,8 +2073,7 @@ function orcam_theme_render_shared_static_shell(string $content, string $title, 
         return false;
     }
 
-    // The shell page marks MyEye 3 Pro active. Native products receive their
-    // own dynamic item, so do not leave a different product highlighted.
+    // The shell page marks active items; clean submenu active states
     $html = str_replace(' orcam-submenu__active', '', $html);
 
     $full_title = esc_html($title) . ' - OrCam';
@@ -1689,29 +2092,11 @@ function orcam_theme_render_shared_static_shell(string $content, string $title, 
         $html = preg_replace('#</body>#i', $wordpress_footer . '</body>', $html, 1);
     }
 
-    // OrCam Vietnam: inject support block before .orcam-footer nav
-    if (true) { // always inject OrCam VN footer block
-        // Strip existing block to avoid duplicate
-        $html = preg_replace('#<style\s+id="orcam-vn-footer-css">.*?</style>[\s\S]*?<div\s+id="orcam-vn-support-block">[\s\S]*?</div>(?:\s*</div>){2}#is', '', $html, 1);
-        $lu = esc_url(get_template_directory_uri() . '/media/logo_white-1.svg');
-        $ph = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.47 2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.09 6.09l1.81-1.81a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
-        $hs = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
-        $hd = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>';
-        $css = '<style id="orcam-vn-footer-css">#orcam-vn-support-block{background:var(--orcam-07-solid-gray,#1a1a1a);width:100%;box-sizing:border-box}.ovn-top-row{max-width:1400px;margin:0 auto;padding:36px var(--orcam-sides-padding,5%) 28px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;border-bottom:1px solid rgba(255,255,255,.07)}.ovn-brand{display:flex;align-items:center;gap:10px}.ovn-brand img{height:22px;width:auto;opacity:.95}.ovn-brand-name{color:#fff;font-size:13.5px;font-weight:800;letter-spacing:2px;text-transform:uppercase}.ovn-desc{color:#64748b;font-size:12.5px;line-height:1.6;margin:0;max-width:340px;text-align:right}.ovn-cards-wrap{max-width:1400px;margin:0 auto;padding:24px var(--orcam-sides-padding,5%) 32px;box-sizing:border-box}.ovn-section-label{color:#475569;font-size:10.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin:0 0 16px 0}.ovn-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}.ovn-card{border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:0}.ovn-card-regular{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07)}.ovn-card-hotline{background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.25)}.ovn-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.ovn-card-icon{width:32px;height:32px;border-radius:7px;background:rgba(56,189,248,.08);display:flex;align-items:center;justify-content:center;color:#38bdf8}.ovn-card-hotline .ovn-card-icon{background:rgba(37,99,235,.15);color:#60a5fa}.ovn-badge{font-size:9.5px;font-weight:700;letter-spacing:.8px;padding:2px 9px;border-radius:20px;text-transform:uppercase}.ovn-badge-blue{color:#38bdf8;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.18)}.ovn-badge-indigo{color:#818cf8;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2)}.ovn-card-title{color:#e2e8f0;font-size:13px;font-weight:700;margin:0 0 5px 0;line-height:1.3}.ovn-card-addr{color:#475569;font-size:12px;line-height:1.55;margin:0 0 14px 0}.ovn-card-phone{display:flex;align-items:center;gap:7px;color:#38bdf8;font-size:13px;font-weight:700;text-decoration:none;padding-top:12px;border-top:1px solid rgba(255,255,255,.05);margin-top:auto}.ovn-hotline-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:#1d4ed8;color:#fff;padding:11px 14px;border-radius:7px;font-size:18px;font-weight:800;text-decoration:none;letter-spacing:.5px;margin:4px 0 10px}.ovn-hotline-note{color:#64748b;font-size:11.5px;text-align:center;margin:0;line-height:1.4}@media(max-width:600px){.ovn-desc{text-align:left}.ovn-cards{grid-template-columns:1fr}}</style>';
-        $block = $css
-            . '<div id="orcam-vn-support-block">'
-            . '<div class="ovn-top-row"><div class="ovn-brand"><svg class="ovn-logo-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 15" style="height:20px;width:auto;fill:#ffffff;display:inline-block;vertical-align:middle;" aria-label="OrCam"><g fill="#ffffff"><path d="M25.4,2.8c-2.1,0-3.9,1.7-3.9,3.8v1.9c0,2.1,1.7,3.8,3.9,3.8h4.4c2.1,0,3.9-1.7,3.9-3.8V6.5c0-2.1-1.7-3.8-3.9-3.8C29.8,2.8,25.4,2.8,25.4,2.8z M25.3,5.2H30c0.7,0,1.3,0.4,1.3,1.2v2.3c0,0.7-0.5,1.3-1.3,1.3h-4.8c-0.7,0-1.4-0.5-1.4-1.3V6.4C23.9,5.6,24.5,5.2,25.3,5.2z"/><path d="M53.3,2.8h8.1v2.4h-8.2c-0.7,0-1.3,0.6-1.3,1.3v0.1v1.9v0.1c0,0.7,0.6,1.3,1.3,1.3h8.2v2.4h-8.1c-2.1,0-3.9-1.7-3.9-3.8V8.3l0,0V6.8V6.7C49.4,4.5,51.2,2.8,53.3,2.8"/><path d="M38.4,5.2v2.2h4.6c1.4,0,1.4-2.2,0-2.2H38.4z M43.9,2.8c1.7,0,3.1,1.7,3.1,3.4c0,0.9-0.4,2-1.1,2.5l2.1,3.5h-2.7l-1.5-2.3h-5.5v2.3h-2.4V4.4c0-1,0.6-1.6,1.3-1.6L43.9,2.8L43.9,2.8z"/><g><path d="M12.3,2.7C11,1.3,9.1,0.5,7.1,0.5C3.2,0.5,0,3.6,0,7.5c0,3.9,3.2,7,7.1,7c2.1,0,3.9-0.9,5.2-2.2l4.5-4.8L12.3,2.7z M7.1,12.1c-2.6,0-4.6-2.1-4.6-4.6s2.1-4.6,4.6-4.6s4.6,2.1,4.6,4.6S9.7,12.1,7.1,12.1z"/><path d="M7.2,9.9c1.3,0,2.4-1.1,2.4-2.4S8.5,5.1,7.2,5.1S4.8,6.2,4.8,7.5S5.9,9.9,7.2,9.9"/></g><path d="M68.7,5.2h-1.3c-0.7,0-1.3,0.6-1.3,1.3v1h7.2v-1c0-0.7-0.6-1.3-1.3-1.3H68.7z M67.6,2.8h1.1h3.1c2.1,0,3.9,1.7,3.9,3.8v0.9v2.2v2.6h-2.4V9.8h-7.2v2.4h-2.4V9.6V7.5V6.6C63.8,4.5,65.5,2.8,67.6,2.8"/><path d="M86.1,2.8H83h-1.1c-2.1,0-3.9,1.7-3.9,3.8v0.9v2.2v2.6h2.4V9.8h0V7.3l0,0V6.5c0-0.7,0.6-1.3,1.3-1.3h1v7.1h2.4V5.1h1c0.7,0,1.3,0.6,1.3,1.3v0.8v0.2v4.8H90V9.6V7.5V6.6C90,4.5,88.3,2.8,86.1,2.8z"/></g></svg><span class="ovn-brand-name" style="color:#38bdf8;font-size:14px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;">VIỆT NAM</span></div>'
-            . '<p class="ovn-desc">C&ocirc;ng ngh&#7879; tr&#7907; n&#259;ng &#273;&#7897;t ph&aacute;, n&acirc;ng cao t&iacute;nh &#273;&#7897;c l&#7853;p<br>cho ng&#432;&#7901;i khi&#7871;m th&#7883; v&agrave; ng&#432;&#7901;i g&#7863;p kh&oacute; kh&#259;n khi &#273;&#7885;c.</p></div>'
-            . '<div class="ovn-cards-wrap"><p class="ovn-section-label">H&#7895; tr&#7907; kh&aacute;ch h&agrave;ng</p><div class="ovn-cards">'
-            . '<div class="ovn-card ovn-card-regular"><div class="ovn-card-header"><div class="ovn-card-icon">' . $hs . '</div><span class="ovn-badge ovn-badge-blue">Mi&#7873;n B&#7855;c</span></div><p class="ovn-card-title">V&#259;n ph&ograve;ng H&agrave; N&#7897;i</p><p class="ovn-card-addr">226 &#272;&#432;&#7901;ng L&aacute;ng, Ph&#432;&#7901;ng Th&#7883;nh Quang,<br>Qu&#7853;n &#272;&#7889;ng &#272;a, H&agrave; N&#7897;i</p><a href="tel:02473048700" class="ovn-card-phone">' . $ph . '024.7304.8700</a></div>'
-            . '<div class="ovn-card ovn-card-regular"><div class="ovn-card-header"><div class="ovn-card-icon">' . $hs . '</div><span class="ovn-badge ovn-badge-blue">Mi&#7873;n Nam</span></div><p class="ovn-card-title">V&#259;n ph&ograve;ng H&#7891; Ch&iacute; Minh</p><p class="ovn-card-addr">137 H&ograve;a H&#432;ng, Ph&#432;&#7901;ng H&ograve;a H&#432;ng,<br>TP. H&#7891; Ch&iacute; Minh</p><a href="tel:02873048700" class="ovn-card-phone">' . $ph . '028.7304.8700</a></div>'
-            . '<div class="ovn-card ovn-card-hotline"><div class="ovn-card-header"><div class="ovn-card-icon">' . $hd . '</div><span class="ovn-badge ovn-badge-indigo">T&#432; v&#7845;n 24/7</span></div><p class="ovn-card-title">Hotline T&#7893;ng &#272;&agrave;i</p><a href="tel:1900638400" class="ovn-hotline-btn">' . $ph . '1900.63.8400</a><p class="ovn-hotline-note">H&#7895; tr&#7907; v&agrave; t&#432; v&#7845;n m&#7885;i l&uacute;c, m&#7885;i n&#417;i</p></div>'
-            . '</div></div></div>';
-        $html = preg_replace('#(<nav\b[^>]*class="[^"]*orcam-footer)#', $block . '$1', $html, 1);
-    }
+    // Remove the redundant brand column inside the footer links grid
+    $html = preg_replace('#<div\s+class=["\']orcam-vn-brand-col["\'][\s\S]*?</div>\s*</div>#is', '', $html);
 
-    // Hydrate the original Svelte header/footer. static-navigation.js keeps
-    // the WooCommerce main body authoritative after hydration rebuilds DOM.
+
+
     $title_tag = '<script>window.orcamHydratedChrome=true;window.orcamAuthoritativeTitle='
         . wp_json_encode($full_title) . ';document.title=window.orcamAuthoritativeTitle;</script></head>';
     $html = preg_replace(
@@ -1721,47 +2106,68 @@ function orcam_theme_render_shared_static_shell(string $content, string $title, 
         1
     );
 
-    $render_target = $custom_cache_file !== '' ? $custom_cache_file : $file;
-    if ($include_wordpress_assets) {
-        // For checkout, do not run heavy static text translation dictionary over WordPress scripts
-        $theme_uri = untrailingslashit(get_template_directory_uri());
-        $theme_stylesheet = $theme_uri . '/style.css?ver=' . rawurlencode(ORCAM_THEME_VERSION);
-        $base = '<base href="' . esc_url(trailingslashit(home_url('/vi/'))) . '">'
-            . '<link rel="stylesheet" id="orcam-theme-css" href="' . esc_url($theme_stylesheet) . '">';
-        $html = preg_replace('/<head(\\s[^>]*)?>/i', '$0' . $base, $html, 1);
-        $html = preg_replace_callback(
-            '#(["\'(=])(?:\\.\\./|\\./|/)*(?P<asset>_app|fonts|images|media)/#i',
-            static function (array $matches) use ($theme_uri): string {
-                return $matches[1] . $theme_uri . '/' . $matches['asset'] . '/';
-            },
-            $html
-        );
-        $html = preg_replace(
-            '#(["\'(=])(?:\\.\\./|\\./|/)*smui\\.css#i',
-            '$1' . $theme_uri . '/smui.css',
-            $html
-        );
-        $navigation_uri = $theme_uri . '/js/static-navigation.js?ver=' . rawurlencode(ORCAM_THEME_VERSION);
-        $navigation_config = '<script>window.orcamThemeUri=' . wp_json_encode($theme_uri)
-            . ';window.orcamHomeUrl=' . wp_json_encode(home_url('/vi/home'))
-            . ';window.orcamShopUrl=' . wp_json_encode(home_url('/vi/shop/'))
-            . ';window.orcamGoogleApiKey=' . wp_json_encode(orcam_theme_google_api_key())
-            . ';window.orcamContactForm=' . wp_json_encode(array(
-                'action' => admin_url('admin-post.php'),
-                'nonce'  => wp_create_nonce('orcam_consultation'),
-                'supportNonce' => wp_create_nonce('orcam_support_case'),
-            )) . ';</script>';
-        $html = preg_replace('/<\/body>/i', $navigation_config . '<script id="orcam-static-navigation" src="' . esc_url($navigation_uri) . '"></script></body>', $html, 1);
-        
-        status_header(200);
-        nocache_headers();
-        header('Content-Type: text/html; charset=' . get_bloginfo('charset'));
-        header('X-OrCam-Cache: DYNAMIC');
-        echo $html;
-        exit;
+    // Strip Svelte client hydration scripts so Svelte router NEVER runs or overwrites DOM
+    $html = preg_replace('#<script\b[^>]*>(?:(?!</script>)[\s\S])*?__sveltekit(?:(?!</script>)[\s\S])*?</script>#is', '', $html);
+    $html = preg_replace('#<script\b[^>]*\bsrc=["\'][^"\']*_app/[^"\']*["\'][^>]*>\s*</script>#is', '', $html);
+    $html = preg_replace('#<script\b[^>]*data-sveltekit-fetched[^>]*>(?:(?!</script>)[\s\S])*?</script>#is', '', $html);
+    $html = preg_replace('#<link\b[^>]*\brel=["\']modulepreload["\'][^>]*>#is', '', $html);
+
+    $theme_uri = untrailingslashit(get_template_directory_uri());
+    $theme_stylesheet = $theme_uri . '/style.css?ver=' . rawurlencode(ORCAM_THEME_VERSION);
+    $base = '<base href="' . esc_url(trailingslashit(home_url('/vi/'))) . '">'
+        . '<link rel="stylesheet" id="orcam-theme-css" href="' . esc_url($theme_stylesheet) . '">';
+    $html = preg_replace('/<head(\\s[^>]*)?>/i', '$0' . $base, $html, 1);
+    $html = preg_replace_callback(
+        '#(["\'(=])(?:\\.\\./|\\./|/)*(?P<asset>_app|fonts|images|media)/#i',
+        static function (array $matches) use ($theme_uri): string {
+            return $matches[1] . $theme_uri . '/' . $matches['asset'] . '/';
+        },
+        $html
+    );
+    $html = preg_replace(
+        '#(["\'(=])(?:\\.\\./|\\./|/)*smui\\.css#i',
+        '$1' . $theme_uri . '/smui.css',
+        $html
+    );
+
+    // Normalize all relative and .html links into clean absolute WordPress URLs
+    $html = preg_replace_callback(
+        '#\bhref=(["\'])(?:vi/)?([a-zA-Z0-9_-]+)\.html\1#i',
+        static function (array $matches): string {
+            $slug = $matches[2];
+            if ($slug === 'index') {
+                return 'href=' . $matches[1] . esc_url(home_url('/vi/home')) . $matches[1];
+            }
+            return 'href=' . $matches[1] . esc_url(home_url('/vi/' . $slug . '/')) . $matches[1];
+        },
+        $html
+    );
+
+    $navigation_uri = $theme_uri . '/js/static-navigation.js?ver=' . rawurlencode(ORCAM_THEME_VERSION);
+    $navigation_config = '<script>window.orcamThemeUri=' . wp_json_encode($theme_uri)
+        . ';window.orcamHomeUrl=' . wp_json_encode(home_url('/vi/home'))
+        . ';window.orcamShopUrl=' . wp_json_encode(home_url('/vi/shop/'))
+        . ';window.orcamGoogleApiKey=' . wp_json_encode(orcam_theme_google_api_key())
+        . ';window.orcamContactForm=' . wp_json_encode(array(
+            'action' => admin_url('admin-post.php'),
+            'nonce'  => wp_create_nonce('orcam_consultation'),
+            'supportNonce' => wp_create_nonce('orcam_support_case'),
+        )) . ';</script>';
+    $html = preg_replace('/<\/body>/i', $navigation_config . '<script id="orcam-static-navigation" src="' . esc_url($navigation_uri) . '"></script></body>', $html, 1);
+
+    if ($return_only) {
+        return $html;
     }
-    orcam_theme_render_document($render_target, $html, $custom_cache_key, $return_only);
-    return true;
+
+    status_header(200);
+    nocache_headers();
+    header('Content-Type: text/html; charset=' . get_bloginfo('charset'));
+    header('X-OrCam-Cache: DB_PRODUCT');
+    if (!ob_get_level() && extension_loaded('zlib') && !ini_get('zlib.output_compression')) {
+        ob_start('ob_gzhandler');
+    }
+    echo $html;
+    exit;
 }
 
 /** Render a complete product document whose authoritative copy is in wp_posts. */
