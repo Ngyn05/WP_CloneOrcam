@@ -44,7 +44,7 @@ add_action('do_meta_boxes', static function (): void {
     remove_meta_box('postexcerpt', 'post', 'normal');
     add_meta_box(
         'postimagediv',
-        __('Ảnh đại diện', 'orcam-theme'),
+        __('áº¢nh Ä‘áº¡i diá»‡n', 'orcam-theme'),
         'post_thumbnail_meta_box',
         'post',
         'normal',
@@ -58,7 +58,7 @@ add_action('do_meta_boxes', static function (): void {
             echo '<p><label class="screen-reader-text" for="orcam-post-description-field">Description</label>';
             echo '<textarea id="orcam-post-description-field" name="orcam_post_description" rows="5" style="width:100%">'
                 . esc_textarea($post->post_excerpt) . '</textarea></p>';
-            echo '<p class="description">' . esc_html__('Nội dung này xuất hiện trên thẻ bài viết và trong thẻ meta description.', 'orcam-theme') . '</p>';
+            echo '<p class="description">' . esc_html__('Ná»™i dung nÃ y xuáº¥t hiá»‡n trÃªn tháº» bÃ i viáº¿t vÃ  trong tháº» meta description.', 'orcam-theme') . '</p>';
         },
         'post',
         'normal',
@@ -181,17 +181,17 @@ add_action('add_meta_boxes_product', static function (): void {
 
     add_meta_box(
         'orcam-product-live-preview',
-        __('Xem trước giao diện thật', 'orcam-theme'),
+        __('Xem trÆ°á»›c giao diá»‡n tháº­t', 'orcam-theme'),
         static function (WP_Post $product): void {
             $url = get_permalink($product);
             echo '<div class="orcam-product-preview-toolbar">';
-            echo '<strong>Trang WooCommerce đang hiển thị thực tế</strong>';
-            echo '<span>Nhấn Cập nhật rồi Tải lại bản xem trước để kiểm tra thay đổi.</span>';
-            echo '<button type="button" class="button" id="orcam-refresh-product-preview">Tải lại bản xem trước</button>';
-            echo '<a class="button button-primary" href="' . esc_url($url) . '" target="_blank" rel="noopener">Mở trang thật</a>';
+            echo '<strong>Trang WooCommerce Ä‘ang hiá»ƒn thá»‹ thá»±c táº¿</strong>';
+            echo '<span>Nháº¥n Cáº­p nháº­t rá»“i Táº£i láº¡i báº£n xem trÆ°á»›c Ä‘á»ƒ kiá»ƒm tra thay Ä‘á»•i.</span>';
+            echo '<button type="button" class="button" id="orcam-refresh-product-preview">Táº£i láº¡i báº£n xem trÆ°á»›c</button>';
+            echo '<a class="button button-primary" href="' . esc_url($url) . '" target="_blank" rel="noopener">Má»Ÿ trang tháº­t</a>';
             echo '</div>';
             echo '<iframe id="orcam-product-live-preview-frame" src="' . esc_url(add_query_arg('orcam_admin_preview', '1', $url)) . '"'
-                . ' title="Xem trước ' . esc_attr(get_the_title($product)) . '" loading="eager"></iframe>';
+                . ' title="Xem trÆ°á»›c ' . esc_attr(get_the_title($product)) . '" loading="eager"></iframe>';
             echo '<script>(function(){var button=document.getElementById("orcam-refresh-product-preview"),frame=document.getElementById("orcam-product-live-preview-frame");'
                 . 'if(button&&frame){button.addEventListener("click",function(){var url=new URL(frame.src);url.searchParams.set("preview_refresh",Date.now());frame.src=url.toString();});}})();</script>';
         },
@@ -249,8 +249,8 @@ function orcam_theme_handle_consultation_form(): void
     }
 
     $recipient = apply_filters('orcam_consultation_recipient', get_option('admin_email'));
-    $subject = sprintf('[OrCam] Yêu cầu tư vấn từ %s', $name);
-    $body = "Họ và tên: {$name}\nSố điện thoại: {$phone}\nEmail: {$email}\n\nNội dung tư vấn:\n{$message}";
+    $subject = sprintf('[OrCam] YÃªu cáº§u tÆ° váº¥n tá»« %s', $name);
+    $body = "Há» vÃ  tÃªn: {$name}\nSá»‘ Ä‘iá»‡n thoáº¡i: {$phone}\nEmail: {$email}\n\nNá»™i dung tÆ° váº¥n:\n{$message}";
     $headers = array('Content-Type: text/plain; charset=UTF-8', 'Reply-To: ' . $name . ' <' . $email . '>');
     $sent = wp_mail($recipient, $subject, $body, $headers);
 
@@ -275,21 +275,21 @@ function orcam_theme_handle_support_case(): void
     }
 
     $fields = array(
-        'Mối quan hệ với OrCam' => sanitize_text_field(wp_unslash($_POST['connection'] ?? '')),
-        'Họ và tên'             => sanitize_text_field(wp_unslash($_POST['contact_name'] ?? '')),
+        'Má»‘i quan há»‡ vá»›i OrCam' => sanitize_text_field(wp_unslash($_POST['connection'] ?? '')),
+        'Há» vÃ  tÃªn'             => sanitize_text_field(wp_unslash($_POST['contact_name'] ?? '')),
         'Email'                 => sanitize_email(wp_unslash($_POST['email'] ?? '')),
-        'Số điện thoại'         => sanitize_text_field(wp_unslash($_POST['phone'] ?? '')),
-        'Thành phố'             => sanitize_text_field(wp_unslash($_POST['city'] ?? '')),
-        'Quốc gia'              => sanitize_text_field(wp_unslash($_POST['country'] ?? '')),
-        'Tỉnh/Thành'            => sanitize_text_field(wp_unslash($_POST['state'] ?? '')),
-        'Thiết bị OrCam'        => sanitize_text_field(wp_unslash($_POST['device'] ?? '')),
-        'Số sê-ri'              => sanitize_text_field(wp_unslash($_POST['serial_number'] ?? '')),
-        'Loại yêu cầu'          => sanitize_text_field(wp_unslash($_POST['case_type'] ?? '')),
-        'Mô tả'                 => sanitize_textarea_field(wp_unslash($_POST['description'] ?? '')),
+        'Sá»‘ Ä‘iá»‡n thoáº¡i'         => sanitize_text_field(wp_unslash($_POST['phone'] ?? '')),
+        'ThÃ nh phá»‘'             => sanitize_text_field(wp_unslash($_POST['city'] ?? '')),
+        'Quá»‘c gia'              => sanitize_text_field(wp_unslash($_POST['country'] ?? '')),
+        'Tá»‰nh/ThÃ nh'            => sanitize_text_field(wp_unslash($_POST['state'] ?? '')),
+        'Thiáº¿t bá»‹ OrCam'        => sanitize_text_field(wp_unslash($_POST['device'] ?? '')),
+        'Sá»‘ sÃª-ri'              => sanitize_text_field(wp_unslash($_POST['serial_number'] ?? '')),
+        'Loáº¡i yÃªu cáº§u'          => sanitize_text_field(wp_unslash($_POST['case_type'] ?? '')),
+        'MÃ´ táº£'                 => sanitize_textarea_field(wp_unslash($_POST['description'] ?? '')),
     );
-    if ($fields['Mối quan hệ với OrCam'] === '' || $fields['Họ và tên'] === ''
-        || !is_email($fields['Email']) || $fields['Số điện thoại'] === ''
-        || $fields['Loại yêu cầu'] === '' || $fields['Mô tả'] === '') {
+    if ($fields['Má»‘i quan há»‡ vá»›i OrCam'] === '' || $fields['Há» vÃ  tÃªn'] === ''
+        || !is_email($fields['Email']) || $fields['Sá»‘ Ä‘iá»‡n thoáº¡i'] === ''
+        || $fields['Loáº¡i yÃªu cáº§u'] === '' || $fields['MÃ´ táº£'] === '') {
         wp_safe_redirect(add_query_arg('case_status', 'invalid', $redirect));
         exit;
     }
@@ -299,8 +299,8 @@ function orcam_theme_handle_support_case(): void
         $body .= $label . ': ' . $value . "\n";
     }
     $recipient = apply_filters('orcam_support_recipient', get_option('admin_email'));
-    $subject = sprintf('[OrCam Support] %s - %s', $fields['Loại yêu cầu'], $fields['Họ và tên']);
-    $headers = array('Content-Type: text/plain; charset=UTF-8', 'Reply-To: ' . $fields['Họ và tên'] . ' <' . $fields['Email'] . '>');
+    $subject = sprintf('[OrCam Support] %s - %s', $fields['Loáº¡i yÃªu cáº§u'], $fields['Há» vÃ  tÃªn']);
+    $headers = array('Content-Type: text/plain; charset=UTF-8', 'Reply-To: ' . $fields['Há» vÃ  tÃªn'] . ' <' . $fields['Email'] . '>');
     $sent = wp_mail($recipient, $subject, $body, $headers);
     wp_safe_redirect(add_query_arg('case_status', $sent ? 'success' : 'error', $redirect));
     exit;
@@ -485,8 +485,8 @@ add_action('template_redirect', static function (): void {
 add_filter('woocommerce_checkout_fields', static function (array $fields): array {
     $fields['billing'] = array(
         'billing_phone' => array(
-            'label'        => 'Số điện thoại',
-            'placeholder'  => 'Nhập số điện thoại (bắt buộc)',
+            'label'        => 'Sá»‘ Ä‘iá»‡n thoáº¡i',
+            'placeholder'  => 'Nháº­p sá»‘ Ä‘iá»‡n thoáº¡i (báº¯t buá»™c)',
             'required'     => true,
             'class'        => array('form-row-wide'),
             'clear'        => true,
@@ -495,23 +495,23 @@ add_filter('woocommerce_checkout_fields', static function (array $fields): array
         ),
         'billing_email' => array(
             'label'        => 'Email',
-            'placeholder'  => 'Nhập địa chỉ email (không bắt buộc)',
+            'placeholder'  => 'Nháº­p Ä‘á»‹a chá»‰ email (khÃ´ng báº¯t buá»™c)',
             'required'     => false,
             'class'        => array('form-row-wide'),
             'clear'        => true,
             'priority'     => 20,
         ),
         'billing_first_name' => array(
-            'label'        => 'Họ và tên',
-            'placeholder'  => 'Nhập họ và tên',
+            'label'        => 'Há» vÃ  tÃªn',
+            'placeholder'  => 'Nháº­p há» vÃ  tÃªn',
             'required'     => false,
             'class'        => array('form-row-wide'),
             'clear'        => true,
             'priority'     => 30,
         ),
         'billing_address_1' => array(
-            'label'        => 'Địa chỉ',
-            'placeholder'  => 'Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành',
+            'label'        => 'Äá»‹a chá»‰',
+            'placeholder'  => 'Sá»‘ nhÃ , tÃªn Ä‘Æ°á»ng, phÆ°á»ng/xÃ£, quáº­n/huyá»‡n, tá»‰nh/thÃ nh',
             'required'     => false,
             'class'        => array('form-row-wide'),
             'clear'        => true,
@@ -523,20 +523,20 @@ add_filter('woocommerce_checkout_fields', static function (array $fields): array
 
     $fields['order']['customer_intent'] = array(
         'type'        => 'radio',
-        'label'       => 'Hình thức phục vụ mong muốn',
+        'label'       => 'HÃ¬nh thá»©c phá»¥c vá»¥ mong muá»‘n',
         'class'       => array('form-row-wide', 'orcam-checkout-intent'),
         'required'    => false,
         'default'     => 'cod',
         'options'     => array(
-            'cod'     => 'Giao hàng và thanh toán khi nhận hàng (COD)',
-            'consult' => 'Tư vấn chuyên sâu về sản phẩm & hỗ trợ phương thức thanh toán',
+            'cod'     => 'Giao hÃ ng vÃ  thanh toÃ¡n khi nháº­n hÃ ng (COD)',
+            'consult' => 'TÆ° váº¥n chuyÃªn sÃ¢u vá» sáº£n pháº©m & há»— trá»£ phÆ°Æ¡ng thá»©c thanh toÃ¡n',
         ),
         'priority'    => 5,
     );
 
     if (isset($fields['order']['order_comments'])) {
-        $fields['order']['order_comments']['label'] = 'Ghi chú đơn hàng';
-        $fields['order']['order_comments']['placeholder'] = 'Ghi chú thêm về đơn hàng hoặc thời gian giao hàng...';
+        $fields['order']['order_comments']['label'] = 'Ghi chÃº Ä‘Æ¡n hÃ ng';
+        $fields['order']['order_comments']['placeholder'] = 'Ghi chÃº thÃªm vá» Ä‘Æ¡n hÃ ng hoáº·c thá»i gian giao hÃ ng...';
         $fields['order']['order_comments']['required'] = false;
         $fields['order']['order_comments']['class'] = array('form-row-wide');
         $fields['order']['order_comments']['priority'] = 15;
@@ -550,8 +550,8 @@ add_action('woocommerce_checkout_update_order_meta', static function (int $order
     if (!empty($_POST['customer_intent'])) {
         $intent_key = sanitize_text_field(wp_unslash($_POST['customer_intent']));
         $intent_label = $intent_key === 'consult'
-            ? 'Tư vấn chuyên sâu về sản phẩm & hỗ trợ phương thức thanh toán'
-            : 'Giao hàng và thanh toán khi nhận hàng (COD)';
+            ? 'TÆ° váº¥n chuyÃªn sÃ¢u vá» sáº£n pháº©m & há»— trá»£ phÆ°Æ¡ng thá»©c thanh toÃ¡n'
+            : 'Giao hÃ ng vÃ  thanh toÃ¡n khi nháº­n hÃ ng (COD)';
         update_post_meta($order_id, '_customer_intent', $intent_label);
     }
 });
@@ -559,15 +559,15 @@ add_action('woocommerce_checkout_update_order_meta', static function (int $order
 add_action('woocommerce_admin_order_data_after_billing_address', static function (WC_Order $order): void {
     $intent = get_post_meta($order->get_id(), '_customer_intent', true);
     if ($intent) {
-        echo '<p><strong>Hình thức yêu cầu:</strong> ' . esc_html($intent) . '</p>';
+        echo '<p><strong>HÃ¬nh thá»©c yÃªu cáº§u:</strong> ' . esc_html($intent) . '</p>';
     }
 });
 
 add_filter('woocommerce_billing_fields', static function (array $fields): array {
     return array(
         'billing_phone' => array(
-            'label'        => 'Số điện thoại',
-            'placeholder'  => 'Nhập số điện thoại (bắt buộc)',
+            'label'        => 'Sá»‘ Ä‘iá»‡n thoáº¡i',
+            'placeholder'  => 'Nháº­p sá»‘ Ä‘iá»‡n thoáº¡i (báº¯t buá»™c)',
             'required'     => true,
             'class'        => array('form-row-wide'),
             'clear'        => true,
@@ -575,23 +575,23 @@ add_filter('woocommerce_billing_fields', static function (array $fields): array 
         ),
         'billing_email' => array(
             'label'        => 'Email',
-            'placeholder'  => 'Nhập địa chỉ email (không bắt buộc)',
+            'placeholder'  => 'Nháº­p Ä‘á»‹a chá»‰ email (khÃ´ng báº¯t buá»™c)',
             'required'     => false,
             'class'        => array('form-row-wide'),
             'clear'        => true,
             'priority'     => 20,
         ),
         'billing_first_name' => array(
-            'label'        => 'Họ và tên',
-            'placeholder'  => 'Nhập họ và tên',
+            'label'        => 'Há» vÃ  tÃªn',
+            'placeholder'  => 'Nháº­p há» vÃ  tÃªn',
             'required'     => false,
             'class'        => array('form-row-wide'),
             'clear'        => true,
             'priority'     => 30,
         ),
         'billing_address_1' => array(
-            'label'        => 'Địa chỉ',
-            'placeholder'  => 'Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành',
+            'label'        => 'Äá»‹a chá»‰',
+            'placeholder'  => 'Sá»‘ nhÃ , tÃªn Ä‘Æ°á»ng, phÆ°á»ng/xÃ£, quáº­n/huyá»‡n, tá»‰nh/thÃ nh',
             'required'     => false,
             'class'        => array('form-row-wide'),
             'clear'        => true,
@@ -616,10 +616,10 @@ remove_action('woocommerce_before_checkout_form', 'woocommerce_checkout_coupon_f
 add_action('woocommerce_after_order_notes', static function (): void {
     ?>
     <div class="orcam-voucher-box">
-        <label for="orcam_coupon_input" class="orcam-voucher-box__label">Mã ưu đãi / Voucher</label>
+        <label for="orcam_coupon_input" class="orcam-voucher-box__label">MÃ£ Æ°u Ä‘Ã£i / Voucher</label>
         <div class="orcam-voucher-box__group">
-            <input type="text" id="orcam_coupon_input" name="orcam_coupon_code" placeholder="Nhập mã giảm giá..." />
-            <button type="button" id="orcam_apply_coupon_btn">Áp dụng</button>
+            <input type="text" id="orcam_coupon_input" name="orcam_coupon_code" placeholder="Nháº­p mÃ£ giáº£m giÃ¡..." />
+            <button type="button" id="orcam_apply_coupon_btn">Ãp dá»¥ng</button>
         </div>
     </div>
     <script>
@@ -633,11 +633,11 @@ add_action('woocommerce_after_order_notes', static function (): void {
                 e.preventDefault();
                 var code = (input.value || '').trim();
                 if (!code) {
-                    alert('Vui lòng nhập mã ưu đãi.');
+                    alert('Vui lÃ²ng nháº­p mÃ£ Æ°u Ä‘Ã£i.');
                     return;
                 }
                 btn.disabled = true;
-                btn.textContent = 'Đang áp dụng...';
+                btn.textContent = 'Äang Ã¡p dá»¥ng...';
                 if (window.jQuery && window.wc_checkout_params) {
                     window.jQuery.ajax({
                         type: 'POST',
@@ -653,7 +653,7 @@ add_action('woocommerce_after_order_notes', static function (): void {
                         },
                         complete: function() {
                             btn.disabled = false;
-                            btn.textContent = 'Áp dụng';
+                            btn.textContent = 'Ãp dá»¥ng';
                         },
                         dataType: 'html'
                     });
@@ -687,8 +687,8 @@ add_filter('woocommerce_available_payment_gateways', static function (array $ava
             $gateways = WC()->payment_gateways()->payment_gateways();
             if (isset($gateways['cod'])) {
                 $gateways['cod']->enabled = 'yes';
-                $gateways['cod']->title = 'Thanh toán khi nhận hàng (COD) / Tư vấn thanh toán';
-                $gateways['cod']->description = 'Nhân viên OrCam sẽ liên hệ xác nhận đơn và tư vấn hình thức nhận hàng thuận tiện nhất.';
+                $gateways['cod']->title = 'Thanh toÃ¡n khi nháº­n hÃ ng (COD) / TÆ° váº¥n thanh toÃ¡n';
+                $gateways['cod']->description = 'NhÃ¢n viÃªn OrCam sáº½ liÃªn há»‡ xÃ¡c nháº­n Ä‘Æ¡n vÃ  tÆ° váº¥n hÃ¬nh thá»©c nháº­n hÃ ng thuáº­n tiá»‡n nháº¥t.';
                 $available_gateways['cod'] = $gateways['cod'];
             }
         }
@@ -698,129 +698,129 @@ add_filter('woocommerce_available_payment_gateways', static function (array $ava
 
 /** Vietnamese privacy policy and payment methods notices */
 add_filter('woocommerce_checkout_privacy_policy_text', static function (): string {
-    return 'Thông tin cá nhân của bạn sẽ được sử dụng để xử lý đơn hàng, hỗ trợ trải nghiệm của bạn trên website và cho các mục đích khác theo <a href="' . esc_url(home_url('/vi/privacy-policy/')) . '" class="woocommerce-privacy-policy-link" target="_blank">chính sách bảo mật</a>.';
+    return 'ThÃ´ng tin cÃ¡ nhÃ¢n cá»§a báº¡n sáº½ Ä‘Æ°á»£c sá»­ dá»¥ng Ä‘á»ƒ xá»­ lÃ½ Ä‘Æ¡n hÃ ng, há»— trá»£ tráº£i nghiá»‡m cá»§a báº¡n trÃªn website vÃ  cho cÃ¡c má»¥c Ä‘Ã­ch khÃ¡c theo <a href="' . esc_url(home_url('/vi/privacy-policy/')) . '" class="woocommerce-privacy-policy-link" target="_blank">chÃ­nh sÃ¡ch báº£o máº­t</a>.';
 });
 
 add_filter('woocommerce_no_available_payment_methods_message', static function (): string {
-    return 'Hiện tại đơn hàng sẽ được nhân viên của OrCam liên hệ trực tiếp để xác nhận và hướng dẫn thanh toán chi tiết cho bạn.';
+    return 'Hiá»‡n táº¡i Ä‘Æ¡n hÃ ng sáº½ Ä‘Æ°á»£c nhÃ¢n viÃªn cá»§a OrCam liÃªn há»‡ trá»±c tiáº¿p Ä‘á»ƒ xÃ¡c nháº­n vÃ  hÆ°á»›ng dáº«n thanh toÃ¡n chi tiáº¿t cho báº¡n.';
 });
 
 add_filter('woocommerce_coupon_message', static function (string $msg, int $msg_code, $coupon = null): string {
     if ($coupon instanceof WC_Coupon) {
-        return sprintf('Áp dụng mã ưu đãi "%s" thành công.', $coupon->get_code());
+        return sprintf('Ãp dá»¥ng mÃ£ Æ°u Ä‘Ã£i "%s" thÃ nh cÃ´ng.', $coupon->get_code());
     }
-    return 'Áp dụng mã ưu đãi thành công.';
+    return 'Ãp dá»¥ng mÃ£ Æ°u Ä‘Ã£i thÃ nh cÃ´ng.';
 }, 20, 3);
 
 add_filter('woocommerce_coupon_error', static function (string $err, int $err_code, $coupon = null): string {
     static $errors = array(
-        100 => 'Mã giảm giá không tồn tại!',
-        101 => 'Mã giảm giá này đã được áp dụng trước đó!',
-        102 => 'Mã giảm giá này không thể dùng chung với các mã khác.',
-        103 => 'Mã giảm giá này không áp dụng cho sản phẩm trong đơn hàng.',
-        104 => 'Mã giảm giá này đã hết lượt sử dụng.',
-        105 => 'Mã giảm giá này đã hết hạn sử dụng.',
-        106 => 'Đơn hàng chưa đạt giá trị tối thiểu để áp dụng mã này.',
-        107 => 'Đơn hàng đã vượt quá giá trị tối đa để áp dụng mã này.',
-        108 => 'Mã giảm giá này không áp dụng cho các sản phẩm đang giảm giá.',
-        109 => 'Vui lòng nhập mã giảm giá.',
-        110 => 'Mã giảm giá không hợp lệ và đã bị gỡ bỏ.',
+        100 => 'MÃ£ giáº£m giÃ¡ khÃ´ng tá»“n táº¡i!',
+        101 => 'MÃ£ giáº£m giÃ¡ nÃ y Ä‘Ã£ Ä‘Æ°á»£c Ã¡p dá»¥ng trÆ°á»›c Ä‘Ã³!',
+        102 => 'MÃ£ giáº£m giÃ¡ nÃ y khÃ´ng thá»ƒ dÃ¹ng chung vá»›i cÃ¡c mÃ£ khÃ¡c.',
+        103 => 'MÃ£ giáº£m giÃ¡ nÃ y khÃ´ng Ã¡p dá»¥ng cho sáº£n pháº©m trong Ä‘Æ¡n hÃ ng.',
+        104 => 'MÃ£ giáº£m giÃ¡ nÃ y Ä‘Ã£ háº¿t lÆ°á»£t sá»­ dá»¥ng.',
+        105 => 'MÃ£ giáº£m giÃ¡ nÃ y Ä‘Ã£ háº¿t háº¡n sá»­ dá»¥ng.',
+        106 => 'ÄÆ¡n hÃ ng chÆ°a Ä‘áº¡t giÃ¡ trá»‹ tá»‘i thiá»ƒu Ä‘á»ƒ Ã¡p dá»¥ng mÃ£ nÃ y.',
+        107 => 'ÄÆ¡n hÃ ng Ä‘Ã£ vÆ°á»£t quÃ¡ giÃ¡ trá»‹ tá»‘i Ä‘a Ä‘á»ƒ Ã¡p dá»¥ng mÃ£ nÃ y.',
+        108 => 'MÃ£ giáº£m giÃ¡ nÃ y khÃ´ng Ã¡p dá»¥ng cho cÃ¡c sáº£n pháº©m Ä‘ang giáº£m giÃ¡.',
+        109 => 'Vui lÃ²ng nháº­p mÃ£ giáº£m giÃ¡.',
+        110 => 'MÃ£ giáº£m giÃ¡ khÃ´ng há»£p lá»‡ vÃ  Ä‘Ã£ bá»‹ gá»¡ bá».',
     );
-    return $errors[$err_code] ?? 'Mã giảm giá không hợp lệ hoặc đã hết hạn sử dụng.';
+    return $errors[$err_code] ?? 'MÃ£ giáº£m giÃ¡ khÃ´ng há»£p lá»‡ hoáº·c Ä‘Ã£ háº¿t háº¡n sá»­ dá»¥ng.';
 }, 20, 3);
 
 /** Complete Vietnamese translations for WooCommerce checkout & order details. */
 add_filter('gettext', static function (string $translation, string $text, string $domain): string {
     static $translations = array(
-        'Checkout' => 'Thanh toán',
-        'Billing details' => 'Thông tin người nhận',
-        'Billing Details' => 'Thông tin người nhận',
-        'Customer details' => 'Thông tin khách hàng',
-        'Additional information' => 'Hình thức phục vụ & Ghi chú',
-        'Additional Information' => 'Hình thức phục vụ & Ghi chú',
-        'Your order' => 'Đơn hàng của bạn',
-        'Your Order' => 'Đơn hàng của bạn',
-        'Product' => 'Sản phẩm',
-        'Subtotal' => 'Tạm tính',
-        'Total' => 'Tổng cộng',
-        'Place order' => 'Xác nhận đặt hàng',
-        'Place Order' => 'Xác nhận đặt hàng',
-        'Order notes' => 'Ghi chú đơn hàng',
-        'Order notes (optional)' => 'Ghi chú đơn hàng (không bắt buộc)',
-        'Notes about your order, e.g. special notes for delivery.' => 'Ghi chú thêm về đơn hàng hoặc thời gian nhận hàng...',
-        'Have a coupon?' => 'Bạn có mã ưu đãi / voucher?',
-        'Click here to enter your code' => 'Nhấn vào đây để nhập mã',
-        'Coupon code' => 'Mã ưu đãi / Voucher',
-        'Apply coupon' => 'Áp dụng',
-        'Apply Coupon' => 'Áp dụng',
-        'Coupon:' => 'Mã giảm giá:',
-        'If you have a coupon code, please apply it below.' => 'Nếu bạn có mã giảm giá hoặc Voucher, vui lòng nhập bên dưới:',
-        'Ship to a different address?' => 'Giao hàng đến địa chỉ khác?',
-        'Returning customer?' => 'Bạn đã từng mua hàng?',
-        'Click here to login' => 'Nhấn vào đây để đăng nhập',
-        'Payment' => 'Phương thức thanh toán',
-        'Payment methods' => 'Phương thức thanh toán',
-        'Payment Methods' => 'Phương thức thanh toán',
-        'Cash on delivery' => 'Thanh toán khi nhận hàng (COD)',
-        'Pay with cash upon delivery.' => 'Thanh toán bằng tiền mặt trực tiếp khi nhận hàng.',
-        'Direct bank transfer' => 'Chuyển khoản ngân hàng',
-        'Make your payment directly into our bank account. Please use your Order ID as the payment reference. Your order will not be shipped until the funds have cleared in our account.' => 'Vui lòng chuyển khoản trực tiếp vào tài khoản ngân hàng của chúng tôi với nội dung là Mã đơn hàng. Đơn hàng sẽ được nhân viên liên hệ xác nhận ngay.',
-        'Sorry, it seems that there are no available payment methods. Please contact us if you require assistance or wish to make alternate arrangements.' => 'Hiện tại đơn hàng sẽ được nhân viên liên hệ trực tiếp để xác nhận và hướng dẫn thanh toán chi tiết cho bạn.',
-        'Sorry, it seems that there are no available payment methods.' => 'Hiện tại đơn hàng sẽ được nhân viên liên hệ trực tiếp để xác nhận và hướng dẫn thanh toán chi tiết cho bạn.',
-        'Your personal data will be used to process your order, support your experience throughout this website, and for other purposes described in our %s.' => 'Thông tin cá nhân của bạn sẽ được sử dụng để xử lý đơn hàng, hỗ trợ trải nghiệm của bạn trên website và cho các mục đích khác theo %s.',
-        'privacy policy' => 'chính sách bảo mật',
-        'Privacy Policy' => 'Chính sách bảo mật',
-        'Please enter a valid phone number.' => 'Vui lòng nhập số điện thoại hợp lệ.',
-        'Billing Phone is a required field.' => 'Vui lòng nhập Số điện thoại.',
-        'Phone is a required field.' => 'Vui lòng nhập Số điện thoại.',
-        '%s is a required field.' => '%s là thông tin bắt buộc.',
-        'optional' => 'không bắt buộc',
-        '(optional)' => '(không bắt buộc)',
-        'First name' => 'Họ và tên',
-        'Last name' => 'Tên',
-        'Phone' => 'Số điện thoại',
+        'Checkout' => 'Thanh toÃ¡n',
+        'Billing details' => 'ThÃ´ng tin ngÆ°á»i nháº­n',
+        'Billing Details' => 'ThÃ´ng tin ngÆ°á»i nháº­n',
+        'Customer details' => 'ThÃ´ng tin khÃ¡ch hÃ ng',
+        'Additional information' => 'HÃ¬nh thá»©c phá»¥c vá»¥ & Ghi chÃº',
+        'Additional Information' => 'HÃ¬nh thá»©c phá»¥c vá»¥ & Ghi chÃº',
+        'Your order' => 'ÄÆ¡n hÃ ng cá»§a báº¡n',
+        'Your Order' => 'ÄÆ¡n hÃ ng cá»§a báº¡n',
+        'Product' => 'Sáº£n pháº©m',
+        'Subtotal' => 'Táº¡m tÃ­nh',
+        'Total' => 'Tá»•ng cá»™ng',
+        'Place order' => 'XÃ¡c nháº­n Ä‘áº·t hÃ ng',
+        'Place Order' => 'XÃ¡c nháº­n Ä‘áº·t hÃ ng',
+        'Order notes' => 'Ghi chÃº Ä‘Æ¡n hÃ ng',
+        'Order notes (optional)' => 'Ghi chÃº Ä‘Æ¡n hÃ ng (khÃ´ng báº¯t buá»™c)',
+        'Notes about your order, e.g. special notes for delivery.' => 'Ghi chÃº thÃªm vá» Ä‘Æ¡n hÃ ng hoáº·c thá»i gian nháº­n hÃ ng...',
+        'Have a coupon?' => 'Báº¡n cÃ³ mÃ£ Æ°u Ä‘Ã£i / voucher?',
+        'Click here to enter your code' => 'Nháº¥n vÃ o Ä‘Ã¢y Ä‘á»ƒ nháº­p mÃ£',
+        'Coupon code' => 'MÃ£ Æ°u Ä‘Ã£i / Voucher',
+        'Apply coupon' => 'Ãp dá»¥ng',
+        'Apply Coupon' => 'Ãp dá»¥ng',
+        'Coupon:' => 'MÃ£ giáº£m giÃ¡:',
+        'If you have a coupon code, please apply it below.' => 'Náº¿u báº¡n cÃ³ mÃ£ giáº£m giÃ¡ hoáº·c Voucher, vui lÃ²ng nháº­p bÃªn dÆ°á»›i:',
+        'Ship to a different address?' => 'Giao hÃ ng Ä‘áº¿n Ä‘á»‹a chá»‰ khÃ¡c?',
+        'Returning customer?' => 'Báº¡n Ä‘Ã£ tá»«ng mua hÃ ng?',
+        'Click here to login' => 'Nháº¥n vÃ o Ä‘Ã¢y Ä‘á»ƒ Ä‘Äƒng nháº­p',
+        'Payment' => 'PhÆ°Æ¡ng thá»©c thanh toÃ¡n',
+        'Payment methods' => 'PhÆ°Æ¡ng thá»©c thanh toÃ¡n',
+        'Payment Methods' => 'PhÆ°Æ¡ng thá»©c thanh toÃ¡n',
+        'Cash on delivery' => 'Thanh toÃ¡n khi nháº­n hÃ ng (COD)',
+        'Pay with cash upon delivery.' => 'Thanh toÃ¡n báº±ng tiá»n máº·t trá»±c tiáº¿p khi nháº­n hÃ ng.',
+        'Direct bank transfer' => 'Chuyá»ƒn khoáº£n ngÃ¢n hÃ ng',
+        'Make your payment directly into our bank account. Please use your Order ID as the payment reference. Your order will not be shipped until the funds have cleared in our account.' => 'Vui lÃ²ng chuyá»ƒn khoáº£n trá»±c tiáº¿p vÃ o tÃ i khoáº£n ngÃ¢n hÃ ng cá»§a chÃºng tÃ´i vá»›i ná»™i dung lÃ  MÃ£ Ä‘Æ¡n hÃ ng. ÄÆ¡n hÃ ng sáº½ Ä‘Æ°á»£c nhÃ¢n viÃªn liÃªn há»‡ xÃ¡c nháº­n ngay.',
+        'Sorry, it seems that there are no available payment methods. Please contact us if you require assistance or wish to make alternate arrangements.' => 'Hiá»‡n táº¡i Ä‘Æ¡n hÃ ng sáº½ Ä‘Æ°á»£c nhÃ¢n viÃªn liÃªn há»‡ trá»±c tiáº¿p Ä‘á»ƒ xÃ¡c nháº­n vÃ  hÆ°á»›ng dáº«n thanh toÃ¡n chi tiáº¿t cho báº¡n.',
+        'Sorry, it seems that there are no available payment methods.' => 'Hiá»‡n táº¡i Ä‘Æ¡n hÃ ng sáº½ Ä‘Æ°á»£c nhÃ¢n viÃªn liÃªn há»‡ trá»±c tiáº¿p Ä‘á»ƒ xÃ¡c nháº­n vÃ  hÆ°á»›ng dáº«n thanh toÃ¡n chi tiáº¿t cho báº¡n.',
+        'Your personal data will be used to process your order, support your experience throughout this website, and for other purposes described in our %s.' => 'ThÃ´ng tin cÃ¡ nhÃ¢n cá»§a báº¡n sáº½ Ä‘Æ°á»£c sá»­ dá»¥ng Ä‘á»ƒ xá»­ lÃ½ Ä‘Æ¡n hÃ ng, há»— trá»£ tráº£i nghiá»‡m cá»§a báº¡n trÃªn website vÃ  cho cÃ¡c má»¥c Ä‘Ã­ch khÃ¡c theo %s.',
+        'privacy policy' => 'chÃ­nh sÃ¡ch báº£o máº­t',
+        'Privacy Policy' => 'ChÃ­nh sÃ¡ch báº£o máº­t',
+        'Please enter a valid phone number.' => 'Vui lÃ²ng nháº­p sá»‘ Ä‘iá»‡n thoáº¡i há»£p lá»‡.',
+        'Billing Phone is a required field.' => 'Vui lÃ²ng nháº­p Sá»‘ Ä‘iá»‡n thoáº¡i.',
+        'Phone is a required field.' => 'Vui lÃ²ng nháº­p Sá»‘ Ä‘iá»‡n thoáº¡i.',
+        '%s is a required field.' => '%s lÃ  thÃ´ng tin báº¯t buá»™c.',
+        'optional' => 'khÃ´ng báº¯t buá»™c',
+        '(optional)' => '(khÃ´ng báº¯t buá»™c)',
+        'First name' => 'Há» vÃ  tÃªn',
+        'Last name' => 'TÃªn',
+        'Phone' => 'Sá»‘ Ä‘iá»‡n thoáº¡i',
         'Email address' => 'Email',
         'Email Address' => 'Email',
-        'Street address' => 'Địa chỉ',
-        'Order received' => 'Đặt hàng thành công',
-        'Thank you. Your order has been received.' => 'Cảm ơn bạn! Đơn hàng đã được tiếp nhận thành công. Chúng tôi sẽ liên hệ trong thời gian sớm nhất.',
-        'Order number:' => 'Mã đơn hàng:',
-        'Date:' => 'Ngày đặt:',
+        'Street address' => 'Äá»‹a chá»‰',
+        'Order received' => 'Äáº·t hÃ ng thÃ nh cÃ´ng',
+        'Thank you. Your order has been received.' => 'Cáº£m Æ¡n báº¡n! ÄÆ¡n hÃ ng Ä‘Ã£ Ä‘Æ°á»£c tiáº¿p nháº­n thÃ nh cÃ´ng. ChÃºng tÃ´i sáº½ liÃªn há»‡ trong thá»i gian sá»›m nháº¥t.',
+        'Order number:' => 'MÃ£ Ä‘Æ¡n hÃ ng:',
+        'Date:' => 'NgÃ y Ä‘áº·t:',
         'Email:' => 'Email:',
-        'Total:' => 'Tổng thanh toán:',
-        'Payment method:' => 'Phương thức thanh toán:',
-        'Order details' => 'Chi tiết đơn hàng',
-        'Billing address' => 'Địa chỉ nhận hàng',
-        'Shipping' => 'Giao hàng',
-        'Free shipping' => 'Miễn phí giao hàng',
-        'Flat rate' => 'Phí cố định',
-        'Cart' => 'Giỏ hàng',
-        'Update cart' => 'Cập nhật',
-        'Apply' => 'Áp dụng',
-        'Enter code' => 'Nhập mã',
-        'Coupon code applied successfully.' => 'Đã áp dụng mã giảm giá thành công.',
-        'Coupon "%s" does not exist!' => 'Mã giảm giá "%s" không tồn tại!',
-        'Coupon code already applied!' => 'Mã giảm giá này đã được áp dụng trước đó!',
-        'Coupon code "%s" already applied!' => 'Mã giảm giá "%s" đã được áp dụng trước đó!',
-        'Please enter a coupon code.' => 'Vui lòng nhập mã giảm giá.',
-        'Coupon usage limit has been reached.' => 'Mã giảm giá này đã hết lượt sử dụng.',
-        'This coupon has expired.' => 'Mã giảm giá này đã hết hạn sử dụng.',
-        'The minimum spend for this coupon is %s.' => 'Giá trị đơn hàng tối thiểu để dùng mã này là %s.',
-        'The maximum spend for this coupon is %s.' => 'Giá trị đơn hàng tối đa để dùng mã này là %s.',
-        'Sorry, this coupon is not applicable to selected products.' => 'Mã giảm giá này không áp dụng cho sản phẩm đã chọn.',
-        'Sorry, this coupon is not applicable to your cart contents.' => 'Mã giảm giá này không áp dụng cho đơn hàng của bạn.',
-        'Coupon code removed successfully.' => 'Đã xóa mã giảm giá thành công.',
-        '[Remove]' => '[Xóa]',
-        'Remove' => 'Xóa',
-        'Browse products' => 'Xem sản phẩm',
-        'Return to shop' => 'Quay lại cửa hàng',
-        'Your cart is currently empty.' => 'Bạn chưa chọn sản phẩm nào để thanh toán.',
-        'Description' => 'Mô tả',
-        'Reviews' => 'Đánh giá',
-        'Related products' => 'Sản phẩm tương tự',
-        'In stock' => 'Còn hàng',
-        'Out of stock' => 'Hết hàng',
-        'Sale!' => 'Ưu đãi!',
+        'Total:' => 'Tá»•ng thanh toÃ¡n:',
+        'Payment method:' => 'PhÆ°Æ¡ng thá»©c thanh toÃ¡n:',
+        'Order details' => 'Chi tiáº¿t Ä‘Æ¡n hÃ ng',
+        'Billing address' => 'Äá»‹a chá»‰ nháº­n hÃ ng',
+        'Shipping' => 'Giao hÃ ng',
+        'Free shipping' => 'Miá»…n phÃ­ giao hÃ ng',
+        'Flat rate' => 'PhÃ­ cá»‘ Ä‘á»‹nh',
+        'Cart' => 'Giá» hÃ ng',
+        'Update cart' => 'Cáº­p nháº­t',
+        'Apply' => 'Ãp dá»¥ng',
+        'Enter code' => 'Nháº­p mÃ£',
+        'Coupon code applied successfully.' => 'ÄÃ£ Ã¡p dá»¥ng mÃ£ giáº£m giÃ¡ thÃ nh cÃ´ng.',
+        'Coupon "%s" does not exist!' => 'MÃ£ giáº£m giÃ¡ "%s" khÃ´ng tá»“n táº¡i!',
+        'Coupon code already applied!' => 'MÃ£ giáº£m giÃ¡ nÃ y Ä‘Ã£ Ä‘Æ°á»£c Ã¡p dá»¥ng trÆ°á»›c Ä‘Ã³!',
+        'Coupon code "%s" already applied!' => 'MÃ£ giáº£m giÃ¡ "%s" Ä‘Ã£ Ä‘Æ°á»£c Ã¡p dá»¥ng trÆ°á»›c Ä‘Ã³!',
+        'Please enter a coupon code.' => 'Vui lÃ²ng nháº­p mÃ£ giáº£m giÃ¡.',
+        'Coupon usage limit has been reached.' => 'MÃ£ giáº£m giÃ¡ nÃ y Ä‘Ã£ háº¿t lÆ°á»£t sá»­ dá»¥ng.',
+        'This coupon has expired.' => 'MÃ£ giáº£m giÃ¡ nÃ y Ä‘Ã£ háº¿t háº¡n sá»­ dá»¥ng.',
+        'The minimum spend for this coupon is %s.' => 'GiÃ¡ trá»‹ Ä‘Æ¡n hÃ ng tá»‘i thiá»ƒu Ä‘á»ƒ dÃ¹ng mÃ£ nÃ y lÃ  %s.',
+        'The maximum spend for this coupon is %s.' => 'GiÃ¡ trá»‹ Ä‘Æ¡n hÃ ng tá»‘i Ä‘a Ä‘á»ƒ dÃ¹ng mÃ£ nÃ y lÃ  %s.',
+        'Sorry, this coupon is not applicable to selected products.' => 'MÃ£ giáº£m giÃ¡ nÃ y khÃ´ng Ã¡p dá»¥ng cho sáº£n pháº©m Ä‘Ã£ chá»n.',
+        'Sorry, this coupon is not applicable to your cart contents.' => 'MÃ£ giáº£m giÃ¡ nÃ y khÃ´ng Ã¡p dá»¥ng cho Ä‘Æ¡n hÃ ng cá»§a báº¡n.',
+        'Coupon code removed successfully.' => 'ÄÃ£ xÃ³a mÃ£ giáº£m giÃ¡ thÃ nh cÃ´ng.',
+        '[Remove]' => '[XÃ³a]',
+        'Remove' => 'XÃ³a',
+        'Browse products' => 'Xem sáº£n pháº©m',
+        'Return to shop' => 'Quay láº¡i cá»­a hÃ ng',
+        'Your cart is currently empty.' => 'Báº¡n chÆ°a chá»n sáº£n pháº©m nÃ o Ä‘á»ƒ thanh toÃ¡n.',
+        'Description' => 'MÃ´ táº£',
+        'Reviews' => 'ÄÃ¡nh giÃ¡',
+        'Related products' => 'Sáº£n pháº©m tÆ°Æ¡ng tá»±',
+        'In stock' => 'CÃ²n hÃ ng',
+        'Out of stock' => 'Háº¿t hÃ ng',
+        'Sale!' => 'Æ¯u Ä‘Ã£i!',
     );
     return $translations[$text] ?? $translation;
 }, 20, 3);
@@ -842,10 +842,10 @@ add_action('save_post_product', static function (int $post_id, WP_Post $post): v
 
     $plain_content = trim(wp_strip_all_tags($post->post_content));
     $summary = $plain_content !== ''
-        ? wp_trim_words($plain_content, 30, '…')
+        ? wp_trim_words($plain_content, 30, 'â€¦')
         : sprintf(
             /* translators: %s: product name. */
-            __('Khám phá %s với thiết kế tiện dụng và công nghệ hỗ trợ tiên tiến từ OrCam.', 'orcam-theme'),
+            __('KhÃ¡m phÃ¡ %s vá»›i thiáº¿t káº¿ tiá»‡n dá»¥ng vÃ  cÃ´ng nghá»‡ há»— trá»£ tiÃªn tiáº¿n tá»« OrCam.', 'orcam-theme'),
             $post->post_title
         );
 
@@ -1053,14 +1053,14 @@ function orcam_theme_product_navigation_products(bool $force_refresh = false): a
 function orcam_theme_product_navigation_bar(int $current_product_id = 0): string
 {
     $links = '<a class="orcam-product-bar__link" href="' . esc_url(home_url('/vi/shop/'))
-        . '">Tất cả sản phẩm</a>';
+        . '">Táº¥t cáº£ sáº£n pháº©m</a>';
     foreach (orcam_theme_product_navigation_products() as $product) {
         $active = $product->ID === $current_product_id ? ' is-active' : '';
         $links .= '<a class="orcam-product-bar__link' . $active . '" href="'
             . esc_url(get_permalink($product)) . '">' . esc_html(get_the_title($product)) . '</a>';
     }
 
-    return '<nav class="orcam-product-bar" aria-label="Sản phẩm"><strong>Thị lực kém</strong>'
+    return '<nav class="orcam-product-bar" aria-label="Sáº£n pháº©m"><strong>Thá»‹ lá»±c kÃ©m</strong>'
         . '<div class="orcam-product-bar__items">' . $links . '</div></nav>';
 }
 
@@ -1081,7 +1081,7 @@ function orcam_theme_append_products_to_static_submenu(string $html, string $fil
         $is_low_vision = in_array($filename, $low_vision_files, true);
     }
     if (!$is_low_vision && strpos($html, 'desktop-submenu') !== false) {
-        if (preg_match('#<div[^>]*class="[^"]*desktop-submenu__logo[^"]*"[^>]*>\s*<p[^>]*>\s*(?:Thị lực kém|Low Vision)\s*</p>#iu', $html)) {
+        if (preg_match('#<div[^>]*class="[^"]*desktop-submenu__logo[^"]*"[^>]*>\s*<p[^>]*>\s*(?:Thá»‹ lá»±c kÃ©m|Low Vision)\s*</p>#iu', $html)) {
             $is_low_vision = true;
         }
     }
@@ -1091,7 +1091,7 @@ function orcam_theme_append_products_to_static_submenu(string $html, string $fil
     }
 
     $all_products_link = '<div class="d-flex"><a class="p3 desktop-submenu__submenu-link svelte-alcb1y" href="'
-        . esc_url(home_url('/vi/shop/')) . '" target="_self">Tất cả sản phẩm</a> </div>';
+        . esc_url(home_url('/vi/shop/')) . '" target="_self">Táº¥t cáº£ sáº£n pháº©m</a> </div>';
     $extra_links = '';
     foreach (orcam_theme_product_navigation_products() as $product) {
         if (get_post_meta($product->ID, '_orcam_product_route', true) !== '') {
@@ -1104,17 +1104,17 @@ function orcam_theme_append_products_to_static_submenu(string $html, string $fil
         '#(<div class="desktop-submenu__items svelte-alcb1y">)(.*?)(</div>\s*<div class="desktop-submenu__buttons svelte-alcb1y">)#s',
         static function ($matches) use ($all_products_link, $extra_links): string {
             $inner = $matches[2];
-            $prefix = (strpos($inner, 'Tất cả sản phẩm') === false && strpos($inner, '/vi/shop') === false) ? $all_products_link : '';
+            $prefix = (strpos($inner, 'Táº¥t cáº£ sáº£n pháº©m') === false && strpos($inner, '/vi/shop') === false) ? $all_products_link : '';
             return $matches[1] . $prefix . $inner . $extra_links . $matches[3];
         },
         $html,
         1
     ) ?: $html;
 
-    // Inject "Tất cả sản phẩm" into Svelte inline script submenu data so client hydration on mobile also includes it
+    // Inject "Táº¥t cáº£ sáº£n pháº©m" into Svelte inline script submenu data so client hydration on mobile also includes it
     $html = preg_replace(
-        '#(submenu:\s*\{[^}]*?items:\s*\[)(?!\s*\{\s*label\s*:\s*["\']Tất cả sản phẩm["\'])#s',
-        '$1{label:"Tất cả sản phẩm",pageUrl:"' . esc_js(home_url('/vi/shop/')) . '",id:"all-products",blockName:"All Products",blockType:"internalNavigation"},',
+        '#(submenu:\s*\{[^}]*?items:\s*\[)(?!\s*\{\s*label\s*:\s*["\']Táº¥t cáº£ sáº£n pháº©m["\'])#s',
+        '$1{label:"Táº¥t cáº£ sáº£n pháº©m",pageUrl:"' . esc_js(home_url('/vi/shop/')) . '",id:"all-products",blockName:"All Products",blockType:"internalNavigation"},',
         $html,
         1
     ) ?: $html;
@@ -1138,7 +1138,7 @@ function orcam_theme_sync_woocommerce_product_data_into_html(string $html, strin
     }
 
     $product_data_map = array();
-    $currency_symbol = function_exists('get_woocommerce_currency_symbol') ? get_woocommerce_currency_symbol(get_woocommerce_currency()) : '₫';
+    $currency_symbol = function_exists('get_woocommerce_currency_symbol') ? get_woocommerce_currency_symbol(get_woocommerce_currency()) : 'â‚«';
 
     foreach ($products as $post_item) {
         $wc_prod = wc_get_product($post_item->ID);
@@ -1437,7 +1437,7 @@ function orcam_theme_blog_index(string $html): string
         if ($description !== '') {
             $cards .= '<span class="orcam-blog-card__summary">' . esc_html($description) . '</span>';
         }
-        $cards .= '<span class="orcam-blog-card__more">Đọc thêm &gt;</span></span></a></article>';
+                $cards .= '<span class="orcam-blog-card__more">Đọc thêm &gt;</span></span></a></article>';
     }
 
     return '<section class="orcam-blog-index" aria-label="Danh sách bài viết">'
@@ -1468,7 +1468,7 @@ function orcam_theme_render_document(string $file, ?string $document_html = null
     // downloading the rest of the media library.
     if (wp_normalize_path((string) realpath($file)) === wp_normalize_path((string) realpath(get_template_directory() . '/static-pages/vi/orcam-learn.html'))) {
         $html = str_replace(
-            '<h1><strong>OrCam Học </strong><span style="font-family: Trebuchet MS"><span style="color: rgb(73, 26, 189)"><strong>Cơ bản</strong></span></span></h1>',
+            '<h1><strong>OrCam Há»c </strong><span style="font-family: Trebuchet MS"><span style="color: rgb(73, 26, 189)"><strong>CÆ¡ báº£n</strong></span></span></h1>',
             '<h1><strong>OrCam </strong><span style="font-family: Trebuchet MS"><span style="color: rgb(73, 26, 189)"><strong>Learn Basic</strong></span></span></h1>',
             $html
         );
@@ -1502,6 +1502,27 @@ function orcam_theme_render_document(string $file, ?string $document_html = null
     if ($normalized_file === $blog_file) {
         $blog_index = orcam_theme_blog_index($html);
         $html = preg_replace('/<nav class="orcam-footer/i', $blog_index . '<nav class="orcam-footer', $html, 1);
+    }
+    // OrCam Vietnam: always inject support footer block before .orcam-footer nav
+    {
+        $lu = esc_url(get_template_directory_uri() . '/media/logo_white-1.svg');
+        $ph = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.47 2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.09 6.09l1.81-1.81a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
+        $hs = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
+        $hd = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>';
+        $css = '<style id="orcam-vn-footer-css">#orcam-vn-support-block{background:var(--orcam-07-solid-gray,#1a1a1a);width:100%;box-sizing:border-box}.ovn-top-row{max-width:1400px;margin:0 auto;padding:36px var(--orcam-sides-padding,5%) 28px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;border-bottom:1px solid rgba(255,255,255,.07)}.ovn-brand{display:flex;align-items:center;gap:10px}.ovn-brand img{height:22px;width:auto;opacity:.95}.ovn-brand-name{color:#fff;font-size:13.5px;font-weight:800;letter-spacing:2px;text-transform:uppercase}.ovn-desc{color:#64748b;font-size:12.5px;line-height:1.6;margin:0;max-width:340px;text-align:right}.ovn-cards-wrap{max-width:1400px;margin:0 auto;padding:24px var(--orcam-sides-padding,5%) 32px;box-sizing:border-box}.ovn-section-label{color:#475569;font-size:10.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin:0 0 16px 0}.ovn-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}.ovn-card{border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:0}.ovn-card-regular{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07)}.ovn-card-hotline{background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.25)}.ovn-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.ovn-card-icon{width:32px;height:32px;border-radius:7px;background:rgba(56,189,248,.08);display:flex;align-items:center;justify-content:center;color:#38bdf8}.ovn-card-hotline .ovn-card-icon{background:rgba(37,99,235,.15);color:#60a5fa}.ovn-badge{font-size:9.5px;font-weight:700;letter-spacing:.8px;padding:2px 9px;border-radius:20px;text-transform:uppercase}.ovn-badge-blue{color:#38bdf8;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.18)}.ovn-badge-indigo{color:#818cf8;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2)}.ovn-card-title{color:#e2e8f0;font-size:13px;font-weight:700;margin:0 0 5px 0;line-height:1.3}.ovn-card-addr{color:#475569;font-size:12px;line-height:1.55;margin:0 0 14px 0}.ovn-card-phone{display:flex;align-items:center;gap:7px;color:#38bdf8;font-size:13px;font-weight:700;text-decoration:none;padding-top:12px;border-top:1px solid rgba(255,255,255,.05);margin-top:auto}.ovn-hotline-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:#1d4ed8;color:#fff;padding:11px 14px;border-radius:7px;font-size:18px;font-weight:800;text-decoration:none;letter-spacing:.5px;margin:4px 0 10px}.ovn-hotline-note{color:#64748b;font-size:11.5px;text-align:center;margin:0;line-height:1.4}@media(max-width:600px){.ovn-desc{text-align:left}.ovn-cards{grid-template-columns:1fr}}</style>';
+        $block = $css
+            . '<div id="orcam-vn-support-block">'
+            . '<div class="ovn-top-row"><div class="ovn-brand"><svg class="ovn-logo-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 15" style="height:20px;width:auto;fill:#ffffff;display:inline-block;vertical-align:middle;" aria-label="OrCam"><g fill="#ffffff"><path d="M25.4,2.8c-2.1,0-3.9,1.7-3.9,3.8v1.9c0,2.1,1.7,3.8,3.9,3.8h4.4c2.1,0,3.9-1.7,3.9-3.8V6.5c0-2.1-1.7-3.8-3.9-3.8C29.8,2.8,25.4,2.8,25.4,2.8z M25.3,5.2H30c0.7,0,1.3,0.4,1.3,1.2v2.3c0,0.7-0.5,1.3-1.3,1.3h-4.8c-0.7,0-1.4-0.5-1.4-1.3V6.4C23.9,5.6,24.5,5.2,25.3,5.2z"/><path d="M53.3,2.8h8.1v2.4h-8.2c-0.7,0-1.3,0.6-1.3,1.3v0.1v1.9v0.1c0,0.7,0.6,1.3,1.3,1.3h8.2v2.4h-8.1c-2.1,0-3.9-1.7-3.9-3.8V8.3l0,0V6.8V6.7C49.4,4.5,51.2,2.8,53.3,2.8"/><path d="M38.4,5.2v2.2h4.6c1.4,0,1.4-2.2,0-2.2H38.4z M43.9,2.8c1.7,0,3.1,1.7,3.1,3.4c0,0.9-0.4,2-1.1,2.5l2.1,3.5h-2.7l-1.5-2.3h-5.5v2.3h-2.4V4.4c0-1,0.6-1.6,1.3-1.6L43.9,2.8L43.9,2.8z"/><g><path d="M12.3,2.7C11,1.3,9.1,0.5,7.1,0.5C3.2,0.5,0,3.6,0,7.5c0,3.9,3.2,7,7.1,7c2.1,0,3.9-0.9,5.2-2.2l4.5-4.8L12.3,2.7z M7.1,12.1c-2.6,0-4.6-2.1-4.6-4.6s2.1-4.6,4.6-4.6s4.6,2.1,4.6,4.6S9.7,12.1,7.1,12.1z"/><path d="M7.2,9.9c1.3,0,2.4-1.1,2.4-2.4S8.5,5.1,7.2,5.1S4.8,6.2,4.8,7.5S5.9,9.9,7.2,9.9"/></g><path d="M68.7,5.2h-1.3c-0.7,0-1.3,0.6-1.3,1.3v1h7.2v-1c0-0.7-0.6-1.3-1.3-1.3H68.7z M67.6,2.8h1.1h3.1c2.1,0,3.9,1.7,3.9,3.8v0.9v2.2v2.6h-2.4V9.8h-7.2v2.4h-2.4V9.6V7.5V6.6C63.8,4.5,65.5,2.8,67.6,2.8"/><path d="M86.1,2.8H83h-1.1c-2.1,0-3.9,1.7-3.9,3.8v0.9v2.2v2.6h2.4V9.8h0V7.3l0,0V6.5c0-0.7,0.6-1.3,1.3-1.3h1v7.1h2.4V5.1h1c0.7,0,1.3,0.6,1.3,1.3v0.8v0.2v4.8H90V9.6V7.5V6.6C90,4.5,88.3,2.8,86.1,2.8z"/></g></svg><span class="ovn-brand-name" style="color:#38bdf8;font-size:14px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;">VIỆT NAM</span></div>'
+            . '<p class="ovn-desc">C&ocirc;ng ngh&#7879; tr&#7907; n&#259;ng &#273;&#7897;t ph&aacute;, n&acirc;ng cao t&iacute;nh &#273;&#7897;c l&#7853;p<br>cho ng&#432;&#7901;i khi&#7871;m th&#7883; v&agrave; ng&#432;&#7901;i g&#7863;p kh&oacute; kh&#259;n khi &#273;&#7885;c.</p></div>'
+            . '<div class="ovn-cards-wrap"><p class="ovn-section-label">H&#7895; tr&#7907; kh&aacute;ch h&agrave;ng</p><div class="ovn-cards">'
+            . '<div class="ovn-card ovn-card-regular"><div class="ovn-card-header"><div class="ovn-card-icon">' . $hs . '</div><span class="ovn-badge ovn-badge-blue">Mi&#7873;n B&#7855;c</span></div><p class="ovn-card-title">V&#259;n ph&ograve;ng H&agrave; N&#7897;i</p><p class="ovn-card-addr">226 &#272;&#432;&#7901;ng L&aacute;ng, Ph&#432;&#7901;ng Th&#7883;nh Quang,<br>Qu&#7853;n &#272;&#7889;ng &#272;a, H&agrave; N&#7897;i</p><a href="tel:02473048700" class="ovn-card-phone">' . $ph . '024.7304.8700</a></div>'
+            . '<div class="ovn-card ovn-card-regular"><div class="ovn-card-header"><div class="ovn-card-icon">' . $hs . '</div><span class="ovn-badge ovn-badge-blue">Mi&#7873;n Nam</span></div><p class="ovn-card-title">V&#259;n ph&ograve;ng H&#7891; Ch&iacute; Minh</p><p class="ovn-card-addr">137 H&ograve;a H&#432;ng, Ph&#432;&#7901;ng H&ograve;a H&#432;ng,<br>TP. H&#7891; Ch&iacute; Minh</p><a href="tel:02873048700" class="ovn-card-phone">' . $ph . '028.7304.8700</a></div>'
+            . '<div class="ovn-card ovn-card-hotline"><div class="ovn-card-header"><div class="ovn-card-icon">' . $hd . '</div><span class="ovn-badge ovn-badge-indigo">T&#432; v&#7845;n 24/7</span></div><p class="ovn-card-title">Hotline T&#7893;ng &#272;&agrave;i</p><a href="tel:1900638400" class="ovn-hotline-btn">' . $ph . '1900.63.8400</a><p class="ovn-hotline-note">H&#7895; tr&#7907; v&agrave; t&#432; v&#7845;n m&#7885;i l&uacute;c, m&#7885;i n&#417;i</p></div>'
+            . '</div></div></div>';
+        // Strip any old injected block first, then inject fresh
+        $html = preg_replace('#<style\s+id="orcam-vn-footer-css">[\s\S]*?</style>\s*#i', '', $html, 1);
+        $html = preg_replace('#<div\s+id="orcam-vn-support-block">[\s\S]*?(?:</div>\s*){3}#i', '', $html, 1);
+        $html = preg_replace('#(<nav\b[^>]*class="[^"]*orcam-footer)#', $block . '', $html, 1);
     }
     $theme_uri = untrailingslashit(get_template_directory_uri());
     $request_host = strtolower((string) ($_SERVER['HTTP_HOST'] ?? ''));
@@ -1628,7 +1649,7 @@ function orcam_theme_render_document(string $file, ?string $document_html = null
     $google_api_key = orcam_theme_google_api_key();
     $dynamic_product_items = array();
     $product_data_map = array();
-    $currency_symbol = function_exists('get_woocommerce_currency_symbol') ? get_woocommerce_currency_symbol(get_woocommerce_currency()) : '₫';
+    $currency_symbol = function_exists('get_woocommerce_currency_symbol') ? get_woocommerce_currency_symbol(get_woocommerce_currency()) : 'â‚«';
 
     foreach (orcam_theme_product_navigation_products() as $navigation_product) {
         $wc_p = function_exists('wc_get_product') ? wc_get_product($navigation_product->ID) : null;
@@ -1746,6 +1767,28 @@ function orcam_theme_render_shared_static_shell(string $content, string $title, 
         $html = preg_replace('#</head>#i', $wordpress_head . '</head>', $html, 1);
         $html = preg_replace('#</body>#i', $wordpress_footer . '</body>', $html, 1);
     }
+
+    // OrCam Vietnam: inject support block before .orcam-footer nav
+    if (true) { // always inject OrCam VN footer block
+        // Strip existing block to avoid duplicate
+        $html = preg_replace('#<style\s+id="orcam-vn-footer-css">.*?</style>[\s\S]*?<div\s+id="orcam-vn-support-block">[\s\S]*?</div>(?:\s*</div>){2}#is', '', $html, 1);
+        $lu = esc_url(get_template_directory_uri() . '/media/logo_white-1.svg');
+        $ph = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.47 2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.09 6.09l1.81-1.81a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
+        $hs = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
+        $hd = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>';
+        $css = '<style id="orcam-vn-footer-css">#orcam-vn-support-block{background:var(--orcam-07-solid-gray,#1a1a1a);width:100%;box-sizing:border-box}.ovn-top-row{max-width:1400px;margin:0 auto;padding:36px var(--orcam-sides-padding,5%) 28px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;border-bottom:1px solid rgba(255,255,255,.07)}.ovn-brand{display:flex;align-items:center;gap:10px}.ovn-brand img{height:22px;width:auto;opacity:.95}.ovn-brand-name{color:#fff;font-size:13.5px;font-weight:800;letter-spacing:2px;text-transform:uppercase}.ovn-desc{color:#64748b;font-size:12.5px;line-height:1.6;margin:0;max-width:340px;text-align:right}.ovn-cards-wrap{max-width:1400px;margin:0 auto;padding:24px var(--orcam-sides-padding,5%) 32px;box-sizing:border-box}.ovn-section-label{color:#475569;font-size:10.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin:0 0 16px 0}.ovn-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}.ovn-card{border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:0}.ovn-card-regular{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07)}.ovn-card-hotline{background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.25)}.ovn-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.ovn-card-icon{width:32px;height:32px;border-radius:7px;background:rgba(56,189,248,.08);display:flex;align-items:center;justify-content:center;color:#38bdf8}.ovn-card-hotline .ovn-card-icon{background:rgba(37,99,235,.15);color:#60a5fa}.ovn-badge{font-size:9.5px;font-weight:700;letter-spacing:.8px;padding:2px 9px;border-radius:20px;text-transform:uppercase}.ovn-badge-blue{color:#38bdf8;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.18)}.ovn-badge-indigo{color:#818cf8;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2)}.ovn-card-title{color:#e2e8f0;font-size:13px;font-weight:700;margin:0 0 5px 0;line-height:1.3}.ovn-card-addr{color:#475569;font-size:12px;line-height:1.55;margin:0 0 14px 0}.ovn-card-phone{display:flex;align-items:center;gap:7px;color:#38bdf8;font-size:13px;font-weight:700;text-decoration:none;padding-top:12px;border-top:1px solid rgba(255,255,255,.05);margin-top:auto}.ovn-hotline-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:#1d4ed8;color:#fff;padding:11px 14px;border-radius:7px;font-size:18px;font-weight:800;text-decoration:none;letter-spacing:.5px;margin:4px 0 10px}.ovn-hotline-note{color:#64748b;font-size:11.5px;text-align:center;margin:0;line-height:1.4}@media(max-width:600px){.ovn-desc{text-align:left}.ovn-cards{grid-template-columns:1fr}}</style>';
+        $block = $css
+            . '<div id="orcam-vn-support-block">'
+            . '<div class="ovn-top-row"><div class="ovn-brand"><svg class="ovn-logo-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 15" style="height:20px;width:auto;fill:#ffffff;display:inline-block;vertical-align:middle;" aria-label="OrCam"><g fill="#ffffff"><path d="M25.4,2.8c-2.1,0-3.9,1.7-3.9,3.8v1.9c0,2.1,1.7,3.8,3.9,3.8h4.4c2.1,0,3.9-1.7,3.9-3.8V6.5c0-2.1-1.7-3.8-3.9-3.8C29.8,2.8,25.4,2.8,25.4,2.8z M25.3,5.2H30c0.7,0,1.3,0.4,1.3,1.2v2.3c0,0.7-0.5,1.3-1.3,1.3h-4.8c-0.7,0-1.4-0.5-1.4-1.3V6.4C23.9,5.6,24.5,5.2,25.3,5.2z"/><path d="M53.3,2.8h8.1v2.4h-8.2c-0.7,0-1.3,0.6-1.3,1.3v0.1v1.9v0.1c0,0.7,0.6,1.3,1.3,1.3h8.2v2.4h-8.1c-2.1,0-3.9-1.7-3.9-3.8V8.3l0,0V6.8V6.7C49.4,4.5,51.2,2.8,53.3,2.8"/><path d="M38.4,5.2v2.2h4.6c1.4,0,1.4-2.2,0-2.2H38.4z M43.9,2.8c1.7,0,3.1,1.7,3.1,3.4c0,0.9-0.4,2-1.1,2.5l2.1,3.5h-2.7l-1.5-2.3h-5.5v2.3h-2.4V4.4c0-1,0.6-1.6,1.3-1.6L43.9,2.8L43.9,2.8z"/><g><path d="M12.3,2.7C11,1.3,9.1,0.5,7.1,0.5C3.2,0.5,0,3.6,0,7.5c0,3.9,3.2,7,7.1,7c2.1,0,3.9-0.9,5.2-2.2l4.5-4.8L12.3,2.7z M7.1,12.1c-2.6,0-4.6-2.1-4.6-4.6s2.1-4.6,4.6-4.6s4.6,2.1,4.6,4.6S9.7,12.1,7.1,12.1z"/><path d="M7.2,9.9c1.3,0,2.4-1.1,2.4-2.4S8.5,5.1,7.2,5.1S4.8,6.2,4.8,7.5S5.9,9.9,7.2,9.9"/></g><path d="M68.7,5.2h-1.3c-0.7,0-1.3,0.6-1.3,1.3v1h7.2v-1c0-0.7-0.6-1.3-1.3-1.3H68.7z M67.6,2.8h1.1h3.1c2.1,0,3.9,1.7,3.9,3.8v0.9v2.2v2.6h-2.4V9.8h-7.2v2.4h-2.4V9.6V7.5V6.6C63.8,4.5,65.5,2.8,67.6,2.8"/><path d="M86.1,2.8H83h-1.1c-2.1,0-3.9,1.7-3.9,3.8v0.9v2.2v2.6h2.4V9.8h0V7.3l0,0V6.5c0-0.7,0.6-1.3,1.3-1.3h1v7.1h2.4V5.1h1c0.7,0,1.3,0.6,1.3,1.3v0.8v0.2v4.8H90V9.6V7.5V6.6C90,4.5,88.3,2.8,86.1,2.8z"/></g></svg><span class="ovn-brand-name" style="color:#38bdf8;font-size:14px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;">VIỆT NAM</span></div>'
+            . '<p class="ovn-desc">C&ocirc;ng ngh&#7879; tr&#7907; n&#259;ng &#273;&#7897;t ph&aacute;, n&acirc;ng cao t&iacute;nh &#273;&#7897;c l&#7853;p<br>cho ng&#432;&#7901;i khi&#7871;m th&#7883; v&agrave; ng&#432;&#7901;i g&#7863;p kh&oacute; kh&#259;n khi &#273;&#7885;c.</p></div>'
+            . '<div class="ovn-cards-wrap"><p class="ovn-section-label">H&#7895; tr&#7907; kh&aacute;ch h&agrave;ng</p><div class="ovn-cards">'
+            . '<div class="ovn-card ovn-card-regular"><div class="ovn-card-header"><div class="ovn-card-icon">' . $hs . '</div><span class="ovn-badge ovn-badge-blue">Mi&#7873;n B&#7855;c</span></div><p class="ovn-card-title">V&#259;n ph&ograve;ng H&agrave; N&#7897;i</p><p class="ovn-card-addr">226 &#272;&#432;&#7901;ng L&aacute;ng, Ph&#432;&#7901;ng Th&#7883;nh Quang,<br>Qu&#7853;n &#272;&#7889;ng &#272;a, H&agrave; N&#7897;i</p><a href="tel:02473048700" class="ovn-card-phone">' . $ph . '024.7304.8700</a></div>'
+            . '<div class="ovn-card ovn-card-regular"><div class="ovn-card-header"><div class="ovn-card-icon">' . $hs . '</div><span class="ovn-badge ovn-badge-blue">Mi&#7873;n Nam</span></div><p class="ovn-card-title">V&#259;n ph&ograve;ng H&#7891; Ch&iacute; Minh</p><p class="ovn-card-addr">137 H&ograve;a H&#432;ng, Ph&#432;&#7901;ng H&ograve;a H&#432;ng,<br>TP. H&#7891; Ch&iacute; Minh</p><a href="tel:02873048700" class="ovn-card-phone">' . $ph . '028.7304.8700</a></div>'
+            . '<div class="ovn-card ovn-card-hotline"><div class="ovn-card-header"><div class="ovn-card-icon">' . $hd . '</div><span class="ovn-badge ovn-badge-indigo">T&#432; v&#7845;n 24/7</span></div><p class="ovn-card-title">Hotline T&#7893;ng &#272;&agrave;i</p><a href="tel:1900638400" class="ovn-hotline-btn">' . $ph . '1900.63.8400</a><p class="ovn-hotline-note">H&#7895; tr&#7907; v&agrave; t&#432; v&#7845;n m&#7885;i l&uacute;c, m&#7885;i n&#417;i</p></div>'
+            . '</div></div></div>';
+        $html = preg_replace('#(<nav\b[^>]*class="[^"]*orcam-footer)#', $block . '$1', $html, 1);
+    }
+
     // Hydrate the original Svelte header/footer. static-navigation.js keeps
     // the WooCommerce main body authoritative after hydration rebuilds DOM.
     $title_tag = '<script>window.orcamHydratedChrome=true;window.orcamAuthoritativeTitle='
@@ -1857,7 +1900,7 @@ function orcam_theme_render_database_product(WP_Post $product, bool $return_only
                     }
                     $details_markup .= '<button type="button" class="orcam-woocommerce-gallery__thumb'
                         . ($index === 0 ? ' is-active' : '') . '" data-large="' . esc_url($large_url) . '"'
-                        . ' aria-label="Xem ảnh ' . esc_attr((string) ($index + 1)) . '"><img src="'
+                        . ' aria-label="Xem áº£nh ' . esc_attr((string) ($index + 1)) . '"><img src="'
                         . esc_url((string) $thumbnail_url) . '" alt=""></button>';
                 }
                 $details_markup .= '</div></div>';
@@ -1983,7 +2026,7 @@ function orcam_theme_render_database_blog(WP_Post $post, bool $return_only = fal
     );
 
     // Replace the date/byline when the exported article provides one.
-    $byline = esc_html($date . ' | Bởi ' . ($author ?: 'OrCam'));
+    $byline = esc_html($date . ' | Bá»Ÿi ' . ($author ?: 'OrCam'));
     $html = preg_replace_callback(
         '#(<div\s+class=(["\'])blog\2[^>]*>\s*<h1[^>]*>.*?</h1>\s*<p[^>]*>).*?(</p>)#is',
         static function (array $match) use ($byline): string {
@@ -2150,21 +2193,21 @@ function orcam_theme_warmup_shop_catalog(): void
     ?>
     <main class="orcam-shop" id="primary">
         <header class="orcam-shop__header">
-            <div><p><?php esc_html_e('OrCam Việt Nam', 'orcam-theme'); ?></p><h1><?php esc_html_e('Tất cả sản phẩm', 'orcam-theme'); ?></h1></div>
+            <div><p><?php esc_html_e('OrCam Viá»‡t Nam', 'orcam-theme'); ?></p><h1><?php esc_html_e('Táº¥t cáº£ sáº£n pháº©m', 'orcam-theme'); ?></h1></div>
         </header>
-        <section class="orcam-shop__catalog" aria-label="<?php esc_attr_e('Danh sách sản phẩm', 'orcam-theme'); ?>">
+        <section class="orcam-shop__catalog" aria-label="<?php esc_attr_e('Danh sÃ¡ch sáº£n pháº©m', 'orcam-theme'); ?>">
             <div class="orcam-shop__grid">
                 <?php foreach (orcam_theme_product_navigation_products(true) as $p_post) :
                     $p_obj = wc_get_product($p_post->ID);
                     if (!$p_obj) continue;
                     $p_img = $p_obj->get_image_id() ? wp_get_attachment_image_url($p_obj->get_image_id(), 'medium_large') : wc_placeholder_img_src('medium_large');
-                    $p_sum = trim($p_obj->get_short_description()) ?: sprintf(__('Khám phá %s với công nghệ hỗ trợ tiên tiến từ OrCam.', 'orcam-theme'), get_the_title($p_post));
+                    $p_sum = trim($p_obj->get_short_description()) ?: sprintf(__('KhÃ¡m phÃ¡ %s vá»›i cÃ´ng nghá»‡ há»— trá»£ tiÃªn tiáº¿n tá»« OrCam.', 'orcam-theme'), get_the_title($p_post));
                     ?>
                     <article class="orcam-shop-card">
                         <div class="orcam-shop-card__inner">
                             <a class="orcam-shop-card__media-link" href="<?php echo esc_url(get_permalink($p_post)); ?>">
                                 <span class="orcam-shop-card__media">
-                                    <?php if ($p_obj->is_on_sale()) : ?><span class="orcam-shop-card__badge"><?php esc_html_e('Ưu đãi', 'orcam-theme'); ?></span><?php endif; ?>
+                                    <?php if ($p_obj->is_on_sale()) : ?><span class="orcam-shop-card__badge"><?php esc_html_e('Æ¯u Ä‘Ã£i', 'orcam-theme'); ?></span><?php endif; ?>
                                     <img src="<?php echo esc_url($p_img); ?>" alt="<?php echo esc_attr(get_the_title($p_post)); ?>" loading="lazy">
                                 </span>
                             </a>
@@ -2175,10 +2218,10 @@ function orcam_theme_warmup_shop_catalog(): void
                                 <?php if ($p_obj->get_price() !== '') : ?>
                                     <div class="orcam-shop-card__price"><?php echo wp_kses_post($p_obj->get_price_html()); ?></div>
                                 <?php endif; ?>
-                                <p class="orcam-shop-card__description"><?php echo esc_html(wp_trim_words(wp_strip_all_tags($p_sum), 22, '…')); ?></p>
+                                <p class="orcam-shop-card__description"><?php echo esc_html(wp_trim_words(wp_strip_all_tags($p_sum), 22, 'â€¦')); ?></p>
                                 <div class="orcam-shop-card__actions">
                                     <a class="orcam-shop-card__btn orcam-shop-card__btn--detail" href="<?php echo esc_url(get_permalink($p_post)); ?>">
-                                        <?php esc_html_e('Xem chi tiết', 'orcam-theme'); ?>
+                                        <?php esc_html_e('Xem chi tiáº¿t', 'orcam-theme'); ?>
                                     </a>
                                     <a class="orcam-shop-card__btn orcam-shop-card__btn--buy" href="<?php echo esc_url($p_obj->is_purchasable() && $p_obj->is_in_stock() ? add_query_arg('add-to-cart', $p_obj->get_id(), wc_get_checkout_url()) : get_permalink($p_post)); ?>">
                                         <?php esc_html_e('Mua ngay', 'orcam-theme'); ?>
@@ -2193,7 +2236,7 @@ function orcam_theme_warmup_shop_catalog(): void
     </main>
     <?php
     $shop_html = (string) ob_get_clean();
-    orcam_theme_render_shared_static_shell($shop_html, 'Tất cả sản phẩm', false, 'shop_catalog', 'vi_shop_page', true);
+    orcam_theme_render_shared_static_shell($shop_html, 'Táº¥t cáº£ sáº£n pháº©m', false, 'shop_catalog', 'vi_shop_page', true);
 }
 
 /**
@@ -2277,4 +2320,107 @@ add_action('save_post_post', static function ($post_id): void {
         orcam_theme_render_database_blog($post, true);
     }
 }, 20, 1);
+
+// OrCam Vietnam â€” inject footer support block on WP-rendered pages (products, posts, etc.)
+add_action('wp_footer', static function (): void {
+    ?>
+    <style id="orcam-vn-footer-css">
+        #orcam-vn-support-block {
+            background: var(--orcam-07-solid-gray, #1a1a1a);
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .ovn-top-row {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 36px var(--orcam-sides-padding, 5%) 28px;
+            box-sizing: border-box;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+        .ovn-brand { display: flex; align-items: center; gap: 10px; }
+        .ovn-brand img { height: 22px; width: auto; opacity: 0.95; }
+        .ovn-brand-name { color: #fff; font-size: 13.5px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; }
+        .ovn-desc { color: #64748b; font-size: 12.5px; line-height: 1.6; margin: 0; max-width: 340px; text-align: right; }
+        .ovn-cards-wrap { max-width: 1400px; margin: 0 auto; padding: 24px var(--orcam-sides-padding, 5%) 32px; box-sizing: border-box; }
+        .ovn-section-label { color: #475569; font-size: 10.5px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin: 0 0 16px 0; }
+        .ovn-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+        .ovn-card { border-radius: 10px; padding: 18px 20px; display: flex; flex-direction: column; gap: 0; }
+        .ovn-card-regular { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); }
+        .ovn-card-hotline { background: rgba(37,99,235,0.08); border: 1px solid rgba(37,99,235,0.25); }
+        .ovn-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+        .ovn-card-icon { width: 32px; height: 32px; border-radius: 7px; background: rgba(56,189,248,0.08); display: flex; align-items: center; justify-content: center; color: #38bdf8; }
+        .ovn-card-hotline .ovn-card-icon { background: rgba(37,99,235,0.15); color: #60a5fa; }
+        .ovn-badge { font-size: 9.5px; font-weight: 700; letter-spacing: 0.8px; padding: 2px 9px; border-radius: 20px; text-transform: uppercase; }
+        .ovn-badge-blue { color: #38bdf8; background: rgba(56,189,248,0.08); border: 1px solid rgba(56,189,248,0.18); }
+        .ovn-badge-indigo { color: #818cf8; background: rgba(99,102,241,0.1); border: 1px solid rgba(99,102,241,0.2); }
+        .ovn-card-title { color: #e2e8f0; font-size: 13px; font-weight: 700; margin: 0 0 5px 0; line-height: 1.3; }
+        .ovn-card-addr { color: #475569; font-size: 12px; line-height: 1.55; margin: 0 0 14px 0; }
+        .ovn-card-phone { display: flex; align-items: center; gap: 7px; color: #38bdf8; font-size: 13px; font-weight: 700; text-decoration: none; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: auto; }
+        .ovn-hotline-btn { display: flex; align-items: center; justify-content: center; gap: 8px; background: #1d4ed8; color: #fff; padding: 11px 14px; border-radius: 7px; font-size: 18px; font-weight: 800; text-decoration: none; letter-spacing: 0.5px; margin: 4px 0 10px; }
+        .ovn-hotline-note { color: #64748b; font-size: 11.5px; text-align: center; margin: 0; line-height: 1.4; }
+        @media (max-width: 600px) { .ovn-desc { text-align: left; } .ovn-cards { grid-template-columns: 1fr; } }
+    </style>
+    <script id="orcam-vn-footer-injector">
+    (function() {
+        var LOGO = '<?php echo esc_url(get_theme_file_uri("media/logo_white-1.svg")); ?>';
+        var phone_svg = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.47 2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.09 6.09l1.81-1.81a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
+        var house_svg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
+        var headset_svg = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>';
+
+        function build() {
+            return '<div id="orcam-vn-support-block">'
+                + '<div class="ovn-top-row">'
+                +   '<div class="ovn-brand"><svg class="ovn-logo-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 15" style="height:20px;width:auto;fill:#ffffff;display:inline-block;vertical-align:middle;" aria-label="OrCam"><g fill="#ffffff"><path d="M25.4,2.8c-2.1,0-3.9,1.7-3.9,3.8v1.9c0,2.1,1.7,3.8,3.9,3.8h4.4c2.1,0,3.9-1.7,3.9-3.8V6.5c0-2.1-1.7-3.8-3.9-3.8C29.8,2.8,25.4,2.8,25.4,2.8z M25.3,5.2H30c0.7,0,1.3,0.4,1.3,1.2v2.3c0,0.7-0.5,1.3-1.3,1.3h-4.8c-0.7,0-1.4-0.5-1.4-1.3V6.4C23.9,5.6,24.5,5.2,25.3,5.2z"/><path d="M53.3,2.8h8.1v2.4h-8.2c-0.7,0-1.3,0.6-1.3,1.3v0.1v1.9v0.1c0,0.7,0.6,1.3,1.3,1.3h8.2v2.4h-8.1c-2.1,0-3.9-1.7-3.9-3.8V8.3l0,0V6.8V6.7C49.4,4.5,51.2,2.8,53.3,2.8"/><path d="M38.4,5.2v2.2h4.6c1.4,0,1.4-2.2,0-2.2H38.4z M43.9,2.8c1.7,0,3.1,1.7,3.1,3.4c0,0.9-0.4,2-1.1,2.5l2.1,3.5h-2.7l-1.5-2.3h-5.5v2.3h-2.4V4.4c0-1,0.6-1.6,1.3-1.6L43.9,2.8L43.9,2.8z"/><g><path d="M12.3,2.7C11,1.3,9.1,0.5,7.1,0.5C3.2,0.5,0,3.6,0,7.5c0,3.9,3.2,7,7.1,7c2.1,0,3.9-0.9,5.2-2.2l4.5-4.8L12.3,2.7z M7.1,12.1c-2.6,0-4.6-2.1-4.6-4.6s2.1-4.6,4.6-4.6s4.6,2.1,4.6,4.6S9.7,12.1,7.1,12.1z"/><path d="M7.2,9.9c1.3,0,2.4-1.1,2.4-2.4S8.5,5.1,7.2,5.1S4.8,6.2,4.8,7.5S5.9,9.9,7.2,9.9"/></g><path d="M68.7,5.2h-1.3c-0.7,0-1.3,0.6-1.3,1.3v1h7.2v-1c0-0.7-0.6-1.3-1.3-1.3H68.7z M67.6,2.8h1.1h3.1c2.1,0,3.9,1.7,3.9,3.8v0.9v2.2v2.6h-2.4V9.8h-7.2v2.4h-2.4V9.6V7.5V6.6C63.8,4.5,65.5,2.8,67.6,2.8"/><path d="M86.1,2.8H83h-1.1c-2.1,0-3.9,1.7-3.9,3.8v0.9v2.2v2.6h2.4V9.8h0V7.3l0,0V6.5c0-0.7,0.6-1.3,1.3-1.3h1v7.1h2.4V5.1h1c0.7,0,1.3,0.6,1.3,1.3v0.8v0.2v4.8H90V9.6V7.5V6.6C90,4.5,88.3,2.8,86.1,2.8z"/></g></svg><span class="ovn-brand-name" style="color:#38bdf8;font-size:14px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;">VIỆT NAM</span></div>'
+                +   '<p class="ovn-desc">CÃ´ng nghá»‡ trá»£ nÄƒng Ä‘á»™t phÃ¡, nÃ¢ng cao tÃ­nh Ä‘á»™c láº­p<br>cho ngÆ°á»i khiáº¿m thá»‹ vÃ  ngÆ°á»i gáº·p khÃ³ khÄƒn khi Ä‘á»c.</p>'
+                + '</div>'
+                + '<div class="ovn-cards-wrap">'
+                +   '<p class="ovn-section-label">Há»— trá»£ khÃ¡ch hÃ ng</p>'
+                +   '<div class="ovn-cards">'
+                +     '<div class="ovn-card ovn-card-regular">'
+                +       '<div class="ovn-card-header"><div class="ovn-card-icon">' + house_svg + '</div><span class="ovn-badge ovn-badge-blue">Miá»n Báº¯c</span></div>'
+                +       '<p class="ovn-card-title">VÄƒn phÃ²ng HÃ  Ná»™i</p>'
+                +       '<p class="ovn-card-addr">226 ÄÆ°á»ng LÃ¡ng, PhÆ°á»ng Thá»‹nh Quang,<br>Quáº­n Äá»‘ng Äa, HÃ  Ná»™i</p>'
+                +       '<a href="tel:02473048700" class="ovn-card-phone">' + phone_svg + '024.7304.8700</a>'
+                +     '</div>'
+                +     '<div class="ovn-card ovn-card-regular">'
+                +       '<div class="ovn-card-header"><div class="ovn-card-icon">' + house_svg + '</div><span class="ovn-badge ovn-badge-blue">Miá»n Nam</span></div>'
+                +       '<p class="ovn-card-title">VÄƒn phÃ²ng Há»“ ChÃ­ Minh</p>'
+                +       '<p class="ovn-card-addr">137 HÃ²a HÆ°ng, PhÆ°á»ng HÃ²a HÆ°ng,<br>TP. Há»“ ChÃ­ Minh</p>'
+                +       '<a href="tel:02873048700" class="ovn-card-phone">' + phone_svg + '028.7304.8700</a>'
+                +     '</div>'
+                +     '<div class="ovn-card ovn-card-hotline">'
+                +       '<div class="ovn-card-header"><div class="ovn-card-icon">' + headset_svg + '</div><span class="ovn-badge ovn-badge-indigo">TÆ° váº¥n 24/7</span></div>'
+                +       '<p class="ovn-card-title">Hotline Tá»•ng ÄÃ i</p>'
+                +       '<a href="tel:1900638400" class="ovn-hotline-btn">' + phone_svg + '1900.63.8400</a>'
+                +       '<p class="ovn-hotline-note">Há»— trá»£ vÃ  tÆ° váº¥n má»i lÃºc, má»i nÆ¡i</p>'
+                +     '</div>'
+                +   '</div>'
+                + '</div>'
+                + '</div>';
+        }
+
+        function inject() {
+            if (document.getElementById('orcam-vn-support-block')) return;
+            var footer = document.querySelector('.orcam-footer, .orcam-wp-footer, footer');
+            if (!footer) return;
+            var tmp = document.createElement('div');
+            tmp.innerHTML = build();
+            footer.insertBefore(tmp.firstChild, footer.firstChild);
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', inject);
+        } else {
+            inject();
+        }
+        var n = 0, t = setInterval(function() { inject(); if (++n > 20) clearInterval(t); }, 250);
+    })();
+    </script>
+    <?php
+}, 20);
 
