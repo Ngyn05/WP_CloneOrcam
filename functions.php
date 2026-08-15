@@ -58,7 +58,7 @@ add_action('do_meta_boxes', static function (): void {
             echo '<p><label class="screen-reader-text" for="orcam-post-description-field">Description</label>';
             echo '<textarea id="orcam-post-description-field" name="orcam_post_description" rows="5" style="width:100%">'
                 . esc_textarea($post->post_excerpt) . '</textarea></p>';
-            echo '<p class="description">' . esc_html__('Ná»™i dung nÃ y xuáº¥t hiá»‡n trÃªn tháº» bÃ i viáº¿t vÃ  trong tháº» meta description.', 'orcam-theme') . '</p>';
+            echo '<p class="description">' . esc_html__('Ná»™i dung nÃ y xuáº¥t hiá»‡n trÃªn tháº» bài viết và trong tháº» meta description.', 'orcam-theme') . '</p>';
         },
         'post',
         'normal',
@@ -186,7 +186,7 @@ add_action('add_meta_boxes_product', static function (): void {
             $url = get_permalink($product);
             echo '<div class="orcam-product-preview-toolbar">';
             echo '<strong>Trang WooCommerce Ä‘ang hiá»ƒn thá»‹ thá»±c táº¿</strong>';
-            echo '<span>Nháº¥n Cáº­p nháº­t rá»“i Táº£i láº¡i báº£n xem trÆ°á»›c Ä‘á»ƒ kiá»ƒm tra thay Ä‘á»•i.</span>';
+            echo '<span>Nháº¥n Cập nhật rá»“i Táº£i láº¡i báº£n xem trÆ°á»›c Ä‘á»ƒ kiá»ƒm tra thay Ä‘á»•i.</span>';
             echo '<button type="button" class="button" id="orcam-refresh-product-preview">Táº£i láº¡i báº£n xem trÆ°á»›c</button>';
             echo '<a class="button button-primary" href="' . esc_url($url) . '" target="_blank" rel="noopener">Má»Ÿ trang tháº­t</a>';
             echo '</div>';
@@ -249,8 +249,8 @@ function orcam_theme_handle_consultation_form(): void
     }
 
     $recipient = apply_filters('orcam_consultation_recipient', get_option('admin_email'));
-    $subject = sprintf('[OrCam] YÃªu cáº§u tÆ° váº¥n tá»« %s', $name);
-    $body = "Há» vÃ  tÃªn: {$name}\nSá»‘ Ä‘iá»‡n thoáº¡i: {$phone}\nEmail: {$email}\n\nNá»™i dung tÆ° váº¥n:\n{$message}";
+    $subject = sprintf('[OrCam] Yêu cầu tư vấn từ %s', $name);
+    $body = "Há» và tên: {$name}\nSố điện thoại: {$phone}\nEmail: {$email}\n\nNá»™i dung tÆ° váº¥n:\n{$message}";
     $headers = array('Content-Type: text/plain; charset=UTF-8', 'Reply-To: ' . $name . ' <' . $email . '>');
     $sent = wp_mail($recipient, $subject, $body, $headers);
 
@@ -276,20 +276,20 @@ function orcam_theme_handle_support_case(): void
 
     $fields = array(
         'Má»‘i quan há»‡ vá»›i OrCam' => sanitize_text_field(wp_unslash($_POST['connection'] ?? '')),
-        'Há» vÃ  tÃªn'             => sanitize_text_field(wp_unslash($_POST['contact_name'] ?? '')),
+        'Há» và tên'             => sanitize_text_field(wp_unslash($_POST['contact_name'] ?? '')),
         'Email'                 => sanitize_email(wp_unslash($_POST['email'] ?? '')),
-        'Sá»‘ Ä‘iá»‡n thoáº¡i'         => sanitize_text_field(wp_unslash($_POST['phone'] ?? '')),
+        'Số điện thoại'         => sanitize_text_field(wp_unslash($_POST['phone'] ?? '')),
         'ThÃ nh phá»‘'             => sanitize_text_field(wp_unslash($_POST['city'] ?? '')),
         'Quá»‘c gia'              => sanitize_text_field(wp_unslash($_POST['country'] ?? '')),
         'Tá»‰nh/ThÃ nh'            => sanitize_text_field(wp_unslash($_POST['state'] ?? '')),
         'Thiáº¿t bá»‹ OrCam'        => sanitize_text_field(wp_unslash($_POST['device'] ?? '')),
         'Sá»‘ sÃª-ri'              => sanitize_text_field(wp_unslash($_POST['serial_number'] ?? '')),
-        'Loáº¡i yÃªu cáº§u'          => sanitize_text_field(wp_unslash($_POST['case_type'] ?? '')),
-        'MÃ´ táº£'                 => sanitize_textarea_field(wp_unslash($_POST['description'] ?? '')),
+        'Loại yêu cầu'          => sanitize_text_field(wp_unslash($_POST['case_type'] ?? '')),
+        'Mô tả'                 => sanitize_textarea_field(wp_unslash($_POST['description'] ?? '')),
     );
-    if ($fields['Má»‘i quan há»‡ vá»›i OrCam'] === '' || $fields['Há» vÃ  tÃªn'] === ''
-        || !is_email($fields['Email']) || $fields['Sá»‘ Ä‘iá»‡n thoáº¡i'] === ''
-        || $fields['Loáº¡i yÃªu cáº§u'] === '' || $fields['MÃ´ táº£'] === '') {
+    if ($fields['Má»‘i quan há»‡ vá»›i OrCam'] === '' || $fields['Há» và tên'] === ''
+        || !is_email($fields['Email']) || $fields['Số điện thoại'] === ''
+        || $fields['Loại yêu cầu'] === '' || $fields['Mô tả'] === '') {
         wp_safe_redirect(add_query_arg('case_status', 'invalid', $redirect));
         exit;
     }
@@ -299,8 +299,8 @@ function orcam_theme_handle_support_case(): void
         $body .= $label . ': ' . $value . "\n";
     }
     $recipient = apply_filters('orcam_support_recipient', get_option('admin_email'));
-    $subject = sprintf('[OrCam Support] %s - %s', $fields['Loáº¡i yÃªu cáº§u'], $fields['Há» vÃ  tÃªn']);
-    $headers = array('Content-Type: text/plain; charset=UTF-8', 'Reply-To: ' . $fields['Há» vÃ  tÃªn'] . ' <' . $fields['Email'] . '>');
+    $subject = sprintf('[OrCam Support] %s - %s', $fields['Loại yêu cầu'], $fields['Há» và tên']);
+    $headers = array('Content-Type: text/plain; charset=UTF-8', 'Reply-To: ' . $fields['Há» và tên'] . ' <' . $fields['Email'] . '>');
     $sent = wp_mail($recipient, $subject, $body, $headers);
     wp_safe_redirect(add_query_arg('case_status', $sent ? 'success' : 'error', $redirect));
     exit;
@@ -485,8 +485,8 @@ add_action('template_redirect', static function (): void {
 add_filter('woocommerce_checkout_fields', static function (array $fields): array {
     $fields['billing'] = array(
         'billing_phone' => array(
-            'label'        => 'Sá»‘ Ä‘iá»‡n thoáº¡i',
-            'placeholder'  => 'Nháº­p sá»‘ Ä‘iá»‡n thoáº¡i (báº¯t buá»™c)',
+            'label'        => 'Số điện thoại',
+            'placeholder'  => 'Nhập số điện thoại (bắt buộc)',
             'required'     => true,
             'class'        => array('form-row-wide'),
             'clear'        => true,
@@ -495,23 +495,23 @@ add_filter('woocommerce_checkout_fields', static function (array $fields): array
         ),
         'billing_email' => array(
             'label'        => 'Email',
-            'placeholder'  => 'Nháº­p Ä‘á»‹a chá»‰ email (khÃ´ng báº¯t buá»™c)',
+            'placeholder'  => 'Nhập địa chỉ email (không bắt buộc)',
             'required'     => false,
             'class'        => array('form-row-wide'),
             'clear'        => true,
             'priority'     => 20,
         ),
         'billing_first_name' => array(
-            'label'        => 'Há» vÃ  tÃªn',
-            'placeholder'  => 'Nháº­p há» vÃ  tÃªn',
+            'label'        => 'Họ và tên',
+            'placeholder'  => 'Nhập họ và tên',
             'required'     => false,
             'class'        => array('form-row-wide'),
             'clear'        => true,
             'priority'     => 30,
         ),
         'billing_address_1' => array(
-            'label'        => 'Äá»‹a chá»‰',
-            'placeholder'  => 'Sá»‘ nhÃ , tÃªn Ä‘Æ°á»ng, phÆ°á»ng/xÃ£, quáº­n/huyá»‡n, tá»‰nh/thÃ nh',
+            'label'        => 'Địa chỉ',
+            'placeholder'  => 'Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành',
             'required'     => false,
             'class'        => array('form-row-wide'),
             'clear'        => true,
@@ -521,22 +521,11 @@ add_filter('woocommerce_checkout_fields', static function (array $fields): array
 
     unset($fields['shipping']);
 
-    $fields['order']['customer_intent'] = array(
-        'type'        => 'radio',
-        'label'       => 'HÃ¬nh thá»©c phá»¥c vá»¥ mong muá»‘n',
-        'class'       => array('form-row-wide', 'orcam-checkout-intent'),
-        'required'    => false,
-        'default'     => 'cod',
-        'options'     => array(
-            'cod'     => 'Giao hÃ ng vÃ  thanh toÃ¡n khi nháº­n hÃ ng (COD)',
-            'consult' => 'TÆ° váº¥n chuyÃªn sÃ¢u vá» sáº£n pháº©m & há»— trá»£ phÆ°Æ¡ng thá»©c thanh toÃ¡n',
-        ),
-        'priority'    => 5,
-    );
+
 
     if (isset($fields['order']['order_comments'])) {
-        $fields['order']['order_comments']['label'] = 'Ghi chÃº Ä‘Æ¡n hÃ ng';
-        $fields['order']['order_comments']['placeholder'] = 'Ghi chÃº thÃªm vá» Ä‘Æ¡n hÃ ng hoáº·c thá»i gian giao hÃ ng...';
+        $fields['order']['order_comments']['label'] = 'Ghi chú đơn hàng';
+        $fields['order']['order_comments']['placeholder'] = 'Ghi chú thêm về đơn hàng hoặc thời gian giao hàng...';
         $fields['order']['order_comments']['required'] = false;
         $fields['order']['order_comments']['class'] = array('form-row-wide');
         $fields['order']['order_comments']['priority'] = 15;
@@ -545,29 +534,13 @@ add_filter('woocommerce_checkout_fields', static function (array $fields): array
     return $fields;
 }, 99);
 
-/** Save chosen intent option into order metadata */
-add_action('woocommerce_checkout_update_order_meta', static function (int $order_id): void {
-    if (!empty($_POST['customer_intent'])) {
-        $intent_key = sanitize_text_field(wp_unslash($_POST['customer_intent']));
-        $intent_label = $intent_key === 'consult'
-            ? 'TÆ° váº¥n chuyÃªn sÃ¢u vá» sáº£n pháº©m & há»— trá»£ phÆ°Æ¡ng thá»©c thanh toÃ¡n'
-            : 'Giao hÃ ng vÃ  thanh toÃ¡n khi nháº­n hÃ ng (COD)';
-        update_post_meta($order_id, '_customer_intent', $intent_label);
-    }
-});
 
-add_action('woocommerce_admin_order_data_after_billing_address', static function (WC_Order $order): void {
-    $intent = get_post_meta($order->get_id(), '_customer_intent', true);
-    if ($intent) {
-        echo '<p><strong>HÃ¬nh thá»©c yÃªu cáº§u:</strong> ' . esc_html($intent) . '</p>';
-    }
-});
 
 add_filter('woocommerce_billing_fields', static function (array $fields): array {
     return array(
         'billing_phone' => array(
-            'label'        => 'Sá»‘ Ä‘iá»‡n thoáº¡i',
-            'placeholder'  => 'Nháº­p sá»‘ Ä‘iá»‡n thoáº¡i (báº¯t buá»™c)',
+            'label'        => 'Số điện thoại',
+            'placeholder'  => 'Nhập số điện thoại (bắt buộc)',
             'required'     => true,
             'class'        => array('form-row-wide'),
             'clear'        => true,
@@ -575,23 +548,23 @@ add_filter('woocommerce_billing_fields', static function (array $fields): array 
         ),
         'billing_email' => array(
             'label'        => 'Email',
-            'placeholder'  => 'Nháº­p Ä‘á»‹a chá»‰ email (khÃ´ng báº¯t buá»™c)',
+            'placeholder'  => 'Nhập địa chỉ email (không bắt buộc)',
             'required'     => false,
             'class'        => array('form-row-wide'),
             'clear'        => true,
             'priority'     => 20,
         ),
         'billing_first_name' => array(
-            'label'        => 'Há» vÃ  tÃªn',
-            'placeholder'  => 'Nháº­p há» vÃ  tÃªn',
+            'label'        => 'Họ và tên',
+            'placeholder'  => 'Nhập họ và tên',
             'required'     => false,
             'class'        => array('form-row-wide'),
             'clear'        => true,
             'priority'     => 30,
         ),
         'billing_address_1' => array(
-            'label'        => 'Äá»‹a chá»‰',
-            'placeholder'  => 'Sá»‘ nhÃ , tÃªn Ä‘Æ°á»ng, phÆ°á»ng/xÃ£, quáº­n/huyá»‡n, tá»‰nh/thÃ nh',
+            'label'        => 'Địa chỉ',
+            'placeholder'  => 'Số nhà, tên đường, phường/xã, quận/huyện, tỉnh/thành',
             'required'     => false,
             'class'        => array('form-row-wide'),
             'clear'        => true,
@@ -611,65 +584,8 @@ add_filter('woocommerce_default_address_fields', static function (array $fields)
     return $fields;
 }, 99);
 
-// Render clean non-nested Voucher box inside Additional Information
-remove_action('woocommerce_before_checkout_form', 'woocommerce_checkout_coupon_form', 10);
-add_action('woocommerce_after_order_notes', static function (): void {
-    ?>
-    <div class="orcam-voucher-box">
-        <label for="orcam_coupon_input" class="orcam-voucher-box__label">MÃ£ Æ°u Ä‘Ã£i / Voucher</label>
-        <div class="orcam-voucher-box__group">
-            <input type="text" id="orcam_coupon_input" name="orcam_coupon_code" placeholder="Nháº­p mÃ£ giáº£m giÃ¡..." />
-            <button type="button" id="orcam_apply_coupon_btn">Ãp dá»¥ng</button>
-        </div>
-    </div>
-    <script>
-    (function() {
-        function setupVoucher() {
-            var btn = document.getElementById('orcam_apply_coupon_btn');
-            var input = document.getElementById('orcam_coupon_input');
-            if (!btn || !input || btn.dataset.bound) return;
-            btn.dataset.bound = 'true';
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                var code = (input.value || '').trim();
-                if (!code) {
-                    alert('Vui lÃ²ng nháº­p mÃ£ Æ°u Ä‘Ã£i.');
-                    return;
-                }
-                btn.disabled = true;
-                btn.textContent = 'Äang Ã¡p dá»¥ng...';
-                if (window.jQuery && window.wc_checkout_params) {
-                    window.jQuery.ajax({
-                        type: 'POST',
-                        url: window.wc_checkout_params.wc_ajax_url.toString().replace('%%endpoint%%', 'apply_coupon'),
-                        data: {
-                            security: window.wc_checkout_params.apply_coupon_nonce,
-                            coupon_code: code
-                        },
-                        success: function(res) {
-                            window.jQuery('.woocommerce-error, .woocommerce-message').remove();
-                            window.jQuery('form.woocommerce-checkout').before(res);
-                            window.jQuery(document.body).trigger('update_checkout', { update_shipping_method: false });
-                        },
-                        complete: function() {
-                            btn.disabled = false;
-                            btn.textContent = 'Ãp dá»¥ng';
-                        },
-                        dataType: 'html'
-                    });
-                }
-            });
-        }
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', setupVoucher);
-        } else {
-            setupVoucher();
-        }
-        document.addEventListener('ajaxComplete', setupVoucher);
-    })();
-    </script>
-    <?php
-}, 10);
+// Coupons disabled on checkout per user request
+add_filter('woocommerce_coupons_enabled', '__return_false');
 
 /**
  * Ensure WooCommerce has a ready-to-use payment gateway for Vietnam (COD).
@@ -687,8 +603,8 @@ add_filter('woocommerce_available_payment_gateways', static function (array $ava
             $gateways = WC()->payment_gateways()->payment_gateways();
             if (isset($gateways['cod'])) {
                 $gateways['cod']->enabled = 'yes';
-                $gateways['cod']->title = 'Thanh toÃ¡n khi nháº­n hÃ ng (COD) / TÆ° váº¥n thanh toÃ¡n';
-                $gateways['cod']->description = 'NhÃ¢n viÃªn OrCam sáº½ liÃªn há»‡ xÃ¡c nháº­n Ä‘Æ¡n vÃ  tÆ° váº¥n hÃ¬nh thá»©c nháº­n hÃ ng thuáº­n tiá»‡n nháº¥t.';
+                $gateways['cod']->title = 'Thanh toán khi nhận hàng (COD) / Tư vấn thanh toán';
+                $gateways['cod']->description = 'Nhân viên OrCam sẽ liên hệ xác nhận đơn và tư vấn hình thức nhận hàng thuận tiện nhất.';
                 $available_gateways['cod'] = $gateways['cod'];
             }
         }
@@ -698,131 +614,136 @@ add_filter('woocommerce_available_payment_gateways', static function (array $ava
 
 /** Vietnamese privacy policy and payment methods notices */
 add_filter('woocommerce_checkout_privacy_policy_text', static function (): string {
-    return 'ThÃ´ng tin cÃ¡ nhÃ¢n cá»§a báº¡n sáº½ Ä‘Æ°á»£c sá»­ dá»¥ng Ä‘á»ƒ xá»­ lÃ½ Ä‘Æ¡n hÃ ng, há»— trá»£ tráº£i nghiá»‡m cá»§a báº¡n trÃªn website vÃ  cho cÃ¡c má»¥c Ä‘Ã­ch khÃ¡c theo <a href="' . esc_url(home_url('/vi/privacy-policy/')) . '" class="woocommerce-privacy-policy-link" target="_blank">chÃ­nh sÃ¡ch báº£o máº­t</a>.';
+    return 'Thông tin cá nhân của bạn sẽ được sử dụng để xử lý đơn hàng, hỗ trợ trải nghiệm của bạn trên website và cho các mục đích khác theo <a href="' . esc_url(home_url('/vi/privacy-policy/')) . '" class="woocommerce-privacy-policy-link" target="_blank">chính sách bảo mật</a>.';
 });
 
 add_filter('woocommerce_no_available_payment_methods_message', static function (): string {
-    return 'Hiá»‡n táº¡i Ä‘Æ¡n hÃ ng sáº½ Ä‘Æ°á»£c nhÃ¢n viÃªn cá»§a OrCam liÃªn há»‡ trá»±c tiáº¿p Ä‘á»ƒ xÃ¡c nháº­n vÃ  hÆ°á»›ng dáº«n thanh toÃ¡n chi tiáº¿t cho báº¡n.';
+    return 'Hiện tại đơn hàng sẽ được nhân viên của OrCam liên hệ trực tiếp để xác nhận và hướng dẫn thanh toán chi tiết cho bạn.';
 });
 
 add_filter('woocommerce_coupon_message', static function (string $msg, int $msg_code, $coupon = null): string {
     if ($coupon instanceof WC_Coupon) {
-        return sprintf('Ãp dá»¥ng mÃ£ Æ°u Ä‘Ã£i "%s" thÃ nh cÃ´ng.', $coupon->get_code());
+        return sprintf('Áp dụng mã ưu đãi "%s" thành công.', $coupon->get_code());
     }
-    return 'Ãp dá»¥ng mÃ£ Æ°u Ä‘Ã£i thÃ nh cÃ´ng.';
+    return 'Áp dụng mã ưu đãi thành công.';
 }, 20, 3);
 
 add_filter('woocommerce_coupon_error', static function (string $err, int $err_code, $coupon = null): string {
     static $errors = array(
-        100 => 'MÃ£ giáº£m giÃ¡ khÃ´ng tá»“n táº¡i!',
-        101 => 'MÃ£ giáº£m giÃ¡ nÃ y Ä‘Ã£ Ä‘Æ°á»£c Ã¡p dá»¥ng trÆ°á»›c Ä‘Ã³!',
-        102 => 'MÃ£ giáº£m giÃ¡ nÃ y khÃ´ng thá»ƒ dÃ¹ng chung vá»›i cÃ¡c mÃ£ khÃ¡c.',
-        103 => 'MÃ£ giáº£m giÃ¡ nÃ y khÃ´ng Ã¡p dá»¥ng cho sáº£n pháº©m trong Ä‘Æ¡n hÃ ng.',
-        104 => 'MÃ£ giáº£m giÃ¡ nÃ y Ä‘Ã£ háº¿t lÆ°á»£t sá»­ dá»¥ng.',
-        105 => 'MÃ£ giáº£m giÃ¡ nÃ y Ä‘Ã£ háº¿t háº¡n sá»­ dá»¥ng.',
-        106 => 'ÄÆ¡n hÃ ng chÆ°a Ä‘áº¡t giÃ¡ trá»‹ tá»‘i thiá»ƒu Ä‘á»ƒ Ã¡p dá»¥ng mÃ£ nÃ y.',
-        107 => 'ÄÆ¡n hÃ ng Ä‘Ã£ vÆ°á»£t quÃ¡ giÃ¡ trá»‹ tá»‘i Ä‘a Ä‘á»ƒ Ã¡p dá»¥ng mÃ£ nÃ y.',
-        108 => 'MÃ£ giáº£m giÃ¡ nÃ y khÃ´ng Ã¡p dá»¥ng cho cÃ¡c sáº£n pháº©m Ä‘ang giáº£m giÃ¡.',
-        109 => 'Vui lÃ²ng nháº­p mÃ£ giáº£m giÃ¡.',
-        110 => 'MÃ£ giáº£m giÃ¡ khÃ´ng há»£p lá»‡ vÃ  Ä‘Ã£ bá»‹ gá»¡ bá».',
+        100 => 'Mã giảm giá không tồn tại!',
+        101 => 'Mã giảm giá này đã được áp dụng trước đó!',
+        102 => 'Mã giảm giá này không thể dùng chung với các mã khác.',
+        103 => 'Mã giảm giá này không áp dụng cho sản phẩm trong đơn hàng.',
+        104 => 'Mã giảm giá này đã hết lượt sử dụng.',
+        105 => 'Mã giảm giá này đã hết hạn sử dụng.',
+        106 => 'Đơn hàng chưa đạt giá trị tối thiểu để áp dụng mã này.',
+        107 => 'Đơn hàng đã vượt quá giá trị tối đa để áp dụng mã này.',
+        108 => 'Mã giảm giá này không áp dụng cho các sản phẩm đang giảm giá.',
+        109 => 'Vui lòng nhập mã giảm giá.',
+        110 => 'Mã giảm giá không hợp lệ và đã bị gỡ bỏ.',
     );
-    return $errors[$err_code] ?? 'MÃ£ giáº£m giÃ¡ khÃ´ng há»£p lá»‡ hoáº·c Ä‘Ã£ háº¿t háº¡n sá»­ dá»¥ng.';
+    return $errors[$err_code] ?? 'Mã giảm giá không hợp lệ hoặc đã hết hạn sử dụng.';
 }, 20, 3);
 
-/** Complete Vietnamese translations for WooCommerce checkout & order details. */
+/** Translate WooCommerce phrases into natural Vietnamese. */
 add_filter('gettext', static function (string $translation, string $text, string $domain): string {
-    static $translations = array(
-        'Checkout' => 'Thanh toÃ¡n',
-        'Billing details' => 'ThÃ´ng tin ngÆ°á»i nháº­n',
-        'Billing Details' => 'ThÃ´ng tin ngÆ°á»i nháº­n',
-        'Customer details' => 'ThÃ´ng tin khÃ¡ch hÃ ng',
-        'Additional information' => 'HÃ¬nh thá»©c phá»¥c vá»¥ & Ghi chÃº',
-        'Additional Information' => 'HÃ¬nh thá»©c phá»¥c vá»¥ & Ghi chÃº',
-        'Your order' => 'ÄÆ¡n hÃ ng cá»§a báº¡n',
-        'Your Order' => 'ÄÆ¡n hÃ ng cá»§a báº¡n',
-        'Product' => 'Sáº£n pháº©m',
-        'Subtotal' => 'Táº¡m tÃ­nh',
-        'Total' => 'Tá»•ng cá»™ng',
-        'Place order' => 'XÃ¡c nháº­n Ä‘áº·t hÃ ng',
-        'Place Order' => 'XÃ¡c nháº­n Ä‘áº·t hÃ ng',
-        'Order notes' => 'Ghi chÃº Ä‘Æ¡n hÃ ng',
-        'Order notes (optional)' => 'Ghi chÃº Ä‘Æ¡n hÃ ng (khÃ´ng báº¯t buá»™c)',
-        'Notes about your order, e.g. special notes for delivery.' => 'Ghi chÃº thÃªm vá» Ä‘Æ¡n hÃ ng hoáº·c thá»i gian nháº­n hÃ ng...',
-        'Have a coupon?' => 'Báº¡n cÃ³ mÃ£ Æ°u Ä‘Ã£i / voucher?',
-        'Click here to enter your code' => 'Nháº¥n vÃ o Ä‘Ã¢y Ä‘á»ƒ nháº­p mÃ£',
-        'Coupon code' => 'MÃ£ Æ°u Ä‘Ã£i / Voucher',
-        'Apply coupon' => 'Ãp dá»¥ng',
-        'Apply Coupon' => 'Ãp dá»¥ng',
-        'Coupon:' => 'MÃ£ giáº£m giÃ¡:',
-        'If you have a coupon code, please apply it below.' => 'Náº¿u báº¡n cÃ³ mÃ£ giáº£m giÃ¡ hoáº·c Voucher, vui lÃ²ng nháº­p bÃªn dÆ°á»›i:',
-        'Ship to a different address?' => 'Giao hÃ ng Ä‘áº¿n Ä‘á»‹a chá»‰ khÃ¡c?',
-        'Returning customer?' => 'Báº¡n Ä‘Ã£ tá»«ng mua hÃ ng?',
-        'Click here to login' => 'Nháº¥n vÃ o Ä‘Ã¢y Ä‘á»ƒ Ä‘Äƒng nháº­p',
-        'Payment' => 'PhÆ°Æ¡ng thá»©c thanh toÃ¡n',
-        'Payment methods' => 'PhÆ°Æ¡ng thá»©c thanh toÃ¡n',
-        'Payment Methods' => 'PhÆ°Æ¡ng thá»©c thanh toÃ¡n',
-        'Cash on delivery' => 'Thanh toÃ¡n khi nháº­n hÃ ng (COD)',
-        'Pay with cash upon delivery.' => 'Thanh toÃ¡n báº±ng tiá»n máº·t trá»±c tiáº¿p khi nháº­n hÃ ng.',
-        'Direct bank transfer' => 'Chuyá»ƒn khoáº£n ngÃ¢n hÃ ng',
-        'Make your payment directly into our bank account. Please use your Order ID as the payment reference. Your order will not be shipped until the funds have cleared in our account.' => 'Vui lÃ²ng chuyá»ƒn khoáº£n trá»±c tiáº¿p vÃ o tÃ i khoáº£n ngÃ¢n hÃ ng cá»§a chÃºng tÃ´i vá»›i ná»™i dung lÃ  MÃ£ Ä‘Æ¡n hÃ ng. ÄÆ¡n hÃ ng sáº½ Ä‘Æ°á»£c nhÃ¢n viÃªn liÃªn há»‡ xÃ¡c nháº­n ngay.',
-        'Sorry, it seems that there are no available payment methods. Please contact us if you require assistance or wish to make alternate arrangements.' => 'Hiá»‡n táº¡i Ä‘Æ¡n hÃ ng sáº½ Ä‘Æ°á»£c nhÃ¢n viÃªn liÃªn há»‡ trá»±c tiáº¿p Ä‘á»ƒ xÃ¡c nháº­n vÃ  hÆ°á»›ng dáº«n thanh toÃ¡n chi tiáº¿t cho báº¡n.',
-        'Sorry, it seems that there are no available payment methods.' => 'Hiá»‡n táº¡i Ä‘Æ¡n hÃ ng sáº½ Ä‘Æ°á»£c nhÃ¢n viÃªn liÃªn há»‡ trá»±c tiáº¿p Ä‘á»ƒ xÃ¡c nháº­n vÃ  hÆ°á»›ng dáº«n thanh toÃ¡n chi tiáº¿t cho báº¡n.',
-        'Your personal data will be used to process your order, support your experience throughout this website, and for other purposes described in our %s.' => 'ThÃ´ng tin cÃ¡ nhÃ¢n cá»§a báº¡n sáº½ Ä‘Æ°á»£c sá»­ dá»¥ng Ä‘á»ƒ xá»­ lÃ½ Ä‘Æ¡n hÃ ng, há»— trá»£ tráº£i nghiá»‡m cá»§a báº¡n trÃªn website vÃ  cho cÃ¡c má»¥c Ä‘Ã­ch khÃ¡c theo %s.',
-        'privacy policy' => 'chÃ­nh sÃ¡ch báº£o máº­t',
-        'Privacy Policy' => 'ChÃ­nh sÃ¡ch báº£o máº­t',
-        'Please enter a valid phone number.' => 'Vui lÃ²ng nháº­p sá»‘ Ä‘iá»‡n thoáº¡i há»£p lá»‡.',
-        'Billing Phone is a required field.' => 'Vui lÃ²ng nháº­p Sá»‘ Ä‘iá»‡n thoáº¡i.',
-        'Phone is a required field.' => 'Vui lÃ²ng nháº­p Sá»‘ Ä‘iá»‡n thoáº¡i.',
-        '%s is a required field.' => '%s lÃ  thÃ´ng tin báº¯t buá»™c.',
-        'optional' => 'khÃ´ng báº¯t buá»™c',
-        '(optional)' => '(khÃ´ng báº¯t buá»™c)',
-        'First name' => 'Há» vÃ  tÃªn',
-        'Last name' => 'TÃªn',
-        'Phone' => 'Sá»‘ Ä‘iá»‡n thoáº¡i',
-        'Email address' => 'Email',
-        'Email Address' => 'Email',
-        'Street address' => 'Äá»‹a chá»‰',
-        'Order received' => 'Äáº·t hÃ ng thÃ nh cÃ´ng',
-        'Thank you. Your order has been received.' => 'Cáº£m Æ¡n báº¡n! ÄÆ¡n hÃ ng Ä‘Ã£ Ä‘Æ°á»£c tiáº¿p nháº­n thÃ nh cÃ´ng. ChÃºng tÃ´i sáº½ liÃªn há»‡ trong thá»i gian sá»›m nháº¥t.',
-        'Order number:' => 'MÃ£ Ä‘Æ¡n hÃ ng:',
-        'Date:' => 'NgÃ y Ä‘áº·t:',
+    if ($domain !== 'woocommerce') {
+        return $translation;
+    }
+
+    static $dictionary = array(
+        'Checkout' => 'Thanh toán',
+        'Billing details' => 'Thông tin người nhận',
+        'Billing Details' => 'Thông tin người nhận',
+        'Customer details' => 'Thông tin khách hàng',
+        'Additional information' => 'Hình thức phục vụ & Ghi chú',
+        'Additional Information' => 'Hình thức phục vụ & Ghi chú',
+        'Your order' => 'Đơn hàng của bạn',
+        'Your Order' => 'Đơn hàng của bạn',
+        'Product' => 'Sản phẩm',
+        'Subtotal' => 'Tạm tính',
+        'Total' => 'Tổng cộng',
+        'Place order' => 'Xác nhận đặt hàng',
+        'Place Order' => 'Xác nhận đặt hàng',
+        'Order notes' => 'Ghi chú đơn hàng',
+        'Order notes (optional)' => 'Ghi chú đơn hàng (không bắt buộc)',
+        'Notes about your order, e.g. special notes for delivery.' => 'Ghi chú thêm về đơn hàng hoặc thời gian nhận hàng...',
+        'Have a coupon?' => 'Bạn có mã ưu đãi / voucher?',
+        'Click here to enter your code' => 'Nhấn vào đây để nhập mã',
+        'Coupon code' => 'Mã ưu đãi / Voucher',
+        'Apply coupon' => 'Áp dụng',
+        'Apply Coupon' => 'Áp dụng',
+        'Coupon:' => 'Mã ưu đãi:',
+        'If you have a coupon code, please apply it below.' => 'Nếu bạn có mã giảm giá hoặc Voucher, vui lòng nhập bên dưới:',
+        'Ship to a different address?' => 'Giao hàng đến địa chỉ khác?',
+        'Returning customer?' => 'Bạn đã từng mua hàng?',
+        'Click here to login' => 'Nhấn vào đây để đăng nhập',
+        'Payment' => 'Phương thức thanh toán',
+        'Payment methods' => 'Phương thức thanh toán',
+        'Payment Methods' => 'Phương thức thanh toán',
+        'Cash on delivery' => 'Thanh toán khi nhận hàng (COD)',
+        'Pay with cash upon delivery.' => 'Thanh toán bằng tiền mặt trực tiếp khi nhận hàng.',
+        'Direct bank transfer' => 'Chuyển khoản ngân hàng',
+        'Make your payment directly into our bank account. Please use your Order ID as the payment reference. Your order will not be shipped until the funds have cleared in our account.' => 'Vui lòng chuyển khoản trực tiếp vào tài khoản ngân hàng của chúng tôi với nội dung là Mã đơn hàng. Đơn hàng sẽ được nhân viên liên hệ xác nhận ngay.',
+        'Sorry, it seems that there are no available payment methods. Please contact us if you require assistance or wish to make alternate arrangements.' => 'Hiện tại đơn hàng sẽ được nhân viên liên hệ trực tiếp để xác nhận và hướng dẫn thanh toán chi tiết cho bạn.',
+        'Sorry, it seems that there are no available payment methods.' => 'Hiện tại đơn hàng sẽ được nhân viên liên hệ trực tiếp để xác nhận và hướng dẫn thanh toán chi tiết cho bạn.',
+        'Your personal data will be used to process your order, support your experience throughout this website, and for other purposes described in our %s.' => 'Thông tin cá nhân của bạn sẽ được sử dụng để xử lý đơn hàng, hỗ trợ trải nghiệm của bạn trên website và cho các mục đích khác theo %s.',
+        'privacy policy' => 'chính sách bảo mật',
+        'Privacy Policy' => 'Chính sách bảo mật',
+        'Please enter a valid phone number.' => 'Vui lòng nhập số điện thoại hợp lệ.',
+        'Billing Phone is a required field.' => 'Vui lòng nhập Số điện thoại.',
+        'Phone is a required field.' => 'Vui lòng nhập Số điện thoại.',
+        '%s is a required field.' => '%s là thông tin bắt buộc.',
+        'optional' => 'không bắt buộc',
+        '(optional)' => '(không bắt buộc)',
+        'First name' => 'Họ và tên',
+        'Last name' => 'Tên',
+        'Phone' => 'Số điện thoại',
+        'Email address' => 'Địa chỉ Email',
+        'Country / Region' => 'Quốc gia / Khu vực',
+        'Street address' => 'Địa chỉ',
+        'Order received' => 'Đặt hàng thành công',
+        'Thank you. Your order has been received.' => 'Cảm ơn bạn! Đơn hàng đã được tiếp nhận thành công. Chúng tôi sẽ liên hệ trong thời gian sớm nhất.',
+        'Order number:' => 'Mã đơn hàng:',
+        'Date:' => 'Ngày đặt:',
         'Email:' => 'Email:',
-        'Total:' => 'Tá»•ng thanh toÃ¡n:',
-        'Payment method:' => 'PhÆ°Æ¡ng thá»©c thanh toÃ¡n:',
-        'Order details' => 'Chi tiáº¿t Ä‘Æ¡n hÃ ng',
-        'Billing address' => 'Äá»‹a chá»‰ nháº­n hÃ ng',
-        'Shipping' => 'Giao hÃ ng',
-        'Free shipping' => 'Miá»…n phÃ­ giao hÃ ng',
-        'Flat rate' => 'PhÃ­ cá»‘ Ä‘á»‹nh',
-        'Cart' => 'Giá» hÃ ng',
-        'Update cart' => 'Cáº­p nháº­t',
-        'Apply' => 'Ãp dá»¥ng',
-        'Enter code' => 'Nháº­p mÃ£',
-        'Coupon code applied successfully.' => 'ÄÃ£ Ã¡p dá»¥ng mÃ£ giáº£m giÃ¡ thÃ nh cÃ´ng.',
-        'Coupon "%s" does not exist!' => 'MÃ£ giáº£m giÃ¡ "%s" khÃ´ng tá»“n táº¡i!',
-        'Coupon code already applied!' => 'MÃ£ giáº£m giÃ¡ nÃ y Ä‘Ã£ Ä‘Æ°á»£c Ã¡p dá»¥ng trÆ°á»›c Ä‘Ã³!',
-        'Coupon code "%s" already applied!' => 'MÃ£ giáº£m giÃ¡ "%s" Ä‘Ã£ Ä‘Æ°á»£c Ã¡p dá»¥ng trÆ°á»›c Ä‘Ã³!',
-        'Please enter a coupon code.' => 'Vui lÃ²ng nháº­p mÃ£ giáº£m giÃ¡.',
-        'Coupon usage limit has been reached.' => 'MÃ£ giáº£m giÃ¡ nÃ y Ä‘Ã£ háº¿t lÆ°á»£t sá»­ dá»¥ng.',
-        'This coupon has expired.' => 'MÃ£ giáº£m giÃ¡ nÃ y Ä‘Ã£ háº¿t háº¡n sá»­ dá»¥ng.',
-        'The minimum spend for this coupon is %s.' => 'GiÃ¡ trá»‹ Ä‘Æ¡n hÃ ng tá»‘i thiá»ƒu Ä‘á»ƒ dÃ¹ng mÃ£ nÃ y lÃ  %s.',
-        'The maximum spend for this coupon is %s.' => 'GiÃ¡ trá»‹ Ä‘Æ¡n hÃ ng tá»‘i Ä‘a Ä‘á»ƒ dÃ¹ng mÃ£ nÃ y lÃ  %s.',
-        'Sorry, this coupon is not applicable to selected products.' => 'MÃ£ giáº£m giÃ¡ nÃ y khÃ´ng Ã¡p dá»¥ng cho sáº£n pháº©m Ä‘Ã£ chá»n.',
-        'Sorry, this coupon is not applicable to your cart contents.' => 'MÃ£ giáº£m giÃ¡ nÃ y khÃ´ng Ã¡p dá»¥ng cho Ä‘Æ¡n hÃ ng cá»§a báº¡n.',
-        'Coupon code removed successfully.' => 'ÄÃ£ xÃ³a mÃ£ giáº£m giÃ¡ thÃ nh cÃ´ng.',
-        '[Remove]' => '[XÃ³a]',
-        'Remove' => 'XÃ³a',
-        'Browse products' => 'Xem sáº£n pháº©m',
-        'Return to shop' => 'Quay láº¡i cá»­a hÃ ng',
-        'Your cart is currently empty.' => 'Báº¡n chÆ°a chá»n sáº£n pháº©m nÃ o Ä‘á»ƒ thanh toÃ¡n.',
-        'Description' => 'MÃ´ táº£',
-        'Reviews' => 'ÄÃ¡nh giÃ¡',
-        'Related products' => 'Sáº£n pháº©m tÆ°Æ¡ng tá»±',
-        'In stock' => 'CÃ²n hÃ ng',
-        'Out of stock' => 'Háº¿t hÃ ng',
-        'Sale!' => 'Æ¯u Ä‘Ã£i!',
+        'Total:' => 'Tổng thanh toán:',
+        'Payment method:' => 'Phương thức thanh toán:',
+        'Order details' => 'Chi tiết đơn hàng',
+        'Billing address' => 'Địa chỉ nhận hàng',
+        'Shipping' => 'Giao hàng',
+        'Free shipping' => 'Miễn phí giao hàng',
+        'Flat rate' => 'Phí cố định',
+        'Cart' => 'Giỏ hàng',
+        'Update cart' => 'Cập nhật',
+        'Apply' => 'Áp dụng',
+        'Enter code' => 'Nhập mã',
+        'Coupon code applied successfully.' => 'Đã áp dụng mã giảm giá thành công.',
+        'Coupon "%s" does not exist!' => 'Mã giảm giá "%s" không tồn tại!',
+        'Coupon code already applied!' => 'Mã giảm giá này đã được áp dụng trước đó!',
+        'Coupon code "%s" already applied!' => 'Mã giảm giá "%s" đã được áp dụng trước đó!',
+        'Please enter a coupon code.' => 'Vui lòng nhập mã giảm giá.',
+        'Coupon usage limit has been reached.' => 'Mã giảm giá này đã hết lượt sử dụng.',
+        'This coupon has expired.' => 'Mã giảm giá này đã hết hạn sử dụng.',
+        'The minimum spend for this coupon is %s.' => 'Giá trị đơn hàng tối thiểu để dùng mã này là %s.',
+        'The maximum spend for this coupon is %s.' => 'Giá trị đơn hàng tối đa để dùng mã này là %s.',
+        'Sorry, this coupon is not applicable to selected products.' => 'Mã giảm giá này không áp dụng cho sản phẩm đã chọn.',
+        'Sorry, this coupon is not applicable to your cart contents.' => 'Mã giảm giá này không áp dụng cho đơn hàng của bạn.',
+        'Coupon code removed successfully.' => 'Đã xóa mã giảm giá thành công.',
+        'Quantity' => 'Số lượng',
+        'Price' => 'Đơn giá',
+        'Browse products' => 'Xem sản phẩm',
+        'Return to shop' => 'Quay lại cửa hàng',
+        'Your cart is currently empty.' => 'Bạn chưa chọn sản phẩm nào để thanh toán.',
+        'Description' => 'Mô tả',
+        'Reviews' => 'Đánh giá',
+        'Related products' => 'Sản phẩm tương tự',
+        'In stock' => 'Còn hàng',
+        'Out of stock' => 'Hết hàng',
+        'Sale!' => 'Ưu đãi!',
     );
-    return $translations[$text] ?? $translation;
+
+    return $dictionary[$text] ?? $translation;
 }, 20, 3);
 
 add_filter('gettext_with_context', static function (string $translation, string $text, string $context, string $domain): string {
@@ -845,7 +766,7 @@ add_action('save_post_product', static function (int $post_id, WP_Post $post): v
         ? wp_trim_words($plain_content, 30, 'â€¦')
         : sprintf(
             /* translators: %s: product name. */
-            __('KhÃ¡m phÃ¡ %s vá»›i thiáº¿t káº¿ tiá»‡n dá»¥ng vÃ  cÃ´ng nghá»‡ há»— trá»£ tiÃªn tiáº¿n tá»« OrCam.', 'orcam-theme'),
+            __('Khám phá %s với thiết kế tiện dụng và công nghệ hỗ trợ tiên tiến từ OrCam.', 'orcam-theme'),
             $post->post_title
         );
 
@@ -1053,14 +974,14 @@ function orcam_theme_product_navigation_products(bool $force_refresh = false): a
 function orcam_theme_product_navigation_bar(int $current_product_id = 0): string
 {
     $links = '<a class="orcam-product-bar__link" href="' . esc_url(home_url('/vi/shop/'))
-        . '">Táº¥t cáº£ sáº£n pháº©m</a>';
+        . '">Tất cả sản phẩm</a>';
     foreach (orcam_theme_product_navigation_products() as $product) {
         $active = $product->ID === $current_product_id ? ' is-active' : '';
         $links .= '<a class="orcam-product-bar__link' . $active . '" href="'
             . esc_url(get_permalink($product)) . '">' . esc_html(get_the_title($product)) . '</a>';
     }
 
-    return '<nav class="orcam-product-bar" aria-label="Sáº£n pháº©m"><strong>Thá»‹ lá»±c kÃ©m</strong>'
+    return '<nav class="orcam-product-bar" aria-label="Sản phẩm"><strong>Thị lực kém</strong>'
         . '<div class="orcam-product-bar__items">' . $links . '</div></nav>';
 }
 
@@ -1081,7 +1002,7 @@ function orcam_theme_append_products_to_static_submenu(string $html, string $fil
         $is_low_vision = in_array($filename, $low_vision_files, true);
     }
     if (!$is_low_vision && strpos($html, 'desktop-submenu') !== false) {
-        if (preg_match('#<div[^>]*class="[^"]*desktop-submenu__logo[^"]*"[^>]*>\s*<p[^>]*>\s*(?:Thá»‹ lá»±c kÃ©m|Low Vision)\s*</p>#iu', $html)) {
+        if (preg_match('#<div[^>]*class="[^"]*desktop-submenu__logo[^"]*"[^>]*>\s*<p[^>]*>\s*(?:Thị lực kém|Low Vision)\s*</p>#iu', $html)) {
             $is_low_vision = true;
         }
     }
@@ -1091,7 +1012,7 @@ function orcam_theme_append_products_to_static_submenu(string $html, string $fil
     }
 
     $all_products_link = '<div class="d-flex"><a class="p3 desktop-submenu__submenu-link svelte-alcb1y" href="'
-        . esc_url(home_url('/vi/shop/')) . '" target="_self">Táº¥t cáº£ sáº£n pháº©m</a> </div>';
+        . esc_url(home_url('/vi/shop/')) . '" target="_self">Tất cả sản phẩm</a> </div>';
     $extra_links = '';
     foreach (orcam_theme_product_navigation_products() as $product) {
         if (get_post_meta($product->ID, '_orcam_product_route', true) !== '') {
@@ -1104,17 +1025,17 @@ function orcam_theme_append_products_to_static_submenu(string $html, string $fil
         '#(<div class="desktop-submenu__items svelte-alcb1y">)(.*?)(</div>\s*<div class="desktop-submenu__buttons svelte-alcb1y">)#s',
         static function ($matches) use ($all_products_link, $extra_links): string {
             $inner = $matches[2];
-            $prefix = (strpos($inner, 'Táº¥t cáº£ sáº£n pháº©m') === false && strpos($inner, '/vi/shop') === false) ? $all_products_link : '';
+            $prefix = (strpos($inner, 'Tất cả sản phẩm') === false && strpos($inner, '/vi/shop') === false) ? $all_products_link : '';
             return $matches[1] . $prefix . $inner . $extra_links . $matches[3];
         },
         $html,
         1
     ) ?: $html;
 
-    // Inject "Táº¥t cáº£ sáº£n pháº©m" into Svelte inline script submenu data so client hydration on mobile also includes it
+    // Inject "Tất cả sản phẩm" into Svelte inline script submenu data so client hydration on mobile also includes it
     $html = preg_replace(
-        '#(submenu:\s*\{[^}]*?items:\s*\[)(?!\s*\{\s*label\s*:\s*["\']Táº¥t cáº£ sáº£n pháº©m["\'])#s',
-        '$1{label:"Táº¥t cáº£ sáº£n pháº©m",pageUrl:"' . esc_js(home_url('/vi/shop/')) . '",id:"all-products",blockName:"All Products",blockType:"internalNavigation"},',
+        '#(submenu:\s*\{[^}]*?items:\s*\[)(?!\s*\{\s*label\s*:\s*["\']Tất cả sản phẩm["\'])#s',
+        '$1{label:"Tất cả sản phẩm",pageUrl:"' . esc_js(home_url('/vi/shop/')) . '",id:"all-products",blockName:"All Products",blockType:"internalNavigation"},',
         $html,
         1
     ) ?: $html;
@@ -1138,7 +1059,7 @@ function orcam_theme_sync_woocommerce_product_data_into_html(string $html, strin
     }
 
     $product_data_map = array();
-    $currency_symbol = function_exists('get_woocommerce_currency_symbol') ? get_woocommerce_currency_symbol(get_woocommerce_currency()) : 'â‚«';
+    $currency_symbol = function_exists('get_woocommerce_currency_symbol') ? get_woocommerce_currency_symbol(get_woocommerce_currency()) : 'đ';
 
     foreach ($products as $post_item) {
         $wc_prod = wc_get_product($post_item->ID);
@@ -1468,7 +1389,7 @@ function orcam_theme_render_document(string $file, ?string $document_html = null
     // downloading the rest of the media library.
     if (wp_normalize_path((string) realpath($file)) === wp_normalize_path((string) realpath(get_template_directory() . '/static-pages/vi/orcam-learn.html'))) {
         $html = str_replace(
-            '<h1><strong>OrCam Há»c </strong><span style="font-family: Trebuchet MS"><span style="color: rgb(73, 26, 189)"><strong>CÆ¡ báº£n</strong></span></span></h1>',
+            '<h1><strong>OrCam Há»c </strong><span style="font-family: Trebuchet MS"><span style="color: rgb(73, 26, 189)"><strong>Cơ bản</strong></span></span></h1>',
             '<h1><strong>OrCam </strong><span style="font-family: Trebuchet MS"><span style="color: rgb(73, 26, 189)"><strong>Learn Basic</strong></span></span></h1>',
             $html
         );
@@ -1649,7 +1570,7 @@ function orcam_theme_render_document(string $file, ?string $document_html = null
     $google_api_key = orcam_theme_google_api_key();
     $dynamic_product_items = array();
     $product_data_map = array();
-    $currency_symbol = function_exists('get_woocommerce_currency_symbol') ? get_woocommerce_currency_symbol(get_woocommerce_currency()) : 'â‚«';
+    $currency_symbol = function_exists('get_woocommerce_currency_symbol') ? get_woocommerce_currency_symbol(get_woocommerce_currency()) : 'đ';
 
     foreach (orcam_theme_product_navigation_products() as $navigation_product) {
         $wc_p = function_exists('wc_get_product') ? wc_get_product($navigation_product->ID) : null;
@@ -1900,7 +1821,7 @@ function orcam_theme_render_database_product(WP_Post $product, bool $return_only
                     }
                     $details_markup .= '<button type="button" class="orcam-woocommerce-gallery__thumb'
                         . ($index === 0 ? ' is-active' : '') . '" data-large="' . esc_url($large_url) . '"'
-                        . ' aria-label="Xem áº£nh ' . esc_attr((string) ($index + 1)) . '"><img src="'
+                        . ' aria-label="Xem ảnh ' . esc_attr((string) ($index + 1)) . '"><img src="'
                         . esc_url((string) $thumbnail_url) . '" alt=""></button>';
                 }
                 $details_markup .= '</div></div>';
@@ -2026,7 +1947,7 @@ function orcam_theme_render_database_blog(WP_Post $post, bool $return_only = fal
     );
 
     // Replace the date/byline when the exported article provides one.
-    $byline = esc_html($date . ' | Bá»Ÿi ' . ($author ?: 'OrCam'));
+    $byline = esc_html($date . ' | Bởi ' . ($author ?: 'OrCam'));
     $html = preg_replace_callback(
         '#(<div\s+class=(["\'])blog\2[^>]*>\s*<h1[^>]*>.*?</h1>\s*<p[^>]*>).*?(</p>)#is',
         static function (array $match) use ($byline): string {
@@ -2193,21 +2114,21 @@ function orcam_theme_warmup_shop_catalog(): void
     ?>
     <main class="orcam-shop" id="primary">
         <header class="orcam-shop__header">
-            <div><p><?php esc_html_e('OrCam Viá»‡t Nam', 'orcam-theme'); ?></p><h1><?php esc_html_e('Táº¥t cáº£ sáº£n pháº©m', 'orcam-theme'); ?></h1></div>
+            <div><p><?php esc_html_e('OrCam Việt Nam', 'orcam-theme'); ?></p><h1><?php esc_html_e('Tất cả sản phẩm', 'orcam-theme'); ?></h1></div>
         </header>
-        <section class="orcam-shop__catalog" aria-label="<?php esc_attr_e('Danh sÃ¡ch sáº£n pháº©m', 'orcam-theme'); ?>">
+        <section class="orcam-shop__catalog" aria-label="<?php esc_attr_e('Danh sách sản phẩm', 'orcam-theme'); ?>">
             <div class="orcam-shop__grid">
                 <?php foreach (orcam_theme_product_navigation_products(true) as $p_post) :
                     $p_obj = wc_get_product($p_post->ID);
                     if (!$p_obj) continue;
                     $p_img = $p_obj->get_image_id() ? wp_get_attachment_image_url($p_obj->get_image_id(), 'medium_large') : wc_placeholder_img_src('medium_large');
-                    $p_sum = trim($p_obj->get_short_description()) ?: sprintf(__('KhÃ¡m phÃ¡ %s vá»›i cÃ´ng nghá»‡ há»— trá»£ tiÃªn tiáº¿n tá»« OrCam.', 'orcam-theme'), get_the_title($p_post));
+                    $p_sum = trim($p_obj->get_short_description()) ?: sprintf(__('Khám phá %s với công nghệ hỗ trợ tiên tiến từ OrCam.', 'orcam-theme'), get_the_title($p_post));
                     ?>
                     <article class="orcam-shop-card">
                         <div class="orcam-shop-card__inner">
                             <a class="orcam-shop-card__media-link" href="<?php echo esc_url(get_permalink($p_post)); ?>">
                                 <span class="orcam-shop-card__media">
-                                    <?php if ($p_obj->is_on_sale()) : ?><span class="orcam-shop-card__badge"><?php esc_html_e('Æ¯u Ä‘Ã£i', 'orcam-theme'); ?></span><?php endif; ?>
+                                    <?php if ($p_obj->is_on_sale()) : ?><span class="orcam-shop-card__badge"><?php esc_html_e('Ưu đãi', 'orcam-theme'); ?></span><?php endif; ?>
                                     <img src="<?php echo esc_url($p_img); ?>" alt="<?php echo esc_attr(get_the_title($p_post)); ?>" loading="lazy">
                                 </span>
                             </a>
@@ -2221,7 +2142,7 @@ function orcam_theme_warmup_shop_catalog(): void
                                 <p class="orcam-shop-card__description"><?php echo esc_html(wp_trim_words(wp_strip_all_tags($p_sum), 22, 'â€¦')); ?></p>
                                 <div class="orcam-shop-card__actions">
                                     <a class="orcam-shop-card__btn orcam-shop-card__btn--detail" href="<?php echo esc_url(get_permalink($p_post)); ?>">
-                                        <?php esc_html_e('Xem chi tiáº¿t', 'orcam-theme'); ?>
+                                        <?php esc_html_e('Xem chi tiết', 'orcam-theme'); ?>
                                     </a>
                                     <a class="orcam-shop-card__btn orcam-shop-card__btn--buy" href="<?php echo esc_url($p_obj->is_purchasable() && $p_obj->is_in_stock() ? add_query_arg('add-to-cart', $p_obj->get_id(), wc_get_checkout_url()) : get_permalink($p_post)); ?>">
                                         <?php esc_html_e('Mua ngay', 'orcam-theme'); ?>
@@ -2236,7 +2157,7 @@ function orcam_theme_warmup_shop_catalog(): void
     </main>
     <?php
     $shop_html = (string) ob_get_clean();
-    orcam_theme_render_shared_static_shell($shop_html, 'Táº¥t cáº£ sáº£n pháº©m', false, 'shop_catalog', 'vi_shop_page', true);
+    orcam_theme_render_shared_static_shell($shop_html, 'Tất cả sản phẩm', false, 'shop_catalog', 'vi_shop_page', true);
 }
 
 /**
@@ -2376,28 +2297,28 @@ add_action('wp_footer', static function (): void {
             return '<div id="orcam-vn-support-block">'
                 + '<div class="ovn-top-row">'
                 +   '<div class="ovn-brand"><svg class="ovn-logo-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 15" style="height:20px;width:auto;fill:#ffffff;display:inline-block;vertical-align:middle;" aria-label="OrCam"><g fill="#ffffff"><path d="M25.4,2.8c-2.1,0-3.9,1.7-3.9,3.8v1.9c0,2.1,1.7,3.8,3.9,3.8h4.4c2.1,0,3.9-1.7,3.9-3.8V6.5c0-2.1-1.7-3.8-3.9-3.8C29.8,2.8,25.4,2.8,25.4,2.8z M25.3,5.2H30c0.7,0,1.3,0.4,1.3,1.2v2.3c0,0.7-0.5,1.3-1.3,1.3h-4.8c-0.7,0-1.4-0.5-1.4-1.3V6.4C23.9,5.6,24.5,5.2,25.3,5.2z"/><path d="M53.3,2.8h8.1v2.4h-8.2c-0.7,0-1.3,0.6-1.3,1.3v0.1v1.9v0.1c0,0.7,0.6,1.3,1.3,1.3h8.2v2.4h-8.1c-2.1,0-3.9-1.7-3.9-3.8V8.3l0,0V6.8V6.7C49.4,4.5,51.2,2.8,53.3,2.8"/><path d="M38.4,5.2v2.2h4.6c1.4,0,1.4-2.2,0-2.2H38.4z M43.9,2.8c1.7,0,3.1,1.7,3.1,3.4c0,0.9-0.4,2-1.1,2.5l2.1,3.5h-2.7l-1.5-2.3h-5.5v2.3h-2.4V4.4c0-1,0.6-1.6,1.3-1.6L43.9,2.8L43.9,2.8z"/><g><path d="M12.3,2.7C11,1.3,9.1,0.5,7.1,0.5C3.2,0.5,0,3.6,0,7.5c0,3.9,3.2,7,7.1,7c2.1,0,3.9-0.9,5.2-2.2l4.5-4.8L12.3,2.7z M7.1,12.1c-2.6,0-4.6-2.1-4.6-4.6s2.1-4.6,4.6-4.6s4.6,2.1,4.6,4.6S9.7,12.1,7.1,12.1z"/><path d="M7.2,9.9c1.3,0,2.4-1.1,2.4-2.4S8.5,5.1,7.2,5.1S4.8,6.2,4.8,7.5S5.9,9.9,7.2,9.9"/></g><path d="M68.7,5.2h-1.3c-0.7,0-1.3,0.6-1.3,1.3v1h7.2v-1c0-0.7-0.6-1.3-1.3-1.3H68.7z M67.6,2.8h1.1h3.1c2.1,0,3.9,1.7,3.9,3.8v0.9v2.2v2.6h-2.4V9.8h-7.2v2.4h-2.4V9.6V7.5V6.6C63.8,4.5,65.5,2.8,67.6,2.8"/><path d="M86.1,2.8H83h-1.1c-2.1,0-3.9,1.7-3.9,3.8v0.9v2.2v2.6h2.4V9.8h0V7.3l0,0V6.5c0-0.7,0.6-1.3,1.3-1.3h1v7.1h2.4V5.1h1c0.7,0,1.3,0.6,1.3,1.3v0.8v0.2v4.8H90V9.6V7.5V6.6C90,4.5,88.3,2.8,86.1,2.8z"/></g></svg><span class="ovn-brand-name" style="color:#38bdf8;font-size:14px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;">VIỆT NAM</span></div>'
-                +   '<p class="ovn-desc">CÃ´ng nghá»‡ trá»£ nÄƒng Ä‘á»™t phÃ¡, nÃ¢ng cao tÃ­nh Ä‘á»™c láº­p<br>cho ngÆ°á»i khiáº¿m thá»‹ vÃ  ngÆ°á»i gáº·p khÃ³ khÄƒn khi Ä‘á»c.</p>'
+                +   '<p class="ovn-desc">Công nghệ trợ năng đột phá, nâng cao tính độc lập<br>cho người khiếm thị và người gặp khó khăn khi đọc.</p>'
                 + '</div>'
                 + '<div class="ovn-cards-wrap">'
-                +   '<p class="ovn-section-label">Há»— trá»£ khÃ¡ch hÃ ng</p>'
+                +   '<p class="ovn-section-label">Hỗ trợ khách hàng</p>'
                 +   '<div class="ovn-cards">'
                 +     '<div class="ovn-card ovn-card-regular">'
-                +       '<div class="ovn-card-header"><div class="ovn-card-icon">' + house_svg + '</div><span class="ovn-badge ovn-badge-blue">Miá»n Báº¯c</span></div>'
-                +       '<p class="ovn-card-title">VÄƒn phÃ²ng HÃ  Ná»™i</p>'
-                +       '<p class="ovn-card-addr">226 ÄÆ°á»ng LÃ¡ng, PhÆ°á»ng Thá»‹nh Quang,<br>Quáº­n Äá»‘ng Äa, HÃ  Ná»™i</p>'
+                +       '<div class="ovn-card-header"><div class="ovn-card-icon">' + house_svg + '</div><span class="ovn-badge ovn-badge-blue">Miền Bắc</span></div>'
+                +       '<p class="ovn-card-title">Văn phòng Hà Nội</p>'
+                +       '<p class="ovn-card-addr">226 ÄÆ°á»ng LÃ¡ng, PhÆ°á»ng Thá»‹nh Quang,<br>Quáº­n Äá»‘ng Äa, Hà Nội</p>'
                 +       '<a href="tel:02473048700" class="ovn-card-phone">' + phone_svg + '024.7304.8700</a>'
                 +     '</div>'
                 +     '<div class="ovn-card ovn-card-regular">'
-                +       '<div class="ovn-card-header"><div class="ovn-card-icon">' + house_svg + '</div><span class="ovn-badge ovn-badge-blue">Miá»n Nam</span></div>'
-                +       '<p class="ovn-card-title">VÄƒn phÃ²ng Há»“ ChÃ­ Minh</p>'
-                +       '<p class="ovn-card-addr">137 HÃ²a HÆ°ng, PhÆ°á»ng HÃ²a HÆ°ng,<br>TP. Há»“ ChÃ­ Minh</p>'
+                +       '<div class="ovn-card-header"><div class="ovn-card-icon">' + house_svg + '</div><span class="ovn-badge ovn-badge-blue">Miền Nam</span></div>'
+                +       '<p class="ovn-card-title">Văn phòng Hồ Chí Minh</p>'
+                +       '<p class="ovn-card-addr">137 Hòa Hưng, PhÆ°á»ng Hòa Hưng,<br>TP. Hồ Chí Minh</p>'
                 +       '<a href="tel:02873048700" class="ovn-card-phone">' + phone_svg + '028.7304.8700</a>'
                 +     '</div>'
                 +     '<div class="ovn-card ovn-card-hotline">'
-                +       '<div class="ovn-card-header"><div class="ovn-card-icon">' + headset_svg + '</div><span class="ovn-badge ovn-badge-indigo">TÆ° váº¥n 24/7</span></div>'
+                +       '<div class="ovn-card-header"><div class="ovn-card-icon">' + headset_svg + '</div><span class="ovn-badge ovn-badge-indigo">Tư vấn 24/7</span></div>'
                 +       '<p class="ovn-card-title">Hotline Tá»•ng ÄÃ i</p>'
                 +       '<a href="tel:1900638400" class="ovn-hotline-btn">' + phone_svg + '1900.63.8400</a>'
-                +       '<p class="ovn-hotline-note">Há»— trá»£ vÃ  tÆ° váº¥n má»i lÃºc, má»i nÆ¡i</p>'
+                +       '<p class="ovn-hotline-note">Hỗ trợ và tư vấn mọi lúc, mọi nơi</p>'
                 +     '</div>'
                 +   '</div>'
                 + '</div>'
@@ -2424,3 +2345,49 @@ add_action('wp_footer', static function (): void {
     <?php
 }, 20);
 
+
+/**
+ * Modern OrCam Việt Nam Order Email Customizations
+ */
+add_filter('woocommerce_email_from_name', static function (): string {
+    return 'OrCam Việt Nam';
+});
+
+add_filter('woocommerce_email_subject_customer_processing_order', static function (string $subject, WC_Order $order): string {
+    return sprintf('Xác nhận đơn hàng #%s - OrCam Việt Nam', $order->get_order_number());
+}, 20, 2);
+
+add_filter('woocommerce_email_subject_new_order', static function (string $subject, WC_Order $order): string {
+    return sprintf('[OrCam Việt Nam] Đơn hàng mới #%s từ %s', $order->get_order_number(), $order->get_formatted_billing_full_name() ?: 'Khách hàng');
+}, 20, 2);
+
+add_filter('woocommerce_email_subject_customer_completed_order', static function (string $subject, WC_Order $order): string {
+    return sprintf('Đơn hàng #%s đã hoàn tất - OrCam Việt Nam', $order->get_order_number());
+}, 20, 2);
+
+add_filter('woocommerce_email_heading_customer_processing_order', static function (): string {
+    return 'Cảm ơn bạn đã đặt hàng tại OrCam Việt Nam!';
+});
+
+add_filter('woocommerce_email_heading_customer_completed_order', static function (): string {
+    return 'Đơn hàng của bạn đã được giao thành công!';
+});
+
+add_filter('woocommerce_email_heading_new_order', static function (): string {
+    return 'Bạn có đơn hàng mới từ website';
+});
+
+/**
+ * Vietnamese Currency Format (đ)
+ */
+add_filter('woocommerce_currency', static function (): string {
+    return 'VND';
+});
+
+add_filter('woocommerce_currency_symbol', static function (string $symbol, string $currency): string {
+    return 'đ';
+}, 99, 2);
+
+add_filter('woocommerce_price_format', static function (string $format, string $currency_pos): string {
+    return '%1$s %2$s'; // e.g. 140.250.000 đ
+}, 99, 2);

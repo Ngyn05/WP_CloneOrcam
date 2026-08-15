@@ -746,28 +746,34 @@ article#mainBody .orcam-blog > .orcam-flex img {
 .orcam-checkout__content #order_review_heading { display:none !important; }
 
 #customer_details {
+    background:#fff !important;
+    border:1px solid #e2e8f0 !important;
+    border-radius:20px !important;
+    box-shadow:0 4px 20px -2px rgba(15,23,42,.04),0 2px 6px -1px rgba(15,23,42,.02) !important;
+    box-sizing:border-box !important;
     display:flex !important;
     flex-direction:column !important;
     float:none !important;
-    gap:24px !important;
+    gap:0 !important;
     grid-column:1 !important;
     margin:0 !important;
+    padding:30px !important;
     width:100% !important;
 }
 
 #customer_details .col-1,
 #customer_details .col-2 {
-    background:#fff;
-    border:1px solid #e2e8f0;
-    border-radius:20px;
-    box-shadow:0 4px 20px -2px rgba(15,23,42,.04),0 2px 6px -1px rgba(15,23,42,.02);
-    box-sizing:border-box;
+    background:transparent !important;
+    border:none !important;
+    border-radius:0 !important;
+    box-shadow:none !important;
     float:none !important;
-    padding:30px;
+    margin:0 !important;
+    padding:0 !important;
     width:100% !important;
 }
 
-#customer_details h3 {
+#customer_details .col-1 h3 {
     align-items:center;
     border-bottom:1px solid #f1f5f9;
     color:#0f172a;
@@ -778,6 +784,10 @@ article#mainBody .orcam-blog > .orcam-flex img {
     letter-spacing:-.01em;
     margin:0 0 24px;
     padding-bottom:16px;
+}
+
+#customer_details .col-2 h3 {
+    display:none !important;
 }
 
 /* Form Inputs */
@@ -1295,3 +1305,43 @@ form.cart .quantity,
 
 
 
+
+/* Hide coupon box and hide Subtotal (Tạm tính) row - only show product + price and Total */
+.orcam-voucher-box { display: none !important; }
+.orcam-checkout__content table.shop_table .cart-subtotal { display: none !important; }
+.orcam-checkout__content table.shop_table .shipping { display: none !important; }
+.orcam-checkout__content table.shop_table tbody tr:last-child td { border-bottom: 2px solid #e2e8f0 !important; }
+.orcam-checkout__content table.shop_table .order-total th { padding-top: 18px !important; font-size: 18px !important; }
+.orcam-checkout__content table.shop_table .order-total td { padding-top: 18px !important; font-size: 24px !important; color: #0f172a !important; }
+
+/* ==========================================================================
+   Make Text Bright White on Dark Banners & Sections
+   ========================================================================== */
+#section_2e2d4cu8,
+#section_2e2d4cu8 .orcam-richtext-component,
+#section_2e2d4cu8 h3,
+#section_2e2d4cu8 p,
+#section_2e2d4cu8 span,
+#section_ar1qsme5 h1,
+#section_ar1qsme5 h5,
+#section_ar1qsme5 span,
+[style*="color:var(--orcam-white)"],
+[style*="color: var(--orcam-white)"],
+.orcam-richtext-component [style*="color:var(--orcam-white)"],
+.orcam-richtext-component [style*="color: var(--orcam-white)"],
+.orcam-richtext-component h3.bold[style*="orcam-white"],
+.orcam-richtext-component p.p1[style*="orcam-white"] {
+    color: #ffffff !important;
+}
+
+#section_2e2d4cu8 h3.bold {
+    color: #ffffff !important;
+    font-weight: 800 !important;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.7) !important;
+}
+
+#section_2e2d4cu8 p.p1 {
+    color: #f1f5f9 !important;
+    font-weight: 500 !important;
+    text-shadow: 0 1px 8px rgba(0, 0, 0, 0.7) !important;
+}
