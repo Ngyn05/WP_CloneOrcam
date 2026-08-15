@@ -2050,7 +2050,7 @@ function orcam_theme_render_document(string $file, ?string $document_html = null
 }
 
 /** Render native WooCommerce content inside the same exported header/footer. */
-function orcam_theme_render_shared_static_shell(string $content, string $title, bool $include_wordpress_assets = false, string $custom_cache_file = '', string $custom_cache_key = '', bool $return_only = false): bool
+function orcam_theme_render_shared_static_shell(string $content, string $title, bool $include_wordpress_assets = false, string $custom_cache_file = '', string $custom_cache_key = '', bool $return_only = false, bool $hide_footer = false): bool
 {
     // Use index.html as the canonical shared shell for native WooCommerce database products
     $file = get_template_directory() . '/static-pages/vi/index.html';
@@ -2071,6 +2071,17 @@ function orcam_theme_render_shared_static_shell(string $content, string $title, 
     );
     if (!$replacement_count) {
         return false;
+    }
+
+    // Dynamic WooCommerce product views intentionally end after their main content.
+    // Templates opt in by content type, so future products inherit this layout.
+    if ($hide_footer) {
+        $html = preg_replace(
+            '#<nav\b[^>]*\bclass=["\'][^"\']*orcam-footer[^"\']*["\'][^>]*>[\s\S]*?</nav>#i',
+            '',
+            $html,
+            1
+        );
     }
 
     // The shell page marks active items; clean submenu active states
