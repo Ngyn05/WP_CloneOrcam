@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('ORCAM_THEME_VERSION', '2.4.5');
+define('ORCAM_THEME_VERSION', '2.4.6');
 
 add_action('after_setup_theme', static function () {
     add_theme_support('title-tag');
@@ -2500,6 +2500,182 @@ function orcam_theme_apply_seo_meta(string $html, $context = null): string
             . '<meta name="twitter:description" content="' . $desc_attr . '">';
         $html = preg_replace('#<head(\s[^>]*)?>#i', '$0' . "\n" . $new_desc_tags, $html, 1);
     }
+
+    // 3. Resolve Canonical & OpenGraph Image
+    $canonical_url = get_permalink($post);
+    if ($post->post_type === 'page' && $post->post_name === 'index') {
+        $canonical_url = home_url('/vi/home');
+    }
+    if ($post->post_type === 'page' && $post->post_name === 'blog') {
+        $canonical_url = home_url('/vi/blog');
+    }
+
+    $og_image = '';
+    if (has_post_thumbnail($post)) {
+        $og_image = (string) get_the_post_thumbnail_url($post, 'large');
+    }
+    if ($og_image === '' && function_exists('orcam_theme_hero_image')) {
+        $og_image = orcam_theme_hero_image();
+    }
+    if ($og_image === '') {
+        $og_image = get_template_directory_uri() . '/media/3A1A5245%20(1)%20(1).webp';
+    }
+
+    // Apply Canonical Link & OG URL (deduplicating existing tags)
+    $html = preg_replace('#<link\s+rel=["\']canonical["\'][^>]*>\s*#i', '', $html);
+    $html = preg_replace('#<meta\s+property=["\']og:url["\'][^>]*>\s*#i', '', $html);
+    $canonical_tags = '<link rel="canonical" href="' . esc_url($canonical_url) . '">' . "\n"
+        . '<meta property="og:url" content="' . esc_url($canonical_url) . '">';
+    $html = preg_replace('#<head(\s[^>]*)?>#i', '$0' . "\n" . $canonical_tags, $html, 1);
+
+    // Apply OpenGraph Image & Twitter Card (deduplicating existing tags)
+    if ($og_image !== '') {
+        $html = preg_replace('#<meta\s+property=["\']og:image["\'][^>]*>\s*#i', '', $html);
+        $html = preg_replace('#<meta\s+name=["\']twitter:image["\'][^>]*>\s*#i', '', $html);
+        $html = preg_replace('#<meta\s+name=["\']twitter:card["\'][^>]*>\s*#i', '', $html);
+
+        $image_tags = '<meta property="og:image" content="' . esc_url($og_image) . '">' . "\n"
+            . '<meta name="twitter:card" content="summary_large_image">' . "\n"
+            . '<meta name="twitter:image" content="' . esc_url($og_image) . '">';
+        $html = preg_replace('#<head(\s[^>]*)?>#i', '$0' . "\n" . $image_tags, $html, 1);
+    }
+
+    // 4. Build Professional Vietnamese Structured Data (Schema.org JSON-LD)
+    $schema_graph = array();
+
+    // Organization Schema
+    $schema_graph[] = array(
+        '@type' => 'Organization',
+        '@id'   => home_url('/#organization'),
+        'name'  => 'OrCam Việt Nam',
+        'url'   => home_url('/vi/home'),
+        'logo'  => get_template_directory_uri() . '/media/logo_white-1.svg',
+        'sameAs' => array(
+            'https://www.facebook.com/OrCamTech',
+            'https://www.youtube.com/user/OrCamTech',
+            'https://twitter.com/OrCam'
+        ),
+        'contactPoint' => array(
+            '@type' => 'ContactPoint',
+            'telephone' => '+84-969-691-444',
+            'contactType' => 'customer service',
+            'areaServed' => 'VN',
+            'availableLanguage' => array('Vietnamese', 'English')
+        )
+    );
+
+    // WebSite Schema
+    $schema_graph[] = array(
+        '@type' => 'WebSite',
+        '@id'   => home_url('/#website'),
+        'name'  => 'OrCam Việt Nam',
+        'url'   => home_url('/vi/home'),
+        'description' => 'Khám phá các thiết bị AI hỗ trợ thị lực và đọc sách tiên tiến nhất từ OrCam giúp người khiếm thị, thị lực kém và khó đọc tự tin làm chủ cuộc sống.',
+        'publisher' => array('@id' => home_url('/#organization'))
+    );
+
+    // BreadcrumbList Schema
+    $breadcrumb_items = array(
+        array(
+            '@type' => 'ListItem',
+            'position' => 1,
+            'name' => 'Trang chủ',
+            'item' => home_url('/vi/home')
+        )
+    );
+
+    if ($post->post_type === 'product') {
+        $breadcrumb_items[] = array(
+            '@type' => 'ListItem',
+            'position' => 2,
+            'name' => 'Sản phẩm',
+            'item' => home_url('/vi/shop/')
+        );
+        $breadcrumb_items[] = array(
+            '@type' => 'ListItem',
+            'position' => 3,
+            'name' => get_the_title($post)
+        );
+
+        // Product Schema
+        $wc_p = function_exists('wc_get_product') ? wc_get_product($post->ID) : null;
+        $price = $wc_p ? $wc_p->get_price() : '0';
+        $product_schema = array(
+            '@type' => 'Product',
+            '@id'   => $canonical_url . '#product',
+            'name'  => get_the_title($post),
+            'description' => $seo_desc !== '' ? $seo_desc : get_the_title($post),
+            'image' => $og_image,
+            'sku'   => $post->post_name,
+            'brand' => array(
+                '@type' => 'Brand',
+                'name'  => 'OrCam'
+            ),
+            'offers' => array(
+                '@type' => 'Offer',
+                'url'   => $canonical_url,
+                'priceCurrency' => 'VND',
+                'price' => $price,
+                'availability' => 'https://schema.org/InStock',
+                'itemCondition' => 'https://schema.org/NewCondition',
+                'seller' => array('@id' => home_url('/#organization'))
+            )
+        );
+        $schema_graph[] = $product_schema;
+    } elseif ($post->post_type === 'post') {
+        $breadcrumb_items[] = array(
+            '@type' => 'ListItem',
+            'position' => 2,
+            'name' => 'Blog',
+            'item' => home_url('/vi/blog')
+        );
+        $breadcrumb_items[] = array(
+            '@type' => 'ListItem',
+            'position' => 3,
+            'name' => get_the_title($post)
+        );
+
+        // Article Schema
+        $schema_graph[] = array(
+            '@type' => 'BlogPosting',
+            '@id'   => $canonical_url . '#article',
+            'headline' => get_the_title($post),
+            'description' => $seo_desc !== '' ? $seo_desc : get_the_title($post),
+            'image' => $og_image,
+            'datePublished' => get_the_date('c', $post),
+            'dateModified' => get_the_modified_date('c', $post),
+            'author' => array(
+                '@type' => 'Organization',
+                'name'  => 'OrCam Việt Nam',
+                'url'   => home_url('/vi/home')
+            ),
+            'publisher' => array('@id' => home_url('/#organization')),
+            'mainEntityOfPage' => array(
+                '@type' => 'WebPage',
+                '@id'   => $canonical_url
+            )
+        );
+    } else {
+        if ($post->post_name !== 'index') {
+            $breadcrumb_items[] = array(
+                '@type' => 'ListItem',
+                'position' => 2,
+                'name' => get_the_title($post)
+            );
+        }
+    }
+
+    $schema_graph[] = array(
+        '@type' => 'BreadcrumbList',
+        '@id'   => $canonical_url . '#breadcrumb',
+        'itemListElement' => $breadcrumb_items
+    );
+
+    // Strip old static schemas and inject new authoritative JSON-LD
+    $html = preg_replace('#<script\s+type=["\']application/ld\+json["\'][^>]*>[\s\S]*?</script>#i', '', $html);
+    $schema_json = json_encode(array('@context' => 'https://schema.org', '@graph' => $schema_graph), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+    $schema_tag = '<script type="application/ld+json">' . "\n" . $schema_json . "\n" . '</script>';
+    $html = preg_replace('#</head>#i', $schema_tag . "\n" . '</head>', $html, 1);
 
     return $html;
 }

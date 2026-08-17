@@ -37,6 +37,9 @@ if ($post_obj) :
 endif;
 $post_content = (string) ob_get_clean();
 $title = !empty($title) ? $title : get_bloginfo('name');
+if ($post_obj instanceof WP_Post) {
+    $GLOBALS['post'] = $post_obj;
+}
 if (!orcam_theme_render_shared_static_shell($post_content, $title, true)) {
     get_header();
     echo $post_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
