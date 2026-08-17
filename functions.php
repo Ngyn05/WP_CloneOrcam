@@ -1274,6 +1274,108 @@ function orcam_theme_request_route(): string
     return preg_replace('#/+#', '/', $route) ?: '';
 }
 
+/**
+ * Serve bundled theme assets (images, media, fonts, _app, etc.) directly when requested from root.
+ * This fixes broken images/buttons/icons on live hosting where /images/ or /media/ is requested.
+ */
+function orcam_theme_serve_root_asset(): void
+{
+    if (is_admin() || wp_doing_ajax() || wp_doing_cron()) {
+        return;
+    }
+
+    $route = orcam_theme_request_route();
+    if ($route === '') {
+        return;
+    }
+
+    // Match root asset paths like /images/..., /media/..., /fonts/..., /_app/..., /vi/images/..., etc.
+    if (!preg_match('#^(?:[a-zA-Z0-9_\-]+/)*(images|media|fonts|_app)/(.+)$#i', $route, $matches)) {
+        if (!preg_match('#^(?:[a-zA-Z0-9_\-]+/)*(smui\.css|editor-style\.css)$#i', $route, $matches)) {
+            return;
+        }
+        $folder = '';
+        $subpath = rawurldecode($matches[1]);
+    } else {
+        $folder = strtolower($matches[1]);
+        $subpath = rawurldecode($matches[2]);
+    }
+
+    // Prevent directory traversal
+    if (strpos($subpath, '..') !== false || strpos($subpath, '\\') !== false) {
+        return;
+    }
+
+    $theme_dir = get_template_directory();
+    $target_file = $folder !== '' ? ($theme_dir . '/' . $folder . '/' . $subpath) : ($theme_dir . '/' . $subpath);
+
+    // Fallback search between images and media folders
+    if (!is_file($target_file)) {
+        if ($folder === 'images') {
+            $alt_file = $theme_dir . '/media/' . $subpath;
+            if (is_file($alt_file)) {
+                $target_file = $alt_file;
+            }
+        } elseif ($folder === 'media') {
+            $alt_file = $theme_dir . '/images/' . $subpath;
+            if (is_file($alt_file)) {
+                $target_file = $alt_file;
+            }
+        }
+    }
+
+    if (!is_file($target_file)) {
+        return;
+    }
+
+    $ext = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+    $mime_types = array(
+        'svg'   => 'image/svg+xml',
+        'png'   => 'image/png',
+        'jpg'   => 'image/jpeg',
+        'jpeg'  => 'image/jpeg',
+        'webp'  => 'image/webp',
+        'gif'   => 'image/gif',
+        'ico'   => 'image/x-icon',
+        'mp4'   => 'video/mp4',
+        'webm'  => 'video/webm',
+        'mov'   => 'video/quicktime',
+        'css'   => 'text/css; charset=utf-8',
+        'js'    => 'application/javascript; charset=utf-8',
+        'json'  => 'application/json; charset=utf-8',
+        'woff'  => 'font/woff',
+        'woff2' => 'font/woff2',
+        'ttf'   => 'font/ttf',
+        'eot'   => 'application/vnd.ms-fontobject',
+        'pdf'   => 'application/pdf',
+    );
+
+    $mime = $mime_types[$ext] ?? 'application/octet-stream';
+    $mtime = (int) filemtime($target_file);
+    $etag = '"' . md5($target_file . $mtime) . '"';
+
+    if (isset($_SERVER['HTTP_IF_NONE_MATCH']) && trim($_SERVER['HTTP_IF_NONE_MATCH']) === $etag) {
+        status_header(304);
+        exit;
+    }
+
+    if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']) >= $mtime) {
+        status_header(304);
+        exit;
+    }
+
+    header('Content-Type: ' . $mime);
+    header('Content-Length: ' . filesize($target_file));
+    header('Cache-Control: public, max-age=31536000, immutable');
+    header('Last-Modified: ' . gmdate('D, d M Y H:i:s', $mtime) . ' GMT');
+    header('ETag: ' . $etag);
+    header('Access-Control-Allow-Origin: *');
+
+    readfile($target_file);
+    exit;
+}
+add_action('init', 'orcam_theme_serve_root_asset', 1);
+
 /** Resolve every original URL style: directory index, extensionless or .html. */
 function orcam_theme_static_document(?string $route = null): ?string
 {
