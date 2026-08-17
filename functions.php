@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('ORCAM_THEME_VERSION', '2.4.0');
+define('ORCAM_THEME_VERSION', '2.4.5');
 
 add_action('after_setup_theme', static function () {
     add_theme_support('title-tag');
@@ -277,6 +277,434 @@ add_action('init', 'orcam_theme_seed_product_reviews', 20);
 add_filter('pre_comment_approved', static function ($approved, array $commentdata) {
     return 1;
 }, 99, 2);
+
+/**
+ * Serve dynamic XML Sitemaps and robots.txt for OrCam Vietnam.
+ */
+function orcam_theme_handle_sitemaps(): void {
+    $route = function_exists('orcam_theme_request_route') ? orcam_theme_request_route() : '';
+    if ($route === 'robots.txt') {
+        header('Content-Type: text/plain; charset=UTF-8');
+        header('X-Robots-Tag: noindex, follow');
+        echo "User-agent: *\n";
+        echo "Disallow: /wp-admin/\n";
+        echo "Allow: /wp-admin/admin-ajax.php\n";
+        echo "Allow: /wp-content/themes/orcam_theme/media/\n";
+        echo "Allow: /wp-content/themes/orcam_theme/images/\n";
+        echo "Allow: /wp-content/themes/orcam_theme/fonts/\n\n";
+        echo "Sitemap: " . esc_url(home_url('/sitemap_index.xml')) . "\n";
+        exit;
+    }
+
+    if ($route === 'sitemap_index.xml' || $route === 'sitemap.xml') {
+        header('Content-Type: application/xml; charset=UTF-8');
+        header('X-Robots-Tag: noindex, follow');
+        $now = gmdate('Y-m-d\TH:i:s+00:00');
+        echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        echo '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+        echo '  <sitemap><loc>' . esc_url(home_url('/page-sitemap.xml')) . '</loc><lastmod>' . $now . '</lastmod></sitemap>' . "\n";
+        echo '  <sitemap><loc>' . esc_url(home_url('/product-sitemap.xml')) . '</loc><lastmod>' . $now . '</lastmod></sitemap>' . "\n";
+        echo '  <sitemap><loc>' . esc_url(home_url('/post-sitemap.xml')) . '</loc><lastmod>' . $now . '</lastmod></sitemap>' . "\n";
+        echo '</sitemapindex>';
+        exit;
+    }
+
+    if ($route === 'page-sitemap.xml') {
+        header('Content-Type: application/xml; charset=UTF-8');
+        header('X-Robots-Tag: noindex, follow');
+        echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+        
+        $static_pages = array(
+            'vi/home'                    => '1.0',
+            'vi/low-vision'              => '0.95',
+            'vi/orcam-learn'             => '0.95',
+            'vi/blog'                    => '0.9',
+            'vi/distributor'             => '0.85',
+            'vi/events'                  => '0.85',
+            'vi/comparison'              => '0.85',
+            'vi/contact-us'              => '0.8',
+            'vi/faq'                     => '0.75',
+            'vi/leadership'              => '0.6',
+            'vi/pressroom'               => '0.6',
+            'vi/accessibility'           => '0.5',
+            'vi/orcam-documents'         => '0.65',
+            'vi/orcam-learn-schools'     => '0.75',
+            'vi/orcam-learn-testimonials' => '0.75',
+            'vi/orcam-read-3-testimonials' => '0.75',
+            'vi/patent'                  => '0.5',
+            'vi/release-notes'           => '0.5',
+            'vi/submit-case'             => '0.6',
+            'vi/cookies-policy'          => '0.3',
+            'vi/privacy-policy'          => '0.3',
+            'vi/terms-and-conditions'    => '0.3',
+            'vi/terms-of-use'            => '0.3',
+        );
+
+        $now = gmdate('Y-m-d\TH:i:s+00:00');
+        foreach ($static_pages as $page_path => $priority) {
+            echo "  <url>\n";
+            echo "    <loc>" . esc_url(home_url('/' . $page_path . '/')) . "</loc>\n";
+            echo "    <lastmod>" . $now . "</lastmod>\n";
+            echo "    <changefreq>weekly</changefreq>\n";
+            echo "    <priority>" . $priority . "</priority>\n";
+            echo "  </url>\n";
+        }
+        echo '</urlset>';
+        exit;
+    }
+
+    if ($route === 'product-sitemap.xml') {
+        header('Content-Type: application/xml; charset=UTF-8');
+        header('X-Robots-Tag: noindex, follow');
+        echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+        
+        $products = get_posts(array(
+            'post_type'      => 'product',
+            'post_status'    => 'publish',
+            'posts_per_page' => -1,
+            'orderby'        => 'ID',
+            'order'          => 'ASC',
+        ));
+
+        echo "  <url>\n";
+        echo "    <loc>" . esc_url(home_url('/vi/shop/')) . "</loc>\n";
+        echo "    <lastmod>" . gmdate('Y-m-d\TH:i:s+00:00') . "</lastmod>\n";
+        echo "    <changefreq>daily</changefreq>\n";
+        echo "    <priority>0.9</priority>\n";
+        echo "  </url>\n";
+
+        foreach ($products as $p) {
+            $lastmod = get_the_modified_date('Y-m-d\TH:i:s+00:00', $p) ?: gmdate('Y-m-d\TH:i:s+00:00');
+            $url = home_url('/vi/' . $p->post_name . '/');
+            echo "  <url>\n";
+            echo "    <loc>" . esc_url($url) . "</loc>\n";
+            echo "    <lastmod>" . esc_html($lastmod) . "</lastmod>\n";
+            echo "    <changefreq>weekly</changefreq>\n";
+            echo "    <priority>0.95</priority>\n";
+            echo "  </url>\n";
+        }
+        echo '</urlset>';
+        exit;
+    }
+
+    if ($route === 'post-sitemap.xml') {
+        header('Content-Type: application/xml; charset=UTF-8');
+        header('X-Robots-Tag: noindex, follow');
+        echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
+        
+        $posts = get_posts(array(
+            'post_type'      => 'post',
+            'post_status'    => 'publish',
+            'posts_per_page' => -1,
+            'orderby'        => 'ID',
+            'order'          => 'DESC',
+        ));
+
+        foreach ($posts as $p) {
+            $lastmod = get_the_modified_date('Y-m-d\TH:i:s+00:00', $p) ?: gmdate('Y-m-d\TH:i:s+00:00');
+            $source_slug = get_post_meta($p->ID, '_orcam_source_slug', true);
+            $slug = ($source_slug !== '' && $source_slug !== false) ? $source_slug : $p->post_name;
+            $url = home_url('/vi/blog/' . $slug . '/');
+            echo "  <url>\n";
+            echo "    <loc>" . esc_url($url) . "</loc>\n";
+            echo "    <lastmod>" . esc_html($lastmod) . "</lastmod>\n";
+            echo "    <changefreq>monthly</changefreq>\n";
+            echo "    <priority>0.7</priority>\n";
+            echo "  </url>\n";
+        }
+        echo '</urlset>';
+        exit;
+    }
+}
+add_action('init', 'orcam_theme_handle_sitemaps', 2);
+
+/**
+ * Automatically synchronize all static pages into WordPress Database and seed
+ * rich, professional Vietnamese SEO titles & meta descriptions for Products, Pages, and Blog Posts.
+ */
+function orcam_theme_seed_seo_metadata(): void {
+    if (get_option('orcam_seo_seeded_v3') === 'yes') {
+        return;
+    }
+
+    global $wpdb;
+
+    // Delete any old/duplicate page entries to maintain a clean database
+    $existing_page_ids = $wpdb->get_col("SELECT ID FROM {$wpdb->posts} WHERE post_type = 'page'");
+    if (!empty($existing_page_ids)) {
+        foreach ($existing_page_ids as $pid) {
+            wp_delete_post((int) $pid, true);
+        }
+    }
+
+    $seo_data = array(
+        // 1. Products
+        'orcam-myeye-3-pro' => array(
+            'page_title' => 'OrCam MyEye 3 Pro',
+            'is_product' => true,
+            'title'      => 'OrCam MyEye 3 Pro - Kính Hỗ Trợ Thị Lực AI Thông Minh Cao Cấp | OrCam Việt Nam',
+            'desc'       => 'OrCam MyEye 3 Pro là thiết bị AI đeo kính đột phá giúp đọc văn bản tức thì, nhận diện khuôn mặt, màu sắc và mô tả hình ảnh cho người khiếm thị và thị lực kém.',
+        ),
+        'orcam-myeye-2-pro' => array(
+            'page_title' => 'OrCam MyEye 2 Pro',
+            'is_product' => true,
+            'title'      => 'OrCam MyEye 2 Pro - Thiết Bị Hỗ Trợ Đọc & Nhận Diện Cho Người Khiếm Thị | OrCam Việt Nam',
+            'desc'       => 'OrCam MyEye 2 Pro nhỏ gọn gắn trực tiếp lên kính, đọc tức thì mọi văn bản in và màn hình kỹ thuật số, nhận diện gương mặt và tiền tệ không cần internet.',
+        ),
+        'orcam-read-5' => array(
+            'page_title' => 'OrCam Read 5',
+            'is_product' => true,
+            'title'      => 'OrCam Read 5 - Kính Lúp AI & Máy Đọc Sách Thông Minh Thế Hệ Mới | OrCam Việt Nam',
+            'desc'       => 'OrCam Read 5 kết hợp công nghệ đọc văn bản AI toàn trang và kính lúp kỹ thuật số thông minh, hỗ trợ tối đa cho học sinh, người đi làm và người lớn tuổi.',
+        ),
+        'orcam-read-3' => array(
+            'page_title' => 'OrCam Read 3',
+            'is_product' => true,
+            'title'      => 'OrCam Read 3 - Thiết Bị Đọc Sách & Trợ Năng Đa Năng Cho Người Giảm Thị Lực | OrCam Việt Nam',
+            'desc'       => 'OrCam Read 3 là thiết bị trợ năng 3 trong 1: máy đọc văn bản cầm tay, kính lúp thông minh và trạm đọc tĩnh giúp đọc sách báo, tài liệu dễ dàng.',
+        ),
+        'orcam-read' => array(
+            'page_title' => 'OrCam Read',
+            'is_product' => true,
+            'title'      => 'OrCam Read - Bút Đọc Thông Minh AI Quét Văn Bản Cầm Tay Tiên Tiến | OrCam Việt Nam',
+            'desc'       => 'OrCam Read là thiết bị cầm tay ứng dụng AI đọc toàn bộ trang sách hoặc màn hình chỉ với một nút bấm và định vị laser chuẩn xác.',
+        ),
+
+        // 2. Main Landing & Static Pages
+        'index' => array(
+            'page_title' => 'Trang chủ - OrCam Việt Nam',
+            'title'      => 'Trang Chủ - Thiết Bị Hỗ Trợ Thị Lực AI Thông Minh | OrCam Việt Nam',
+            'desc'       => 'Khám phá các thiết bị AI hỗ trợ thị lực và đọc sách tiên tiến nhất từ OrCam giúp người khiếm thị, thị lực kém và khó đọc tự tin làm chủ cuộc sống.',
+        ),
+        'blog' => array(
+            'page_title' => 'OrCam Bài viết',
+            'title'      => 'Blog & Tin Tức Công Nghệ Trợ Năng AI | OrCam Việt Nam',
+            'desc'       => 'Tổng hợp các bài viết, cẩm nang và tin tức mới nhất về công nghệ hỗ trợ thị lực AI, kinh nghiệm sống và giải pháp đột phá cho người khiếm thị và đọc khó khăn.',
+        ),
+        'low-vision' => array(
+            'page_title' => 'Thị lực kém',
+            'title'      => 'Giải Pháp Toàn Diện Cho Người Thị Lực Kém & Khiếm Thị | OrCam Việt Nam',
+            'desc'       => 'Tìm hiểu các giải pháp công nghệ AI đột phá từ OrCam dành cho người giảm thị lực, thoái hóa điểm vàng, đục thủy tinh thể và người khiếm thị.',
+        ),
+        'orcam-learn' => array(
+            'page_title' => 'Đọc và học tập - OrCam Learn Basic',
+            'title'      => 'OrCam Learn - Giải Pháp Đọc & Hỗ Trợ Học Tập Đột Phá Cho Trẻ Em | OrCam Việt Nam',
+            'desc'       => 'OrCam Learn giúp học sinh mắc chứng khó đọc (Dyslexia) và khó khăn trong việc đọc hiểu nâng cao khả năng đọc, sự tự tin và kết quả học tập vượt trội.',
+        ),
+        'distributor' => array(
+            'page_title' => 'Nhà phân phối & Điểm trải nghiệm',
+            'title'      => 'Tìm Đại Lý Phân Phối & Điểm Trải Nghiệm Chính Hãng | OrCam Việt Nam',
+            'desc'       => 'Tra cứu danh sách đại lý phân phối chính hãng và địa điểm đăng ký trải nghiệm trực tiếp các thiết bị OrCam trên toàn quốc.',
+        ),
+        'events' => array(
+            'page_title' => 'Sự kiện & Demo Days',
+            'title'      => 'Sự Kiện & Ngày Hội Trải Nghiệm Sản Phẩm Miễn Phí | OrCam Việt Nam',
+            'desc'       => 'Đăng ký tham gia các sự kiện Demo Days và ngày hội trải nghiệm công nghệ trợ năng OrCam hoàn toàn miễn phí cùng chuyên gia.',
+        ),
+        'comparison' => array(
+            'page_title' => 'So sánh sản phẩm OrCam',
+            'title'      => 'Bảng So Sánh Các Dòng Sản Phẩm OrCam MyEye & OrCam Read | OrCam Việt Nam',
+            'desc'       => 'So sánh chi tiết tính năng, thông số kỹ thuật và mức giá giữa các dòng OrCam MyEye 3 Pro, MyEye 2 Pro, OrCam Read 5, Read 3 và OrCam Read.',
+        ),
+        'contact-us' => array(
+            'page_title' => 'Liên hệ tư vấn',
+            'title'      => 'Liên Hệ Đội Ngũ Chuyên Gia Tư Vấn & Hỗ Trợ Kỹ Thuật | OrCam Việt Nam',
+            'desc'       => 'Liên hệ với đội ngũ chuyên gia OrCam Việt Nam để nhận tư vấn miễn phí, hỗ trợ kỹ thuật và thông tin chi tiết về sản phẩm.',
+        ),
+        'faq' => array(
+            'page_title' => 'Câu hỏi thường gặp (FAQ)',
+            'title'      => 'Câu Hỏi Thường Gặp (FAQ) Về Các Thiết Bị Trợ Năng | OrCam Việt Nam',
+            'desc'       => 'Giải đáp toàn bộ thắc mắc phổ biến nhất về cách sử dụng, tính năng, bảo hành và chính sách mua hàng của các thiết bị OrCam.',
+        ),
+        'leadership' => array(
+            'page_title' => 'Ban lãnh đạo & Sáng lập',
+            'title'      => 'Ban Lãnh Đạo & Đội Ngũ Sáng Lập OrCam Technologies | OrCam Việt Nam',
+            'desc'       => 'Gặp gỡ những nhà khoa học và chuyên gia công nghệ thị giác máy tính hàng đầu đứng sau sự thành công của OrCam Technologies.',
+        ),
+        'pressroom' => array(
+            'page_title' => 'Phòng báo chí & Truyền thông',
+            'title'      => 'Phòng Báo Chí & Tin Tức Truyền Thông Chính Thức | OrCam Việt Nam',
+            'desc'       => 'Cập nhật các thông cáo báo chí, tin tức truyền thông và câu chuyện truyền cảm hứng về hành trình hỗ trợ cộng đồng của OrCam.',
+        ),
+        'accessibility' => array(
+            'page_title' => 'Tuyên bố về trợ năng',
+            'title'      => 'Tuyên Bố Về Khả Năng Tiếp Cận Website | OrCam Việt Nam',
+            'desc'       => 'Cam kết của OrCam về việc cung cấp website dễ tiếp cận, thuận tiện và thân thiện cho tất cả mọi người, bao gồm người khuyết tật.',
+        ),
+        'affiliation-and-partnership' => array(
+            'page_title' => 'Chương trình đối tác & Đại lý',
+            'title'      => 'Chương Trình Đối Tác & Đại Lý Phân Phối Ủy Quyền | OrCam Việt Nam',
+            'desc'       => 'Hợp tác cùng OrCam mang công nghệ hỗ trợ thị giác tiên tiến đến hàng triệu người cần hỗ trợ tại Việt Nam và trên thế giới.',
+        ),
+        'cookies-policy' => array(
+            'page_title' => 'Chính sách Cookie',
+            'title'      => 'Chính Sách Cookie & Thu Thập Dữ Liệu | OrCam Việt Nam',
+            'desc'       => 'Thông tin chi tiết về cách OrCam sử dụng cookie và công nghệ theo dõi để nâng cao trải nghiệm của người dùng trên website.',
+        ),
+        'privacy-policy' => array(
+            'page_title' => 'Chính sách quyền riêng tư',
+            'title'      => 'Chính Sách Quyền Riêng Tư & Bảo Mật Dữ Liệu Khách Hàng | OrCam Việt Nam',
+            'desc'       => 'Chính sách bảo vệ thông tin cá nhân và dữ liệu riêng tư của khách hàng và người dùng khi sử dụng sản phẩm và dịch vụ của OrCam.',
+        ),
+        'terms-and-conditions' => array(
+            'page_title' => 'Điều khoản và điều kiện chung',
+            'title'      => 'Điều Khoản & Điều Kiện Mua Hàng Và Sử Dụng Dịch Vụ | OrCam Việt Nam',
+            'desc'       => 'Các điều khoản, điều kiện pháp lý và quy định khi mua sắm, sở hữu và sử dụng các thiết bị công nghệ trợ năng từ OrCam.',
+        ),
+        'terms-of-use' => array(
+            'page_title' => 'Điều khoản sử dụng dịch vụ',
+            'title'      => 'Điều Khoản Sử Dụng Dịch Vụ & Quy Định Website | OrCam Việt Nam',
+            'desc'       => 'Quy định và điều khoản sử dụng website và các dịch vụ trực tuyến của OrCam Technologies.',
+        ),
+        'orcam-documents' => array(
+            'page_title' => 'Tài liệu kỹ thuật & Hướng dẫn',
+            'title'      => 'Tài Liệu Kỹ Thuật & Sách Hướng Dẫn Sử Dụng Chi Tiết | OrCam Việt Nam',
+            'desc'       => 'Tổng hợp tài liệu hướng dẫn sử dụng, thông số kỹ thuật và tài liệu giới thiệu chi tiết về các dòng máy OrCam.',
+        ),
+        'orcam-learn-schools' => array(
+            'page_title' => 'OrCam Learn dành cho trường học',
+            'title'      => 'Giải Pháp Ứng Dụng OrCam Learn Trong Trường Học & Giáo Dục | OrCam Việt Nam',
+            'desc'       => 'Ứng dụng công nghệ đọc và học AI OrCam Learn vào trường học giúp học sinh tự tin, xóa bỏ rào cản đọc và bứt phá thành tích.',
+        ),
+        'orcam-learn-testimonials' => array(
+            'page_title' => 'Cảm nhận về OrCam Learn',
+            'title'      => 'Đánh Giá & Cảm Nhận Thực Tế Về OrCam Learn Từ Phụ Huynh | OrCam Việt Nam',
+            'desc'       => 'Những câu chuyện có thật từ phụ huynh, học sinh và giáo viên về sự tiến bộ vượt bậc sau khi sử dụng thiết bị OrCam Learn.',
+        ),
+        'orcam-read-3-testimonials' => array(
+            'page_title' => 'Cảm nhận về OrCam Read 3',
+            'title'      => 'Trải Nghiệm Thực Tế Của Khách Hàng Về OrCam Read 3 | OrCam Việt Nam',
+            'desc'       => 'Chia sẻ chân thực từ khách hàng và chuyên gia nhãn khoa về hiệu quả hỗ trợ đọc của thiết bị trợ năng OrCam Read 3.',
+        ),
+        'patent' => array(
+            'page_title' => 'Bằng sáng chế & Sở hữu trí tuệ',
+            'title'      => 'Bằng Sáng Chế & Công Nghệ Thị Giác AI Độc Quyền | OrCam Việt Nam',
+            'desc'       => 'Danh mục các bằng sáng chế công nghệ thị giác nhân tạo và xử lý ngôn ngữ tiên tiến thuộc sở hữu của OrCam.',
+        ),
+        'release-notes' => array(
+            'page_title' => 'Ghi chú phát hành & Cập nhật',
+            'title'      => 'Ghi Chú Phát Hành & Nhật Ký Cập Nhật Phần Mềm Thiết Bị | OrCam Việt Nam',
+            'desc'       => 'Chi tiết các phiên bản nâng cấp phần mềm, bổ sung tính năng mới và cải tiến hiệu năng cho các thiết bị OrCam.',
+        ),
+        'submit-case' => array(
+            'page_title' => 'Gửi yêu cầu hỗ trợ khách hàng',
+            'title'      => 'Trung Tâm Tiếp Nhận & Gửi Yêu Cầu Hỗ Trợ Khách Hàng | OrCam Việt Nam',
+            'desc'       => 'Gửi thông tin yêu cầu trợ giúp kỹ thuật hoặc bảo hành cho trung tâm chăm sóc khách hàng OrCam Việt Nam.',
+        ),
+        'audio-guide' => array(
+            'page_title' => 'Hướng dẫn âm thanh OrCam MyEye',
+            'title'      => 'Sách Hướng Dẫn & File Âm Thanh Sử Dụng OrCam MyEye | OrCam Việt Nam',
+            'desc'       => 'File âm thanh hướng dẫn từng bước cách sử dụng các tính năng cao cấp trên kính thông minh OrCam MyEye.'
+        ),
+        'orcam-learn-privacy-statement' => array(
+            'page_title' => 'Quyền riêng tư OrCam Learn',
+            'title'      => 'Tuyên Bố Quyền Riêng Tư Dành Riêng Cho OrCam Learn | OrCam Việt Nam',
+            'desc'       => 'Cam kết bảo mật dữ liệu học sinh và thông tin người dùng trong quá trình sử dụng thiết bị học tập OrCam Learn.'
+        ),
+        'orcam-products-privacy-statement' => array(
+            'page_title' => 'Quyền riêng tư sản phẩm OrCam',
+            'title'      => 'Chính Sách Quyền Riêng Tư Dành Cho Thiết Bị Phần Cứng | OrCam Việt Nam',
+            'desc'       => 'Quy định bảo mật và xử lý dữ liệu hình ảnh, giọng nói trên các thiết bị phần cứng OrCam.'
+        ),
+        'orcam-products-terms-conditions' => array(
+            'page_title' => 'Điều khoản sản phẩm OrCam',
+            'title'      => 'Điều Khoản & Điều Kiện Mua Hàng Thiết Bị Chính Hãng | OrCam Việt Nam',
+            'desc'       => 'Chính sách mua hàng, vận chuyển, đổi trả và bảo hành chính hãng đối với các thiết bị OrCam.'
+        ),
+        'terms-and-conditions-orcam-learn' => array(
+            'page_title' => 'Điều khoản OrCam Learn',
+            'title'      => 'Điều Khoản & Quy Định Sử Dụng Gói OrCam Learn | OrCam Việt Nam',
+            'desc'       => 'Chi tiết quy định và điều khoản áp dụng đối với gói sản phẩm và dịch vụ OrCam Learn.'
+        ),
+        'read-3-store' => array(
+            'page_title' => 'Cửa hàng OrCam Read 3',
+            'title'      => 'Đặt Mua OrCam Read 3 Chính Hãng - Giá Ưu Đãi Nhất | OrCam Việt Nam',
+            'desc'       => 'Mua ngay thiết bị trợ năng OrCam Read 3 chính hãng kèm bảo hành 24 tháng và hỗ trợ tận tâm từ OrCam Việt Nam.'
+        ),
+        'read-store' => array(
+            'page_title' => 'Cửa hàng OrCam Read',
+            'title'      => 'Đặt Mua Bút Đọc OrCam Read AI Cầm Tay Chính Hãng | OrCam Việt Nam',
+            'desc'       => 'Đặt mua thiết bị đọc văn bản cầm tay thông minh OrCam Read với ưu đãi đặc quyền và giao hàng miễn phí.'
+        ),
+        'myeye-store' => array(
+            'page_title' => 'Cửa hàng OrCam MyEye',
+            'title'      => 'Đặt Mua Kính Thông Minh OrCam MyEye Chính Hãng | OrCam Việt Nam',
+            'desc'       => 'Khám phá và đặt mua các dòng kính thông minh OrCam MyEye thế hệ mới dành cho người khiếm thị.'
+        ),
+        'retail-installment-contract' => array(
+            'page_title' => 'Hợp đồng trả góp bán lẻ',
+            'title'      => 'Chính Sách Mua Hàng Trả Góp 0% Lãi Suất Linh Hoạt | OrCam Việt Nam',
+            'desc'       => 'Hướng dẫn thủ tục mua thiết bị OrCam trả góp 0% lãi suất với kỳ hạn linh hoạt cho mọi khách hàng.'
+        ),
+        'software-version-8012-february-2024' => array(
+            'page_title' => 'Cập nhật phần mềm v8012',
+            'title'      => 'Chi Tiết Bản Cập Nhật Phần Mềm Version 8012 | OrCam Việt Nam',
+            'desc'       => 'Cập nhật các tính năng AI mới và tối ưu tốc độ đọc trên phiên bản phần mềm OrCam 8012.'
+        ),
+        'orcam-myeye-software-ver-9-21' => array(
+            'page_title' => 'Cập nhật phần mềm v9.21',
+            'title'      => 'Chi Tiết Bản Cập Nhật Phần Mềm MyEye Version 9.21 | OrCam Việt Nam',
+            'desc'       => 'Những cải tiến vượt trội về khả năng nhận diện gương mặt và hỗ trợ tiếng Việt trên bản cập nhật 9.21.'
+        )
+    );
+
+    foreach ($seo_data as $slug => $data) {
+        $is_product = !empty($data['is_product']);
+        $post_type = $is_product ? 'product' : 'page';
+
+        $post_id = (int) $wpdb->get_var($wpdb->prepare(
+            "SELECT ID FROM {$wpdb->posts} WHERE post_name = %s AND post_type = %s AND post_status = 'publish' LIMIT 1",
+            $slug,
+            $post_type
+        ));
+
+        // Create page in WordPress database if not exists
+        if (!$post_id) {
+            $post_id = wp_insert_post(array(
+                'post_title'     => $data['page_title'],
+                'post_name'      => $slug,
+                'post_status'    => 'publish',
+                'post_type'      => $post_type,
+                'post_excerpt'   => $data['desc'],
+                'comment_status' => 'closed',
+                'ping_status'    => 'closed',
+            ));
+        }
+
+        if ($post_id > 0) {
+            update_post_meta($post_id, '_yoast_wpseo_title', $data['title']);
+            update_post_meta($post_id, '_yoast_wpseo_metadesc', $data['desc']);
+            update_post_meta($post_id, 'rank_math_title', $data['title']);
+            update_post_meta($post_id, 'rank_math_description', $data['desc']);
+        }
+    }
+
+    // Also populate SEO meta for all imported blog posts
+    $posts = $wpdb->get_results("SELECT ID, post_title, post_excerpt, post_content FROM {$wpdb->posts} WHERE post_type='post' AND post_status='publish'");
+    foreach ($posts as $p) {
+        $title = $p->post_title . ' | OrCam Việt Nam';
+        $desc = $p->post_excerpt !== '' ? $p->post_excerpt : wp_trim_words(wp_strip_all_tags($p->post_content), 30);
+
+        if (!get_post_meta($p->ID, '_yoast_wpseo_title', true)) {
+            update_post_meta($p->ID, '_yoast_wpseo_title', $title);
+        }
+        if (!get_post_meta($p->ID, '_yoast_wpseo_metadesc', true)) {
+            update_post_meta($p->ID, '_yoast_wpseo_metadesc', $desc);
+        }
+        if (!get_post_meta($p->ID, 'rank_math_title', true)) {
+            update_post_meta($p->ID, 'rank_math_title', $title);
+        }
+        if (!get_post_meta($p->ID, 'rank_math_description', true)) {
+            update_post_meta($p->ID, 'rank_math_description', $desc);
+        }
+    }
+
+    update_option('orcam_seo_seeded_v4', 'yes');
+}
+add_action('init', 'orcam_theme_seed_seo_metadata', 25);
 
 add_filter('pre_option_comment_moderation', static function () {
     return '0';
@@ -1928,6 +2356,155 @@ function orcam_theme_blog_index(string $html): string
 }
 
 /**
+ * Synchronize SEO title and description from Yoast SEO, Rank Math, AIOSEO, or WordPress post meta.
+ */
+function orcam_theme_apply_seo_meta(string $html, $context = null): string
+{
+    $post = null;
+    if ($context instanceof WP_Post) {
+        $post = $context;
+    } elseif (is_numeric($context) && (int) $context > 0) {
+        $post = get_post((int) $context);
+    } elseif (is_string($context)) {
+        $slug = '';
+        if (strpos($context, 'blog.html') !== false || $context === 'vi/blog' || $context === 'blog') {
+            $slug = 'blog';
+        } elseif (strpos($context, 'index.html') !== false || $context === 'vi/home' || $context === 'vi' || $context === '') {
+            $slug = 'index';
+        } else {
+            $slug = sanitize_title(pathinfo(basename($context), PATHINFO_FILENAME));
+        }
+
+        if ($slug !== '') {
+            global $wpdb;
+            $found_id = (int) $wpdb->get_var($wpdb->prepare(
+                "SELECT ID FROM {$wpdb->posts} WHERE post_name = %s AND post_status = 'publish' ORDER BY (post_type = 'page') DESC, (post_type = 'product') DESC LIMIT 1",
+                $slug
+            ));
+            if ($found_id > 0) {
+                $post = get_post($found_id);
+            }
+        }
+    }
+
+    if (!$post instanceof WP_Post) {
+        $queried = get_queried_object();
+        if ($queried instanceof WP_Post) {
+            $post = $queried;
+        }
+    }
+
+    if (!$post instanceof WP_Post) {
+        return $html;
+    }
+
+    $post_id = $post->ID;
+    $sitename = get_bloginfo('name') ?: 'OrCam';
+    $sep = '-';
+
+    // 1. Title Resolution (Yoast -> Rank Math -> AIOSEO)
+    $seo_title = '';
+    $yoast_title = (string) get_post_meta($post_id, '_yoast_wpseo_title', true);
+    if ($yoast_title !== '') {
+        $seo_title = str_replace(
+            array('%%title%%', '%%sitename%%', '%%sep%%', '%%page%%', '%%primary_category%%'),
+            array(get_the_title($post), $sitename, $sep, '', ''),
+            $yoast_title
+        );
+    }
+    if ($seo_title === '') {
+        $rm_title = (string) get_post_meta($post_id, 'rank_math_title', true);
+        if ($rm_title !== '') {
+            $seo_title = str_replace(
+                array('%title%', '%sitename%', '%sep%', '%page%'),
+                array(get_the_title($post), $sitename, $sep, ''),
+                $rm_title
+            );
+        }
+    }
+    if ($seo_title === '') {
+        $aio_title = (string) get_post_meta($post_id, '_aioseo_title', true);
+        if ($aio_title !== '') {
+            $seo_title = str_replace(
+                array('#post_title', '#site_title', '#separator_sa'),
+                array(get_the_title($post), $sitename, $sep),
+                $aio_title
+            );
+        }
+    }
+
+    // 2. Description Resolution (Yoast -> Rank Math -> AIOSEO -> Excerpt)
+    $seo_desc = '';
+    $yoast_desc = (string) get_post_meta($post_id, '_yoast_wpseo_metadesc', true);
+    if ($yoast_desc !== '') {
+        $seo_desc = str_replace(
+            array('%%title%%', '%%sitename%%', '%%excerpt%%'),
+            array(get_the_title($post), $sitename, $post->post_excerpt),
+            $yoast_desc
+        );
+    }
+    if ($seo_desc === '') {
+        $rm_desc = (string) get_post_meta($post_id, 'rank_math_description', true);
+        if ($rm_desc !== '') {
+            $seo_desc = str_replace(
+                array('%title%', '%sitename%', '%excerpt%'),
+                array(get_the_title($post), $sitename, $post->post_excerpt),
+                $rm_desc
+            );
+        }
+    }
+    if ($seo_desc === '') {
+        $aio_desc = (string) get_post_meta($post_id, '_aioseo_description', true);
+        if ($aio_desc !== '') {
+            $seo_desc = $aio_desc;
+        }
+    }
+    if ($seo_desc === '' && has_excerpt($post)) {
+        $seo_desc = get_the_excerpt($post);
+    }
+
+    // Apply SEO Title to HTML (deduplicating existing tags)
+    if ($seo_title !== '') {
+        $seo_title = trim(strip_tags($seo_title));
+        if (strpos($seo_title, 'OrCam Việt Nam') === false) {
+            $seo_title = preg_replace('/\s*[-|]\s*OrCam(\s+Blog|\s+VN)?\s*$/iu', '', $seo_title);
+            $seo_title = trim($seo_title) . ' | OrCam Việt Nam';
+        }
+        $full_title = esc_html($seo_title);
+        $title_attr = esc_attr($seo_title);
+
+        $html = preg_replace('#<title>.*?</title>#is', '<title>' . $full_title . '</title>', $html, 1);
+        $html = preg_replace('#<meta\s+property=["\']og:title["\'][^>]*>\s*#i', '', $html);
+        $html = preg_replace('#<meta\s+name=["\']twitter:title["\'][^>]*>\s*#i', '', $html);
+
+        $new_title_tags = '<meta property="og:title" content="' . $title_attr . '">' . "\n"
+            . '<meta name="twitter:title" content="' . $title_attr . '">';
+        $html = preg_replace('#<head(\s[^>]*)?>#i', '$0' . "\n" . $new_title_tags, $html, 1);
+
+        $script_title = '<script>window.orcamAuthoritativeTitle=' . wp_json_encode($seo_title) . ';document.title=window.orcamAuthoritativeTitle;</script>';
+        $html = preg_replace('#</head>#i', $script_title . '</head>', $html, 1);
+    }
+
+    // Apply SEO Description to HTML (deduplicating existing tags)
+    if ($seo_desc !== '') {
+        $seo_desc = trim(strip_tags($seo_desc));
+        $desc_attr = esc_attr($seo_desc);
+
+        $html = preg_replace('#<meta\s+name=["\']description["\'][^>]*>\s*#i', '', $html);
+        $html = preg_replace('#<meta\s+name=["\']og:description["\'][^>]*>\s*#i', '', $html);
+        $html = preg_replace('#<meta\s+property=["\']og:description["\'][^>]*>\s*#i', '', $html);
+        $html = preg_replace('#<meta\s+name=["\']twitter:description["\'][^>]*>\s*#i', '', $html);
+
+        $new_desc_tags = '<meta name="description" content="' . $desc_attr . '">' . "\n"
+            . '<meta property="og:description" content="' . $desc_attr . '">' . "\n"
+            . '<meta name="twitter:description" content="' . $desc_attr . '">';
+        $html = preg_replace('#<head(\s[^>]*)?>#i', '$0' . "\n" . $new_desc_tags, $html, 1);
+    }
+
+    return $html;
+}
+
+/**
  * Adjust asset URLs at render time so the theme works on any domain or in a
  * WordPress subdirectory. Relative URLs retain the original document base.
  */
@@ -2158,6 +2735,9 @@ function orcam_theme_render_document(string $file, ?string $document_html = null
     // Synchronize actual WooCommerce prices and product imagery into HTML
     $html = orcam_theme_sync_woocommerce_product_data_into_html($html, $file);
 
+    // Apply SEO Title, Meta Description, and OpenGraph/Twitter tags from Yoast/RankMath/WP
+    $html = orcam_theme_apply_seo_meta($html, $file);
+
     $navigation_config = '<script>window.orcamThemeUri=' . wp_json_encode($theme_uri)
         . ';window.orcamHomeUrl=' . wp_json_encode(home_url('/vi/home'))
         . ';window.orcamShopUrl=' . wp_json_encode(home_url('/vi/shop/'))
@@ -2221,7 +2801,7 @@ function orcam_theme_render_shared_static_shell(string $content, string $title, 
     // The shell page marks active items; clean submenu active states
     $html = str_replace(' orcam-submenu__active', '', $html);
 
-    $full_title = esc_html($title) . ' - OrCam';
+    $full_title = esc_html($title) . ' | OrCam Việt Nam';
     $html = preg_replace('#<title>.*?</title>#is', '<title>' . $full_title . '</title>', $html, 1);
     $html = preg_replace('#<meta\s+property=["\']og:title["\']\s+content=["\'][^"\']*["\']>#i', '<meta property="og:title" content="' . esc_attr($full_title) . '">', $html, 1);
     $html = preg_replace('#<meta\s+name=["\']twitter:title["\']\s+content=["\'][^"\']*["\']>#i', '<meta name="twitter:title" content="' . esc_attr($full_title) . '">', $html, 1);
@@ -2240,16 +2820,7 @@ function orcam_theme_render_shared_static_shell(string $content, string $title, 
     // Remove the redundant brand column inside the footer links grid
     $html = preg_replace('#<div\s+class=["\']orcam-vn-brand-col["\'][\s\S]*?</div>\s*</div>#is', '', $html);
 
-
-
-    $title_tag = '<script>window.orcamHydratedChrome=true;window.orcamAuthoritativeTitle='
-        . wp_json_encode($full_title) . ';document.title=window.orcamAuthoritativeTitle;</script></head>';
-    $html = preg_replace(
-        '#</head>#i',
-        $title_tag,
-        $html,
-        1
-    );
+    $html = orcam_theme_apply_seo_meta($html, get_queried_object() ?: ($GLOBALS['post'] ?? null));
 
     // Strip Svelte client bootstrap and scripts safely without catastrophic backtracking across earlier script tags
     $html = preg_replace('#<script\b[^>]*>\s*\{?\s*__sveltekit[\s\S]*?</script>#is', '', $html);
@@ -2544,16 +3115,8 @@ function orcam_theme_render_database_blog(WP_Post $post, bool $return_only = fal
         return false;
     }
 
-    // Keep browser and social metadata synchronized with wp-admin fields.
-    $html = preg_replace('#<title>.*?</title>#is', '<title>' . esc_html($title) . ' - OrCam</title>', $html, 1);
-    $html = preg_replace_callback(
-        '#(<meta\s+name=(["\'])description\2\s+content=)(["\']).*?\3#is',
-        static function (array $match) use ($excerpt): string {
-            return $match[1] . $match[3] . esc_attr($excerpt) . $match[3];
-        },
-        $html,
-        1
-    );
+    // Keep browser and social metadata synchronized with Yoast/RankMath/wp-admin fields.
+    $html = orcam_theme_apply_seo_meta($html, $post);
 
     // Database content is already static; never translate it again in-browser.
     $html = preg_replace(

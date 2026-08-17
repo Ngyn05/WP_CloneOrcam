@@ -1,0 +1,8 @@
+User-agent: *
+Disallow: /wp-admin/
+Allow: /wp-admin/admin-ajax.php
+Allow: /wp-content/themes/orcam_theme/media/
+Allow: /wp-content/themes/orcam_theme/images/
+Allow: /wp-content/themes/orcam_theme/fonts/
+
+Sitemap: https://orcam.vn/sitemap_index.xml
