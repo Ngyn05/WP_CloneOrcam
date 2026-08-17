@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('ORCAM_THEME_VERSION', '2.3.8');
+define('ORCAM_THEME_VERSION', '2.4.0');
 
 add_action('after_setup_theme', static function () {
     add_theme_support('title-tag');
@@ -765,6 +765,12 @@ function orcam_theme_try_serve_cache(string $file, string $custom_html = ''): bo
         return false;
     }
 
+    if (strpos($file, 'blog.html') !== false || $route === 'vi/blog' || $route === 'blog' || strpos($route, 'vi/blog') === 0) {
+        global $wpdb;
+        $latest_posts_state = (string) $wpdb->get_var("SELECT CONCAT(COUNT(ID), '_', IFNULL(MAX(post_modified), '0')) FROM {$wpdb->posts} WHERE post_type='post' AND post_status='publish'");
+        $custom_html .= '|posts_' . $latest_posts_state;
+    }
+
     $cache_dir = orcam_theme_cache_dir();
     $cache_key = orcam_theme_get_cache_key($file, $custom_html);
     $cache_file = $cache_dir . '/' . $cache_key . '.html';
@@ -854,20 +860,44 @@ add_action('template_redirect', static function (): void {
             global $wpdb;
             $post_id = (int) $wpdb->get_var($wpdb->prepare(
                 "SELECT p.ID FROM {$wpdb->posts} p
-                 INNER JOIN {$wpdb->postmeta} m ON m.post_id=p.ID AND m.meta_key='_orcam_source_slug'
-                 WHERE p.post_type='post' AND p.post_status='publish' AND m.meta_value=%s LIMIT 1",
+                 LEFT JOIN {$wpdb->postmeta} m ON m.post_id=p.ID AND m.meta_key='_orcam_source_slug'
+                 WHERE p.post_type='post' AND p.post_status='publish' AND (m.meta_value=%s OR p.post_name=%s) LIMIT 1",
+                $blog_slug,
                 $blog_slug
             ));
             if ($post_id > 0) {
-                $source = (string) get_post_meta($post_id, '_orcam_source_file', true);
-                $source = str_replace(array('static-pages/en-us/', 'static-pages/en-gb/'), 'static-pages/vi/', $source);
-                if ($source !== '') {
-                    $theme_root = wp_normalize_path(get_template_directory());
-                    $file = realpath($theme_root . '/' . ltrim($source, '/'));
-                    if ($file && is_file($file)) {
-                        if (orcam_theme_try_serve_cache($file, 'blog_' . $post_id)) {
-                            exit;
+                $post = get_post($post_id);
+                if ($post) {
+                    global $wp_query;
+                    $wp_query->is_single = true;
+                    $wp_query->is_singular = true;
+                    $wp_query->queried_object = $post;
+                    $wp_query->queried_object_id = $post_id;
+                    $wp_query->posts = array($post);
+                    $wp_query->post_count = 1;
+                    $wp_query->post = $post;
+                    setup_postdata($post);
+
+                    $source = (string) get_post_meta($post_id, '_orcam_source_file', true);
+                    $source = str_replace(array('static-pages/en-us/', 'static-pages/en-gb/'), 'static-pages/vi/', $source);
+                    if ($source !== '') {
+                        $theme_root = wp_normalize_path(get_template_directory());
+                        $file = realpath($theme_root . '/' . ltrim($source, '/'));
+                        if ($file && is_file($file)) {
+                            if (orcam_theme_try_serve_cache($file, 'blog_' . $post_id)) {
+                                exit;
+                            }
+                            if (orcam_theme_render_database_blog($post)) {
+                                exit;
+                            }
                         }
+                    }
+
+                    // Newly created post without static file -> render via single template
+                    $single_template = get_template_directory() . '/single.php';
+                    if (is_file($single_template)) {
+                        include $single_template;
+                        exit;
                     }
                 }
             }
@@ -1222,21 +1252,23 @@ add_filter('request', static function (array $query_vars): array {
         return $query_vars;
     }
 
+    $raw_slug = sanitize_title((string) $query_vars['orcam_slug']);
     global $wpdb;
     $post_id = $wpdb->get_var($wpdb->prepare(
         "SELECT p.ID
          FROM {$wpdb->posts} p
-         INNER JOIN {$wpdb->postmeta} slug ON slug.post_id=p.ID AND slug.meta_key='_orcam_source_slug'
+         LEFT JOIN {$wpdb->postmeta} slug ON slug.post_id=p.ID AND slug.meta_key='_orcam_source_slug'
          WHERE p.post_type='post' AND p.post_status='publish'
-           AND slug.meta_value=%s
+           AND (slug.meta_value=%s OR p.post_name=%s)
          LIMIT 1",
-        sanitize_title((string) $query_vars['orcam_slug'])
+        $raw_slug,
+        $raw_slug
     ));
 
     if ($post_id) {
         $query_vars['p'] = (int) $post_id;
         $query_vars['post_type'] = 'post';
-        unset($query_vars['name']);
+        unset($query_vars['name'], $query_vars['orcam_slug'], $query_vars['orcam_locale']);
     }
     return $query_vars;
 });
@@ -1246,8 +1278,10 @@ add_action('pre_get_posts', static function (WP_Query $query): void {
         return;
     }
 
+    $slug = sanitize_title((string) $query->get('orcam_slug'));
     $query->set('meta_query', array(
-        array('key' => '_orcam_source_slug', 'value' => sanitize_title((string) $query->get('orcam_slug'))),
+        'relation' => 'OR',
+        array('key' => '_orcam_source_slug', 'value' => $slug),
     ));
 });
 
@@ -1257,7 +1291,8 @@ add_filter('post_type_link', static function (string $url, WP_Post $post): strin
     }
 
     $source_slug = get_post_meta($post->ID, '_orcam_source_slug', true);
-    return $source_slug ? home_url('/vi/blog/' . $source_slug . '/') : $url;
+    $slug = ($source_slug !== '' && $source_slug !== false) ? $source_slug : $post->post_name;
+    return home_url('/vi/blog/' . $slug . '/');
 }, 10, 2);
 
 /** Return a normalized route relative to the WordPress installation. */
@@ -1837,6 +1872,22 @@ function orcam_theme_post_card_image(WP_Post $post): string
     return get_template_directory_uri() . '/media/3A1A5245%20(1)%20(1).webp';
 }
 
+/** Invalidate cached static pages whenever posts/products are modified. */
+function orcam_theme_clear_static_cache(): void {
+    $cache_dir = orcam_theme_cache_dir();
+    if (is_dir($cache_dir)) {
+        $files = glob($cache_dir . '/*.html');
+        if ($files) {
+            foreach ($files as $f) {
+                @unlink($f);
+            }
+        }
+    }
+}
+add_action('save_post', 'orcam_theme_clear_static_cache');
+add_action('delete_post', 'orcam_theme_clear_static_cache');
+add_action('transition_post_status', 'orcam_theme_clear_static_cache');
+
 /** Build the blog index entirely from editable WordPress post data. */
 function orcam_theme_blog_index(string $html): string
 {
@@ -1846,8 +1897,6 @@ function orcam_theme_blog_index(string $html): string
         'posts_per_page' => -1,
         'orderby'        => 'date',
         'order'          => 'DESC',
-        'meta_key'       => '_orcam_locale',
-        'meta_compare'   => 'EXISTS',
         'no_found_rows'  => true,
         'update_post_term_cache' => false,
     ));
@@ -1870,7 +1919,7 @@ function orcam_theme_blog_index(string $html): string
         if ($description !== '') {
             $cards .= '<span class="orcam-blog-card__summary">' . esc_html($description) . '</span>';
         }
-                $cards .= '<span class="orcam-blog-card__more">Đọc thêm &gt;</span></span></a></article>';
+        $cards .= '<span class="orcam-blog-card__more">Xem chi tiết &gt;</span></span></a></article>';
     }
 
     return '<section class="orcam-blog-index" aria-label="Danh sách bài viết">'
@@ -1884,6 +1933,14 @@ function orcam_theme_blog_index(string $html): string
  */
 function orcam_theme_render_document(string $file, ?string $document_html = null, string $custom_cache_key = '', bool $return_only = false): string
 {
+    $normalized_file = wp_normalize_path((string) realpath($file));
+    $blog_file = wp_normalize_path((string) realpath(get_template_directory() . '/static-pages/vi/blog.html'));
+    if ($normalized_file === $blog_file && $custom_cache_key === '') {
+        global $wpdb;
+        $latest_posts_state = (string) $wpdb->get_var("SELECT CONCAT(COUNT(ID), '_', IFNULL(MAX(post_modified), '0')) FROM {$wpdb->posts} WHERE post_type='post' AND post_status='publish'");
+        $custom_cache_key = 'blog_posts_' . $latest_posts_state;
+    }
+
     // Fast cache check
     $cache_content_key = $custom_cache_key !== '' ? $custom_cache_key : ($document_html ?? '');
     if (!$return_only) {
