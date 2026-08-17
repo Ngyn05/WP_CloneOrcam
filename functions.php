@@ -2092,10 +2092,10 @@ function orcam_theme_render_shared_static_shell(string $content, string $title, 
         1
     );
 
-    // Strip Svelte client hydration scripts so Svelte router NEVER runs or overwrites DOM
-    $html = preg_replace('#<script\b[^>]*>(?:(?!</script>)[\s\S])*?__sveltekit(?:(?!</script>)[\s\S])*?</script>#is', '', $html);
+    // Strip Svelte client bootstrap and scripts safely without catastrophic backtracking across earlier script tags
+    $html = preg_replace('#<script\b[^>]*>\s*\{?\s*__sveltekit[\s\S]*?</script>#is', '', $html);
     $html = preg_replace('#<script\b[^>]*\bsrc=["\'][^"\']*_app/[^"\']*["\'][^>]*>\s*</script>#is', '', $html);
-    $html = preg_replace('#<script\b[^>]*data-sveltekit-fetched[^>]*>(?:(?!</script>)[\s\S])*?</script>#is', '', $html);
+    $html = preg_replace('#<script\b[^>]*data-sveltekit-fetched[^>]*>[\s\S]*?</script>#is', '', $html);
     $html = preg_replace('#<link\b[^>]*\brel=["\']modulepreload["\'][^>]*>#is', '', $html);
 
     $theme_uri = untrailingslashit(get_template_directory_uri());
@@ -2140,6 +2140,15 @@ function orcam_theme_render_shared_static_shell(string $content, string $title, 
             'supportNonce' => wp_create_nonce('orcam_support_case'),
         )) . ';</script>';
     $html = preg_replace('/<\/body>/i', $navigation_config . '<script id="orcam-static-navigation" src="' . esc_url($navigation_uri) . '"></script></body>', $html, 1);
+
+    if ($custom_cache_file !== '') {
+        $cache_dir = orcam_theme_cache_dir();
+        $cache_key = orcam_theme_get_cache_key($custom_cache_file, $custom_cache_key);
+        $cache_path = $cache_dir . '/' . $cache_key . '.html';
+        if (wp_is_writable($cache_dir) || is_writable($cache_dir)) {
+            @file_put_contents($cache_path, $html);
+        }
+    }
 
     if ($return_only) {
         return $html;
