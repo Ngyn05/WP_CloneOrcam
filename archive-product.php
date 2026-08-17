@@ -62,7 +62,7 @@ ob_start();
 </main>
 <?php
 $shop_content = (string) ob_get_clean();
-if (!orcam_theme_render_shared_static_shell($shop_content, 'Tất cả sản phẩm', false, 'shop_catalog', 'vi_shop_page', false, true)) {
+if (!orcam_theme_render_shared_static_shell($shop_content, 'Tất cả sản phẩm', false, 'shop_catalog', 'vi_shop_page', false, false)) {
     get_header();
     echo $shop_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
     wp_footer();

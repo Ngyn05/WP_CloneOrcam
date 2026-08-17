@@ -1834,27 +1834,13 @@ function orcam_theme_render_document(string $file, ?string $document_html = null
         $blog_index = orcam_theme_blog_index($html);
         $html = preg_replace('/<nav class="orcam-footer/i', $blog_index . '<nav class="orcam-footer', $html, 1);
     }
-    // OrCam Vietnam: always inject support footer block before .orcam-footer nav
-    {
-        $lu = esc_url(get_template_directory_uri() . '/media/logo_white-1.svg');
-        $ph = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.47 2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.09 6.09l1.81-1.81a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>';
-        $hs = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>';
-        $hd = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>';
-        $css = '<style id="orcam-vn-footer-css">#orcam-vn-support-block{background:var(--orcam-07-solid-gray,#1a1a1a);width:100%;box-sizing:border-box}.ovn-top-row{max-width:1400px;margin:0 auto;padding:36px var(--orcam-sides-padding,5%) 28px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;border-bottom:1px solid rgba(255,255,255,.07)}.ovn-brand{display:flex;align-items:center;gap:10px}.ovn-brand img{height:22px;width:auto;opacity:.95}.ovn-brand-name{color:#fff;font-size:13.5px;font-weight:800;letter-spacing:2px;text-transform:uppercase}.ovn-desc{color:#64748b;font-size:12.5px;line-height:1.6;margin:0;max-width:340px;text-align:right}.ovn-cards-wrap{max-width:1400px;margin:0 auto;padding:24px var(--orcam-sides-padding,5%) 32px;box-sizing:border-box}.ovn-section-label{color:#475569;font-size:10.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin:0 0 16px 0}.ovn-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}.ovn-card{border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:0}.ovn-card-regular{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07)}.ovn-card-hotline{background:rgba(37,99,235,.08);border:1px solid rgba(37,99,235,.25)}.ovn-card-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.ovn-card-icon{width:32px;height:32px;border-radius:7px;background:rgba(56,189,248,.08);display:flex;align-items:center;justify-content:center;color:#38bdf8}.ovn-card-hotline .ovn-card-icon{background:rgba(37,99,235,.15);color:#60a5fa}.ovn-badge{font-size:9.5px;font-weight:700;letter-spacing:.8px;padding:2px 9px;border-radius:20px;text-transform:uppercase}.ovn-badge-blue{color:#38bdf8;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.18)}.ovn-badge-indigo{color:#818cf8;background:rgba(99,102,241,.1);border:1px solid rgba(99,102,241,.2)}.ovn-card-title{color:#e2e8f0;font-size:13px;font-weight:700;margin:0 0 5px 0;line-height:1.3}.ovn-card-addr{color:#475569;font-size:12px;line-height:1.55;margin:0 0 14px 0}.ovn-card-phone{display:flex;align-items:center;gap:7px;color:#38bdf8;font-size:13px;font-weight:700;text-decoration:none;padding-top:12px;border-top:1px solid rgba(255,255,255,.05);margin-top:auto}.ovn-hotline-btn{display:flex;align-items:center;justify-content:center;gap:8px;background:#1d4ed8;color:#fff;padding:11px 14px;border-radius:7px;font-size:18px;font-weight:800;text-decoration:none;letter-spacing:.5px;margin:4px 0 10px}.ovn-hotline-note{color:#64748b;font-size:11.5px;text-align:center;margin:0;line-height:1.4}@media(max-width:600px){.ovn-desc{text-align:left}.ovn-cards{grid-template-columns:1fr}}</style>';
-        $block = $css
-            . '<div id="orcam-vn-support-block">'
-            . '<div class="ovn-top-row"><div class="ovn-brand"><svg class="ovn-logo-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 15" style="height:20px;width:auto;fill:#ffffff;display:inline-block;vertical-align:middle;" aria-label="OrCam"><g fill="#ffffff"><path d="M25.4,2.8c-2.1,0-3.9,1.7-3.9,3.8v1.9c0,2.1,1.7,3.8,3.9,3.8h4.4c2.1,0,3.9-1.7,3.9-3.8V6.5c0-2.1-1.7-3.8-3.9-3.8C29.8,2.8,25.4,2.8,25.4,2.8z M25.3,5.2H30c0.7,0,1.3,0.4,1.3,1.2v2.3c0,0.7-0.5,1.3-1.3,1.3h-4.8c-0.7,0-1.4-0.5-1.4-1.3V6.4C23.9,5.6,24.5,5.2,25.3,5.2z"/><path d="M53.3,2.8h8.1v2.4h-8.2c-0.7,0-1.3,0.6-1.3,1.3v0.1v1.9v0.1c0,0.7,0.6,1.3,1.3,1.3h8.2v2.4h-8.1c-2.1,0-3.9-1.7-3.9-3.8V8.3l0,0V6.8V6.7C49.4,4.5,51.2,2.8,53.3,2.8"/><path d="M38.4,5.2v2.2h4.6c1.4,0,1.4-2.2,0-2.2H38.4z M43.9,2.8c1.7,0,3.1,1.7,3.1,3.4c0,0.9-0.4,2-1.1,2.5l2.1,3.5h-2.7l-1.5-2.3h-5.5v2.3h-2.4V4.4c0-1,0.6-1.6,1.3-1.6L43.9,2.8L43.9,2.8z"/><g><path d="M12.3,2.7C11,1.3,9.1,0.5,7.1,0.5C3.2,0.5,0,3.6,0,7.5c0,3.9,3.2,7,7.1,7c2.1,0,3.9-0.9,5.2-2.2l4.5-4.8L12.3,2.7z M7.1,12.1c-2.6,0-4.6-2.1-4.6-4.6s2.1-4.6,4.6-4.6s4.6,2.1,4.6,4.6S9.7,12.1,7.1,12.1z"/><path d="M7.2,9.9c1.3,0,2.4-1.1,2.4-2.4S8.5,5.1,7.2,5.1S4.8,6.2,4.8,7.5S5.9,9.9,7.2,9.9"/></g><path d="M68.7,5.2h-1.3c-0.7,0-1.3,0.6-1.3,1.3v1h7.2v-1c0-0.7-0.6-1.3-1.3-1.3H68.7z M67.6,2.8h1.1h3.1c2.1,0,3.9,1.7,3.9,3.8v0.9v2.2v2.6h-2.4V9.8h-7.2v2.4h-2.4V9.6V7.5V6.6C63.8,4.5,65.5,2.8,67.6,2.8"/><path d="M86.1,2.8H83h-1.1c-2.1,0-3.9,1.7-3.9,3.8v0.9v2.2v2.6h2.4V9.8h0V7.3l0,0V6.5c0-0.7,0.6-1.3,1.3-1.3h1v7.1h2.4V5.1h1c0.7,0,1.3,0.6,1.3,1.3v0.8v0.2v4.8H90V9.6V7.5V6.6C90,4.5,88.3,2.8,86.1,2.8z"/></g></svg><span class="ovn-brand-name" style="color:#38bdf8;font-size:14px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;">VIỆT NAM</span></div>'
-            . '<p class="ovn-desc">C&ocirc;ng ngh&#7879; tr&#7907; n&#259;ng &#273;&#7897;t ph&aacute;, n&acirc;ng cao t&iacute;nh &#273;&#7897;c l&#7853;p<br>cho ng&#432;&#7901;i khi&#7871;m th&#7883; v&agrave; ng&#432;&#7901;i g&#7863;p kh&oacute; kh&#259;n khi &#273;&#7885;c.</p></div>'
-            . '<div class="ovn-cards-wrap"><p class="ovn-section-label">H&#7895; tr&#7907; kh&aacute;ch h&agrave;ng</p><div class="ovn-cards">'
-            . '<div class="ovn-card ovn-card-regular"><div class="ovn-card-header"><div class="ovn-card-icon">' . $hs . '</div><span class="ovn-badge ovn-badge-blue">Mi&#7873;n B&#7855;c</span></div><p class="ovn-card-title">V&#259;n ph&ograve;ng H&agrave; N&#7897;i</p><p class="ovn-card-addr">226 &#272;&#432;&#7901;ng L&aacute;ng, Ph&#432;&#7901;ng Th&#7883;nh Quang,<br>Qu&#7853;n &#272;&#7889;ng &#272;a, H&agrave; N&#7897;i</p><a href="tel:02473048700" class="ovn-card-phone">' . $ph . '024.7304.8700</a></div>'
-            . '<div class="ovn-card ovn-card-regular"><div class="ovn-card-header"><div class="ovn-card-icon">' . $hs . '</div><span class="ovn-badge ovn-badge-blue">Mi&#7873;n Nam</span></div><p class="ovn-card-title">V&#259;n ph&ograve;ng H&#7891; Ch&iacute; Minh</p><p class="ovn-card-addr">137 H&ograve;a H&#432;ng, Ph&#432;&#7901;ng H&ograve;a H&#432;ng,<br>TP. H&#7891; Ch&iacute; Minh</p><a href="tel:02873048700" class="ovn-card-phone">' . $ph . '028.7304.8700</a></div>'
-            . '<div class="ovn-card ovn-card-hotline"><div class="ovn-card-header"><div class="ovn-card-icon">' . $hd . '</div><span class="ovn-badge ovn-badge-indigo">T&#432; v&#7845;n 24/7</span></div><p class="ovn-card-title">Hotline T&#7893;ng &#272;&agrave;i</p><a href="tel:1900638400" class="ovn-hotline-btn">' . $ph . '1900.63.8400</a><p class="ovn-hotline-note">H&#7895; tr&#7907; v&agrave; t&#432; v&#7845;n m&#7885;i l&uacute;c, m&#7885;i n&#417;i</p></div>'
-            . '</div></div></div>';
-        // Strip any old injected block first, then inject fresh
-        $html = preg_replace('#<style\s+id="orcam-vn-footer-css">[\s\S]*?</style>\s*#i', '', $html, 1);
-        $html = preg_replace('#<div\s+id="orcam-vn-support-block">[\s\S]*?(?:</div>\s*){3}#i', '', $html, 1);
-        $html = preg_replace('#(<nav\b[^>]*class="[^"]*orcam-footer)#', $block . '', $html, 1);
-    }
+    // Clean up any legacy injected styles, scripts, or old support section fragments
+    $html = preg_replace('#<style\b[^>]*\bid=["\']orcam-vn-footer-css["\'][^>]*>[\s\S]*?</style>\s*#i', '', $html);
+    $html = preg_replace('#<script\b[^>]*\bid=["\']orcam-vn-footer-injector["\'][^>]*>[\s\S]*?</script>\s*#i', '', $html);
+    $html = preg_replace('#<div\b[^>]*\bid=["\']orcam-vn-support-block["\'][^>]*>[\s\S]*?</div>\s*(?=<nav\b[^>]*\bclass=["\'][^"\']*orcam-footer)#i', '', $html);
+    $html = preg_replace('#<div\s+class=["\']orcam-vn-support-section["\'][\s\S]*?</div>\s*(?=<div\s+class=["\']desktop-footer)#i', '', $html);
+    $html = preg_replace('#<div\s+class=["\']orcam-vn-brand-col["\'][\s\S]*?</div>\s*</div>#is', '', $html);
+
     $theme_uri = untrailingslashit(get_template_directory_uri());
     $request_host = strtolower((string) ($_SERVER['HTTP_HOST'] ?? ''));
     $request_host = preg_replace('/:\d+$/', '', $request_host);
@@ -2071,17 +2057,6 @@ function orcam_theme_render_shared_static_shell(string $content, string $title, 
     );
     if (!$replacement_count) {
         return false;
-    }
-
-    // Dynamic WooCommerce product views intentionally end after their main content.
-    // Templates opt in by content type, so future products inherit this layout.
-    if ($hide_footer) {
-        $html = preg_replace(
-            '#<nav\b[^>]*\bclass=["\'][^"\']*orcam-footer[^"\']*["\'][^>]*>[\s\S]*?</nav>#i',
-            '',
-            $html,
-            1
-        );
     }
 
     // The shell page marks active items; clean submenu active states

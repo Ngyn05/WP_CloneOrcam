@@ -954,6 +954,78 @@
             + '<button type="submit">Gửi yêu cầu hỗ trợ</button></form></div></section>';
     }
 
+    function ensureCanonicalFooter() {
+        var footerNav = document.querySelector('.orcam-footer');
+        if (!footerNav) return;
+
+        var existingSupportBlock = document.getElementById('orcam-vn-support-block');
+        if (!existingSupportBlock) {
+            var supportBlock = document.createElement('div');
+            supportBlock.id = 'orcam-vn-support-block';
+            supportBlock.innerHTML =
+                '<div class="ovn-top-row">' +
+                    '<div class="ovn-brand">' +
+                        '<svg class="ovn-logo-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 90 15" style="height:20px;width:auto;fill:#ffffff;display:inline-block;vertical-align:middle;" aria-label="OrCam">' +
+                            '<g fill="#ffffff">' +
+                                '<path d="M25.4,2.8c-2.1,0-3.9,1.7-3.9,3.8v1.9c0,2.1,1.7,3.8,3.9,3.8h4.4c2.1,0,3.9-1.7,3.9-3.8V6.5c0-2.1-1.7-3.8-3.9-3.8C29.8,2.8,25.4,2.8,25.4,2.8z M25.3,5.2H30c0.7,0,1.3,0.4,1.3,1.2v2.3c0,0.7-0.5,1.3-1.3,1.3h-4.8c-0.7,0-1.4-0.5-1.4-1.3V6.4C23.9,5.6,24.5,5.2,25.3,5.2z"/>' +
+                                '<path d="M53.3,2.8h8.1v2.4h-8.2c-0.7,0-1.3,0.6-1.3,1.3v0.1v1.9v0.1c0,0.7,0.6,1.3,1.3,1.3h8.2v2.4h-8.1c-2.1,0-3.9-1.7-3.9-3.8V8.3l0,0V6.8V6.7C49.4,4.5,51.2,2.8,53.3,2.8"/>' +
+                                '<path d="M38.4,5.2v2.2h4.6c1.4,0,1.4-2.2,0-2.2H38.4z M43.9,2.8c1.7,0,3.1,1.7,3.1,3.4c0,0.9-0.4,2-1.1,2.5l2.1,3.5h-2.7l-1.5-2.3h-5.5v2.3h-2.4V4.4c0-1,0.6-1.6,1.3-1.6L43.9,2.8L43.9,2.8z"/>' +
+                                '<g><path d="M12.3,2.7C11,1.3,9.1,0.5,7.1,0.5C3.2,0.5,0,3.6,0,7.5c0,3.9,3.2,7,7.1,7c2.1,0,3.9-0.9,5.2-2.2l4.5-4.8L12.3,2.7z M7.1,12.1c-2.6,0-4.6-2.1-4.6-4.6s2.1-4.6,4.6-4.6s4.6,2.1,4.6,4.6S9.7,12.1,7.1,12.1z"/><path d="M7.2,9.9c1.3,0,2.4-1.1,2.4-2.4S8.5,5.1,7.2,5.1S4.8,6.2,4.8,7.5S5.9,9.9,7.2,9.9"/></g>' +
+                                '<path d="M68.7,5.2h-1.3c-0.7,0-1.3,0.6-1.3,1.3v1h7.2v-1c0-0.7-0.6-1.3-1.3-1.3H68.7z M67.6,2.8h1.1h3.1c2.1,0,3.9,1.7,3.9,3.8v0.9v2.2v2.6h-2.4V9.8h-7.2v2.4h-2.4V9.6V7.5V6.6C63.8,4.5,65.5,2.8,67.6,2.8"/>' +
+                                '<path d="M86.1,2.8H83h-1.1c-2.1,0-3.9,1.7-3.9,3.8v0.9v2.2v2.6h2.4V9.8h0V7.3l0,0V6.5c0-0.7,0.6-1.3,1.3-1.3h1v7.1h2.4V5.1h1c0.7,0,1.3,0.6,1.3,1.3v0.8v0.2v4.8H90V9.6V7.5V6.6C90,4.5,88.3,2.8,86.1,2.8z"/>' +
+                            '</g>' +
+                        '</svg>' +
+                        '<span class="ovn-brand-name">VIỆT NAM</span>' +
+                    '</div>' +
+                    '<p class="ovn-desc">Công nghệ trợ năng đột phá, nâng cao tính độc lập<br>cho người khiếm thị và người gặp khó khăn khi đọc.</p>' +
+                '</div>' +
+                '<div class="ovn-cards-wrap">' +
+                    '<p class="ovn-section-label">Hỗ trợ khách hàng</p>' +
+                    '<div class="ovn-cards">' +
+                        '<div class="ovn-card ovn-card-regular">' +
+                            '<div class="ovn-card-header">' +
+                                '<div class="ovn-card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>' +
+                                '<span class="ovn-badge ovn-badge-blue">Miền Bắc</span>' +
+                            '</div>' +
+                            '<p class="ovn-card-title">Văn phòng Hà Nội</p>' +
+                            '<p class="ovn-card-addr">226 Đường Láng, Phường Thịnh Quang,<br>Quận Đống Đa, Hà Nội</p>' +
+                            '<a href="tel:02473048700" class="ovn-card-phone"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.47 2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.09 6.09l1.81-1.81a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>024.7304.8700</a>' +
+                        '</div>' +
+                        '<div class="ovn-card ovn-card-regular">' +
+                            '<div class="ovn-card-header">' +
+                                '<div class="ovn-card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>' +
+                                '<span class="ovn-badge ovn-badge-blue">Miền Nam</span>' +
+                            '</div>' +
+                            '<p class="ovn-card-title">Văn phòng Hồ Chí Minh</p>' +
+                            '<p class="ovn-card-addr">137 Hòa Hưng, Phường Hòa Hưng,<br>TP. Hồ Chí Minh</p>' +
+                            '<a href="tel:02873048700" class="ovn-card-phone"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.47 2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.09 6.09l1.81-1.81a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>028.7304.8700</a>' +
+                        '</div>' +
+                        '<div class="ovn-card ovn-card-hotline">' +
+                            '<div class="ovn-card-header">' +
+                                '<div class="ovn-card-icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg></div>' +
+                                '<span class="ovn-badge ovn-badge-indigo">Tư vấn 24/7</span>' +
+                            '</div>' +
+                            '<p class="ovn-card-title">Hotline Tổng Đài</p>' +
+                            '<a href="tel:1900638400" class="ovn-hotline-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.47 2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.09 6.09l1.81-1.81a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>1900.63.8400</a>' +
+                            '<p class="ovn-hotline-note">Hỗ trợ và tư vấn mọi lúc, mọi nơi</p>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+            footerNav.insertBefore(supportBlock, footerNav.firstChild);
+        } else if (existingSupportBlock.parentElement !== footerNav) {
+            footerNav.insertBefore(existingSupportBlock, footerNav.firstChild);
+        }
+
+        var brandCol = footerNav.querySelector('.orcam-vn-brand-col');
+        if (brandCol) {
+            brandCol.remove();
+        }
+        var oldSupportSec = footerNav.querySelector('.orcam-vn-support-section');
+        if (oldSupportSec) {
+            oldSupportSec.remove();
+        }
+    }
+
     repairAssetUrl(document.documentElement);
     replaceGoogleContactForm(document);
     renderSupportCaseForm();
@@ -961,6 +1033,7 @@
     syncDynamicProductSubmenu();
     syncDynamicProductPricesAndImages();
     ensureHeaderDropdowns();
+    ensureCanonicalFooter();
     preserveNativeWooBody();
 
     var mutationScheduled = false;
@@ -973,6 +1046,7 @@
             syncDynamicProductSubmenu();
             syncDynamicProductPricesAndImages();
             ensureHeaderDropdowns();
+            ensureCanonicalFooter();
             repairBlogImages(document);
             replaceGoogleContactForm(document);
             placeBlogIndex();

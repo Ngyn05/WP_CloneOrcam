@@ -478,4 +478,5 @@ while (have_posts()) :
 endwhile;
 
 $product_content = (string) ob_get_clean();
-orcam_theme_render_shared_static_shell($product_content, get_the_title(), false, '', '', false, true);
+orcam_theme_render_shared_static_shell($product_content, get_the_title(), false, '', '', false, false);
+
