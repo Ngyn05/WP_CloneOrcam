@@ -426,18 +426,28 @@ add_action('init', 'orcam_theme_handle_sitemaps', 2);
  * rich, professional Vietnamese SEO titles & meta descriptions for Products, Pages, and Blog Posts.
  */
 function orcam_theme_seed_seo_metadata(): void {
-    if (get_option('orcam_seo_seeded_v3') === 'yes') {
+    $force_sync = (isset($_GET['orcam_sync']) && current_user_can('manage_options'));
+    if (get_option('orcam_seo_seeded_v5') === 'yes' && !$force_sync) {
         return;
     }
 
     global $wpdb;
 
-    // Delete any old/duplicate page entries to maintain a clean database
-    $existing_page_ids = $wpdb->get_col("SELECT ID FROM {$wpdb->posts} WHERE post_type = 'page'");
-    if (!empty($existing_page_ids)) {
-        foreach ($existing_page_ids as $pid) {
-            wp_delete_post((int) $pid, true);
+    // Atomic deduplication: find duplicate pages by post_name and hard-delete extra copies
+    $all_pages = $wpdb->get_results("SELECT ID, post_name FROM {$wpdb->posts} WHERE post_type = 'page' ORDER BY ID ASC");
+    $seen_slugs = array();
+    $dups_to_delete = array();
+    foreach ($all_pages as $p_row) {
+        if (isset($seen_slugs[$p_row->post_name])) {
+            $dups_to_delete[] = (int) $p_row->ID;
+        } else {
+            $seen_slugs[$p_row->post_name] = (int) $p_row->ID;
         }
+    }
+    if (!empty($dups_to_delete)) {
+        $del_sql = implode(',', $dups_to_delete);
+        $wpdb->query("DELETE FROM {$wpdb->posts} WHERE ID IN ($del_sql)");
+        $wpdb->query("DELETE FROM {$wpdb->postmeta} WHERE post_id IN ($del_sql)");
     }
 
     $seo_data = array(
@@ -656,13 +666,23 @@ function orcam_theme_seed_seo_metadata(): void {
         $post_type = $is_product ? 'product' : 'page';
 
         $post_id = (int) $wpdb->get_var($wpdb->prepare(
-            "SELECT ID FROM {$wpdb->posts} WHERE post_name = %s AND post_type = %s AND post_status = 'publish' LIMIT 1",
+            "SELECT ID FROM {$wpdb->posts} WHERE post_name = %s AND post_type = %s LIMIT 1",
             $slug,
             $post_type
         ));
 
-        // Create page in WordPress database if not exists
-        if (!$post_id) {
+        // Create page in WordPress database if not exists, or update existing
+        if ($post_id > 0) {
+            $wpdb->update(
+                $wpdb->posts,
+                array(
+                    'post_title'   => $data['page_title'],
+                    'post_excerpt' => $data['desc'],
+                    'post_status'  => 'publish'
+                ),
+                array('ID' => $post_id)
+            );
+        } else {
             $post_id = wp_insert_post(array(
                 'post_title'     => $data['page_title'],
                 'post_name'      => $slug,
@@ -702,7 +722,7 @@ function orcam_theme_seed_seo_metadata(): void {
         }
     }
 
-    update_option('orcam_seo_seeded_v4', 'yes');
+    update_option('orcam_seo_seeded_v5', 'yes');
 }
 add_action('init', 'orcam_theme_seed_seo_metadata', 25);
 
