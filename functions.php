@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('ORCAM_THEME_VERSION', '2.4.8');
+define('ORCAM_THEME_VERSION', '2.4.9');
 
 add_action('after_setup_theme', static function () {
     add_theme_support('title-tag');
@@ -343,11 +343,162 @@ function orcam_theme_handle_sitemaps(): void {
         exit;
     }
 
+    if ($route === 'sitemap.xsl') {
+        header('Content-Type: text/xsl; charset=UTF-8');
+        header('X-Robots-Tag: noindex, follow');
+        ?>
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet version="2.0" 
+    xmlns:html="http://www.w3.org/TR/REC-html40"
+    xmlns:sitemap="http://www.sitemaps.org/schemas/sitemap/0.9"
+    xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    <xsl:output method="html" version="1.0" encoding="UTF-8" indent="yes"/>
+    <xsl:template match="/">
+        <html xmlns="http://www.w3.org/1999/xhtml" lang="vi">
+            <head>
+                <title>XML Sitemap | OrCam Việt Nam</title>
+                <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+                <style type="text/css">
+                    body {
+                        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+                        color: #1e293b;
+                        background: #f8fafc;
+                        margin: 0;
+                        padding: 40px 20px;
+                    }
+                    .container {
+                        max-width: 1100px;
+                        margin: 0 auto;
+                        background: #ffffff;
+                        padding: 36px;
+                        border-radius: 16px;
+                        box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.06);
+                        border: 1px solid #e2e8f0;
+                    }
+                    h1 {
+                        font-size: 26px;
+                        font-weight: 800;
+                        color: #0f172a;
+                        margin: 0 0 10px;
+                    }
+                    p.desc {
+                        font-size: 14px;
+                        color: #64748b;
+                        margin: 0 0 24px;
+                        line-height: 1.6;
+                    }
+                    p.desc a {
+                        color: #0284c7;
+                        text-decoration: none;
+                        font-weight: 600;
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        font-size: 14px;
+                        margin-top: 20px;
+                    }
+                    th {
+                        background: #f1f5f9;
+                        color: #334155;
+                        text-align: left;
+                        padding: 12px 16px;
+                        font-weight: 700;
+                        border-top: 1px solid #e2e8f0;
+                        border-bottom: 1px solid #cbd5e1;
+                    }
+                    td {
+                        padding: 12px 16px;
+                        border-bottom: 1px solid #f1f5f9;
+                        word-break: break-all;
+                    }
+                    tr:hover td {
+                        background: #f8fafc;
+                    }
+                    a {
+                        color: #0284c7;
+                        text-decoration: none;
+                    }
+                    a:hover {
+                        text-decoration: underline;
+                    }
+                    .badge {
+                        display: inline-block;
+                        padding: 3px 10px;
+                        font-size: 12px;
+                        font-weight: 600;
+                        border-radius: 9999px;
+                        background: #e0f2fe;
+                        color: #0369a1;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h1>XML Sitemap - OrCam Việt Nam</h1>
+                    <p class="desc">
+                        Sơ đồ trang web XML giúp các công cụ tìm kiếm (Google, Bing) thu thập dữ liệu hiệu quả hơn. 
+                        Bạn có thể tìm hiểu thêm về cấu trúc này tại <a href="https://www.sitemaps.org" target="_blank" rel="noopener">sitemaps.org</a>.
+                    </p>
+                    <xsl:if test="sitemap:sitemapindex">
+                        <p class="desc">Chỉ mục sitemap này chứa <span class="badge"><xsl:value-of select="count(sitemap:sitemapindex/sitemap:sitemap)"/> sitemaps con</span>.</p>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="70%">Đường dẫn Sitemap con</th>
+                                    <th width="30%">Thời gian cập nhật (Lastmod)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <xsl:for-each select="sitemap:sitemapindex/sitemap:sitemap">
+                                    <tr>
+                                        <td>
+                                            <a href="{sitemap:loc}"><xsl:value-of select="sitemap:loc"/></a>
+                                        </td>
+                                        <td><xsl:value-of select="sitemap:lastmod"/></td>
+                                    </tr>
+                                </xsl:for-each>
+                            </tbody>
+                        </table>
+                    </xsl:if>
+                    <xsl:if test="sitemap:urlset">
+                        <p class="desc">Sitemap này chứa <span class="badge"><xsl:value-of select="count(sitemap:urlset/sitemap:url)"/> liên kết (URLs)</span>.</p>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="65%">Địa chỉ URL</th>
+                                    <th width="15%">Độ ưu tiên</th>
+                                    <th width="20%">Thời gian cập nhật</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <xsl:for-each select="sitemap:urlset/sitemap:url">
+                                    <tr>
+                                        <td>
+                                            <a href="{sitemap:loc}"><xsl:value-of select="sitemap:loc"/></a>
+                                        </td>
+                                        <td><xsl:value-of select="sitemap:priority"/></td>
+                                        <td><xsl:value-of select="sitemap:lastmod"/></td>
+                                    </tr>
+                                </xsl:for-each>
+                            </tbody>
+                        </table>
+                    </xsl:if>
+                </div>
+            </body>
+        </html>
+    </xsl:template>
+</xsl:stylesheet>
+        <?php
+        exit;
+    }
+
     if ($route === 'sitemap_index.xml' || $route === 'sitemap.xml') {
         header('Content-Type: application/xml; charset=UTF-8');
         header('X-Robots-Tag: noindex, follow');
         $now = gmdate('Y-m-d\TH:i:s+00:00');
         echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        echo '<?xml-stylesheet type="text/xsl" href="' . esc_url(home_url('/sitemap.xsl')) . '"?>' . "\n";
         echo '<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
         echo '  <sitemap><loc>' . esc_url(home_url('/page-sitemap.xml')) . '</loc><lastmod>' . $now . '</lastmod></sitemap>' . "\n";
         echo '  <sitemap><loc>' . esc_url(home_url('/product-sitemap.xml')) . '</loc><lastmod>' . $now . '</lastmod></sitemap>' . "\n";
@@ -360,6 +511,7 @@ function orcam_theme_handle_sitemaps(): void {
         header('Content-Type: application/xml; charset=UTF-8');
         header('X-Robots-Tag: noindex, follow');
         echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        echo '<?xml-stylesheet type="text/xsl" href="' . esc_url(home_url('/sitemap.xsl')) . '"?>' . "\n";
         echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
         
         $static_pages = array(
@@ -405,6 +557,7 @@ function orcam_theme_handle_sitemaps(): void {
         header('Content-Type: application/xml; charset=UTF-8');
         header('X-Robots-Tag: noindex, follow');
         echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        echo '<?xml-stylesheet type="text/xsl" href="' . esc_url(home_url('/sitemap.xsl')) . '"?>' . "\n";
         echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
         
         $products = get_posts(array(
@@ -440,6 +593,7 @@ function orcam_theme_handle_sitemaps(): void {
         header('Content-Type: application/xml; charset=UTF-8');
         header('X-Robots-Tag: noindex, follow');
         echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n";
+        echo '<?xml-stylesheet type="text/xsl" href="' . esc_url(home_url('/sitemap.xsl')) . '"?>' . "\n";
         echo '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">' . "\n";
         
         $posts = get_posts(array(
