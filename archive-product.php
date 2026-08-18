@@ -20,9 +20,7 @@ ob_start();
                 if (!$product) {
                     continue;
                 }
-                $image = $product->get_image_id()
-                    ? wp_get_attachment_image_url($product->get_image_id(), 'medium_large')
-                    : wc_placeholder_img_src('medium_large');
+                $image = orcam_theme_get_product_image_url($product);
                 $summary = trim($product->get_short_description());
                 if ($summary === '') {
                     $summary = sprintf(__('Khám phá %s với công nghệ hỗ trợ tiên tiến từ OrCam.', 'orcam-theme'), get_the_title($post));

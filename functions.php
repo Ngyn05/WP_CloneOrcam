@@ -11,7 +11,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('ORCAM_THEME_VERSION', '2.4.6');
+define('ORCAM_THEME_VERSION', '2.4.8');
 
 add_action('after_setup_theme', static function () {
     add_theme_support('title-tag');
@@ -117,6 +117,53 @@ function orcam_theme_seed_product_specifications(): void {
                     'ID' => $pid,
                     'post_excerpt' => $excerpt_text
                 ));
+            }
+
+            // Ensure featured product image thumbnail is seeded into WordPress Database
+            if (!has_post_thumbnail($pid)) {
+                $img_map = array(
+                    'orcam-myeye-3-pro' => 'media/MYEYE_on floor Flip 1-1.png',
+                    'orcam-myeye-2-pro' => 'media/MYEYE_2_Pro.png',
+                    'orcam-read-5'      => 'media/Read5.webp',
+                    'orcam-read-3'      => 'media/read-device2.png',
+                    'orcam-read'        => 'media/horizontal read yb.webp',
+                );
+                if (isset($img_map[$slug])) {
+                    $rel = $img_map[$slug];
+                    $existing_att = get_posts(array(
+                        'post_type'      => 'attachment',
+                        'post_status'    => 'inherit',
+                        'posts_per_page' => 1,
+                        'meta_key'       => '_orcam_source_asset',
+                        'meta_value'     => $rel,
+                        'fields'         => 'ids',
+                    ));
+                    if (!empty($existing_att)) {
+                        set_post_thumbnail($pid, (int) $existing_att[0]);
+                    } else {
+                        $source = get_template_directory() . '/' . $rel;
+                        if (is_readable($source)) {
+                            require_once ABSPATH . 'wp-admin/includes/image.php';
+                            require_once ABSPATH . 'wp-admin/includes/file.php';
+                            require_once ABSPATH . 'wp-admin/includes/media.php';
+                            $upload = wp_upload_bits(basename($source), null, (string) file_get_contents($source));
+                            if (empty($upload['error'])) {
+                                $mime = wp_check_filetype($upload['file']);
+                                $attachment_id = wp_insert_attachment(array(
+                                    'post_mime_type' => $mime['type'] ?: 'image/png',
+                                    'post_title'     => $posts[0]->post_title,
+                                    'post_status'    => 'inherit',
+                                ), $upload['file'], $pid);
+                                if (!is_wp_error($attachment_id) && $attachment_id > 0) {
+                                    $meta = wp_generate_attachment_metadata((int) $attachment_id, $upload['file']);
+                                    wp_update_attachment_metadata((int) $attachment_id, $meta);
+                                    update_post_meta((int) $attachment_id, '_orcam_source_asset', $rel);
+                                    set_post_thumbnail($pid, (int) $attachment_id);
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             update_post_meta($pid, '_orcam_specs', $data['specs']);
@@ -1965,6 +2012,41 @@ function orcam_theme_product_navigation_products(bool $force_refresh = false): a
     return $cached_products;
 }
 
+/**
+ * Return the primary image URL for a WooCommerce product, checking database attachment first,
+ * with high-quality themed fallback if no database attachment is linked.
+ */
+function orcam_theme_get_product_image_url($product): string
+{
+    if (is_numeric($product)) {
+        $product = function_exists('wc_get_product') ? wc_get_product($product) : null;
+    } elseif ($product instanceof WP_Post) {
+        $product = function_exists('wc_get_product') ? wc_get_product($product->ID) : null;
+    }
+
+    if ($product && function_exists('wp_get_attachment_image_url')) {
+        $img_id = $product->get_image_id();
+        if ($img_id) {
+            $url = wp_get_attachment_image_url($img_id, 'medium_large') ?: wp_get_attachment_image_url($img_id, 'full');
+            if ($url) {
+                return $url;
+            }
+        }
+    }
+
+    $slug = ($product && method_exists($product, 'get_slug')) ? $product->get_slug() : (($product instanceof WP_Post) ? $product->post_name : '');
+    $theme_uri = untrailingslashit(get_template_directory_uri());
+    $fallbacks = array(
+        'orcam-myeye-3-pro' => $theme_uri . '/media/MYEYE_on%20floor%20Flip%201-1.png',
+        'orcam-myeye-2-pro' => $theme_uri . '/media/MYEYE_2_Pro.png',
+        'orcam-read-5'      => $theme_uri . '/media/Read5.webp',
+        'orcam-read-3'      => $theme_uri . '/media/read-device2.png',
+        'orcam-read'        => $theme_uri . '/media/horizontal%20read%20yb.webp',
+    );
+
+    return $fallbacks[$slug] ?? ($theme_uri . '/media/MYEYE%20Angle%20Flip.png');
+}
+
 /** Render the full shared product bar for normal WooCommerce product pages. */
 function orcam_theme_product_navigation_bar(int $current_product_id = 0): string
 {
@@ -3440,7 +3522,7 @@ function orcam_theme_warmup_shop_catalog(): void
                 <?php foreach (orcam_theme_product_navigation_products(true) as $p_post) :
                     $p_obj = wc_get_product($p_post->ID);
                     if (!$p_obj) continue;
-                    $p_img = $p_obj->get_image_id() ? wp_get_attachment_image_url($p_obj->get_image_id(), 'medium_large') : wc_placeholder_img_src('medium_large');
+                    $p_img = orcam_theme_get_product_image_url($p_obj);
                     $p_sum = trim($p_obj->get_short_description()) ?: sprintf(__('Khám phá %s với công nghệ hỗ trợ tiên tiến từ OrCam.', 'orcam-theme'), get_the_title($p_post));
                     ?>
                     <article class="orcam-shop-card">
@@ -3458,7 +3540,7 @@ function orcam_theme_warmup_shop_catalog(): void
                                 <?php if ($p_obj->get_price() !== '') : ?>
                                     <div class="orcam-shop-card__price"><?php echo wp_kses_post($p_obj->get_price_html()); ?></div>
                                 <?php endif; ?>
-                                <p class="orcam-shop-card__description"><?php echo esc_html(wp_trim_words(wp_strip_all_tags($p_sum), 22, 'â€¦')); ?></p>
+                                <p class="orcam-shop-card__description"><?php echo esc_html(wp_trim_words(wp_strip_all_tags($p_sum), 22, '…')); ?></p>
                                 <div class="orcam-shop-card__actions">
                                     <a class="orcam-shop-card__btn orcam-shop-card__btn--detail" href="<?php echo esc_url(get_permalink($p_post)); ?>">
                                         <?php esc_html_e('Xem chi tiết', 'orcam-theme'); ?>

@@ -63,7 +63,7 @@ if (function_exists('orcam_theme_render_shared_static_shell')) {
                 <?php foreach (orcam_theme_product_navigation_products() as $p_post) :
                     $p_obj = wc_get_product($p_post->ID);
                     if (!$p_obj) continue;
-                    $p_img = $p_obj->get_image_id() ? wp_get_attachment_image_url($p_obj->get_image_id(), 'medium_large') : wc_placeholder_img_src('medium_large');
+                    $p_img = orcam_theme_get_product_image_url($p_obj);
                     $p_sum = trim($p_obj->get_short_description()) ?: sprintf(__('Khám phá %s với công nghệ hỗ trợ tiên tiến từ OrCam.', 'orcam-theme'), get_the_title($p_post));
                     ?>
                     <article class="orcam-shop-card">
