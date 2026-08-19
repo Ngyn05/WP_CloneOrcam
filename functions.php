@@ -3232,6 +3232,12 @@ function orcam_theme_render_shared_static_shell(string $content, string $title, 
     // The shell page marks active items; clean submenu active states
     $html = str_replace(' orcam-submenu__active', '', $html);
 
+    // Header replacement in shared static shell
+    if (function_exists('orcam_theme_render_master_header')) {
+        $master_header = orcam_theme_render_master_header();
+        $html = preg_replace('#<section\b[^>]*\bid=[\x27\x22]header[\x27\x22][^>]*>.*?</section>#is', $master_header, $html, 1);
+    }
+
     $full_title = esc_html($title) . ' | OrCam Việt Nam';
     $html = preg_replace('#<title>.*?</title>#is', '<title>' . $full_title . '</title>', $html, 1);
     $html = preg_replace('#<meta\s+property=["\']og:title["\']\s+content=["\'][^"\']*["\']>#i', '<meta property="og:title" content="' . esc_attr($full_title) . '">', $html, 1);
@@ -3552,7 +3558,7 @@ function orcam_theme_render_database_blog(WP_Post $post, bool $return_only = fal
     // Master header for database blog
     if (function_exists('orcam_theme_render_master_header')) {
         $master_header = orcam_theme_render_master_header();
-        $html = preg_replace('#<section\s+id=[\x27\x22]header[\x27\x22][\s\S]*?</section>#is', $master_header, $html, 1);
+        $html = preg_replace('#<section\b[^>]*\bid=[\x27\x22]header[\x27\x22][^>]*>.*?</section>#is', $master_header, $html, 1);
     }
 
     // Database content is already static; never translate it again in-browser.

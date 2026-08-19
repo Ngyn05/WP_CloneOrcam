@@ -164,6 +164,23 @@ function orcam_theme_render_master_header() {
     padding-left: 24px !important;
 }
 
+/* Legacy Svelte Desktop Header Hide on Mobile */
+@media (max-width: 960px) {
+    .desktop-header,
+    .desktop-header__main-menu,
+    .desktop-header__menu-items,
+    .desktop-header__buttons,
+    nav.orcam-header > .desktop-header {
+        display: none !important;
+        visibility: hidden !important;
+        height: 0 !important;
+        max-height: 0 !important;
+        overflow: hidden !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+}
+
 /* Responsive Visibility */
 @media (min-width: 961px) {
     .orcam-desktop-header-wrap {
