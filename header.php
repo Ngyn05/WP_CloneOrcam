@@ -7,6 +7,11 @@
 </head>
 <body <?php body_class(); ?>>
 <?php wp_body_open(); ?>
+<?php
+if (function_exists('orcam_theme_render_master_header')) {
+    echo orcam_theme_render_master_header(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+} else {
+?>
 <header class="orcam-wp-header">
     <div class="orcam-wp-header__inner">
         <a class="orcam-wp-brand" href="<?php echo esc_url(home_url('/')); ?>">
@@ -27,3 +32,4 @@
         </nav>
     </div>
 </header>
+<?php } ?>

@@ -2438,3 +2438,497 @@ form.cart .quantity,
     .ovn-cards { grid-template-columns: 1fr !important; }
 }
 
+
+/* Dropdown Sub-menu */
+.orcam-dropdown-menu {
+    display: none !important;
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    min-width: 230px !important;
+    background: #1c1c1e !important;
+    border: 1px solid #2e2e32 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6) !important;
+    padding: 8px 0 !important;
+    list-style: none !important;
+    margin: 0 !important;
+    z-index: 99999 !important;
+    white-space: nowrap !important;
+}
+
+.orcam-nav-item:last-child .orcam-dropdown-menu,
+.orcam-nav-item:nth-last-child(2) .orcam-dropdown-menu {
+    left: auto !important;
+    right: 0 !important;
+}
+
+.orcam-has-dropdown:hover > .orcam-dropdown-menu {
+    display: block !important;
+}
+
+.orcam-dropdown-menu li {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.orcam-dropdown-menu a {
+    display: block !important;
+    padding: 10px 20px !important;
+    color: #cbd5e1 !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
+}
+
+.orcam-dropdown-menu a:hover {
+    background: #27272a !important;
+    color: #38bdf8 !important;
+    padding-left: 24px !important;
+}
+
+/* Responsive Display */
+@media (min-width: 961px) {
+    .orcam-desktop-header-wrap {
+        display: block !important;
+    }
+    .orcam-mobile-header-wrap {
+        display: none !important;
+    }
+}
+
+@media (max-width: 960px) {
+    .orcam-desktop-header-wrap,
+    #header .desktop-header {
+        display: none !important;
+    }
+    .orcam-mobile-header-wrap {
+        display: block !important;
+        background: #18181b !important;
+    }
+    .orcam-mobile-header-row {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        height: 60px !important;
+    }
+    .orcam-mobile-menu-trigger {
+        background: transparent !important;
+        border: none !important;
+        color: #ffffff !important;
+        cursor: pointer !important;
+        padding: 8px !important;
+        display: flex !important;
+        align-items: center !important;
+    }
+}
+
+/* Mobile Drawer Modal */
+.orcam-mobile-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 999999;
+}
+.orcam-mobile-drawer-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(2px);
+}
+.orcam-mobile-drawer-content {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 82%;
+    max-width: 320px;
+    height: 100%;
+    background: #18181b;
+    padding: 20px 24px;
+    box-sizing: border-box;
+    box-shadow: -4px 0 25px rgba(0,0,0,0.6);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+.orcam-drawer-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #27272a;
+    margin-bottom: 20px;
+}
+.orcam-drawer-close {
+    background: #27272a !important;
+    border: 1px solid #3f3f46 !important;
+    color: #f4f4f5 !important;
+    width: 34px !important;
+    height: 34px !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    padding: 0 !important;
+}
+.orcam-drawer-close:hover {
+    background: #3f3f46 !important;
+}
+.orcam-drawer-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.orcam-drawer-nav li a {
+    display: block;
+    padding: 9px 0;
+    color: #e4e4e7;
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+.orcam-drawer-nav li a:hover {
+    color: #38bdf8;
+}
+/* ==========================================================================
+   MASTER ORCAM RESPONSIVE HEADER (v2.0 - Pixel Perfect Matching Screenshot)
+   ========================================================================== */
+.orcam-master-header {
+    background-color: #1c1c1e !important;
+    width: 100% !important;
+    position: relative !important;
+    z-index: 99999 !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4) !important;
+    border-bottom: 1px solid #27272a !important;
+}
+
+.orcam-header-container {
+    width: 100% !important;
+    max-width: 1440px !important;
+    margin: 0 auto !important;
+    padding: 0 32px !important;
+    box-sizing: border-box !important;
+}
+
+.orcam-header-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    height: 70px !important;
+    width: 100% !important;
+}
+
+.orcam-header-brand {
+    display: flex !important;
+    align-items: center !important;
+    flex-shrink: 0 !important;
+}
+
+.orcam-logo-img {
+    height: 25px !important;
+    width: auto !important;
+    display: block !important;
+}
+
+.orcam-header-nav {
+    display: flex !important;
+    align-items: center !important;
+}
+
+.orcam-nav-list {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    gap: 28px !important;
+}
+
+.orcam-nav-item {
+    position: relative !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.orcam-nav-link {
+    color: #ffffff !important;
+    font-size: 0.93rem !important;
+    font-weight: 500 !important;
+    text-decoration: none !important;
+    padding: 10px 0 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    transition: color 0.2s ease !important;
+}
+
+.orcam-nav-link:hover {
+    color: #38bdf8 !important;
+}
+
+.orcam-nav-distributor {
+    background: rgba(56, 189, 248, 0.12) !important;
+    color: #38bdf8 !important;
+    padding: 6px 14px !important;
+    border-radius: 6px !important;
+    border: 1px solid rgba(56, 189, 248, 0.25) !important;
+}
+
+.orcam-nav-distributor:hover {
+    background: #0284c7 !important;
+    color: #ffffff !important;
+}
+
+.orcam-arrow-icon {
+    transition: transform 0.2s ease !important;
+    color: #94a3b8 !important;
+}
+
+.orcam-has-dropdown:hover .orcam-arrow-icon {
+    transform: rotate(180deg) !important;
+    color: #38bdf8 !important;
+}
+
+/* Dropdown Sub-menu */
+.orcam-dropdown-menu {
+    display: none !important;
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    min-width: 230px !important;
+    background: #1c1c1e !important;
+    border: 1px solid #2e2e32 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6) !important;
+    padding: 8px 0 !important;
+    list-style: none !important;
+    margin: 0 !important;
+    z-index: 99999 !important;
+    white-space: nowrap !important;
+}
+
+.orcam-nav-item:last-child .orcam-dropdown-menu,
+.orcam-nav-item:nth-last-child(2) .orcam-dropdown-menu {
+    left: auto !important;
+    right: 0 !important;
+}
+
+.orcam-has-dropdown:hover > .orcam-dropdown-menu {
+    display: block !important;
+}
+
+.orcam-dropdown-menu li {
+    display: block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.orcam-dropdown-menu a {
+    display: block !important;
+    padding: 10px 20px !important;
+    color: #cbd5e1 !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+    text-decoration: none !important;
+    transition: all 0.2s ease !important;
+}
+
+.orcam-dropdown-menu a:hover {
+    background: #27272a !important;
+    color: #38bdf8 !important;
+    padding-left: 24px !important;
+}
+
+/* ==========================================================================
+   MOBILE HEADER & DRAWER (EXACT SCREENSHOT MATCH)
+   ========================================================================== */
+@media (min-width: 961px) {
+    .orcam-desktop-header-wrap {
+        display: block !important;
+    }
+    .orcam-mobile-header-wrap {
+        display: none !important;
+    }
+}
+
+@media (max-width: 960px) {
+    .orcam-desktop-header-wrap,
+    #header .desktop-header {
+        display: none !important;
+    }
+    .orcam-mobile-header-wrap {
+        display: block !important;
+        background: #1c1c1e !important;
+        width: 100% !important;
+    }
+    .orcam-mobile-header-row {
+        display: flex !important;
+        justify-content: space-between !important;
+        align-items: center !important;
+        height: 56px !important;
+        padding: 0 16px !important;
+        box-sizing: border-box !important;
+    }
+    .orcam-mobile-menu-trigger {
+        background: transparent !important;
+        border: none !important;
+        color: #ffffff !important;
+        cursor: pointer !important;
+        padding: 6px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 36px !important;
+        height: 36px !important;
+    }
+    .orcam-mobile-header-center {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+    .orcam-mobile-header-placeholder {
+        width: 36px !important;
+    }
+}
+
+/* Fullscreen Mobile Drawer Modal */
+.orcam-mobile-drawer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 999999;
+    background: #1c1c1e;
+}
+.orcam-mobile-drawer-overlay {
+    display: none;
+}
+.orcam-mobile-drawer-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    background: #1c1c1e;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+/* Drawer Top Row */
+.orcam-drawer-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 56px;
+    padding: 0 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    flex-shrink: 0;
+}
+.orcam-drawer-close {
+    background: transparent !important;
+    border: none !important;
+    color: #ffffff !important;
+    width: 36px !important;
+    height: 36px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    padding: 6px !important;
+}
+.orcam-drawer-header-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.orcam-drawer-header-placeholder {
+    width: 36px;
+}
+
+/* Drawer Menu List */
+.orcam-drawer-nav {
+    padding: 8px 20px 40px;
+    flex: 1;
+}
+.orcam-drawer-list {
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+.orcam-drawer-item {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    position: relative;
+}
+.orcam-drawer-link,
+.orcam-drawer-link-text {
+    display: block;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 500;
+    padding: 16px 0;
+    text-decoration: none;
+    letter-spacing: 0.2px;
+}
+.orcam-drawer-link:hover {
+    color: #38bdf8;
+}
+
+/* Accordion Row */
+.orcam-drawer-toggle-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    user-select: none;
+}
+.orcam-drawer-toggle-btn {
+    background: transparent !important;
+    border: none !important;
+    color: #94a3b8 !important;
+    cursor: pointer !important;
+    padding: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+.orcam-drawer-chevron {
+    transition: transform 0.25s ease;
+    color: #94a3b8;
+}
+.orcam-drawer-has-sub.is-open .orcam-drawer-chevron {
+    transform: rotate(180deg);
+    color: #38bdf8;
+}
+.orcam-drawer-submenu {
+    display: none;
+    list-style: none !important;
+    margin: 0 !important;
+    padding: 0 0 12px 16px !important;
+}
+.orcam-drawer-has-sub.is-open .orcam-drawer-submenu {
+    display: block;
+}
+.orcam-drawer-submenu li a {
+    display: block;
+    padding: 10px 0;
+    color: #cbd5e1;
+    font-size: 14px;
+    font-weight: 400;
+    text-decoration: none;
+}
+.orcam-drawer-submenu li a:hover {
+    color: #38bdf8;
+}

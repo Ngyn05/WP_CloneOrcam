@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/inc/header-nav.php';
 /**
  * OrCam theme bootstrap.
  *
@@ -11,7 +12,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('ORCAM_THEME_VERSION', '2.4.9');
+define('ORCAM_THEME_VERSION', '2.5.0');
 
 add_action('after_setup_theme', static function () {
     add_theme_support('title-tag');
@@ -3547,6 +3548,12 @@ function orcam_theme_render_database_blog(WP_Post $post, bool $return_only = fal
 
     // Keep browser and social metadata synchronized with Yoast/RankMath/wp-admin fields.
     $html = orcam_theme_apply_seo_meta($html, $post);
+
+    // Master header for database blog
+    if (function_exists('orcam_theme_render_master_header')) {
+        $master_header = orcam_theme_render_master_header();
+        $html = preg_replace('#<section\s+id=[\x27\x22]header[\x27\x22][\s\S]*?</section>#is', $master_header, $html, 1);
+    }
 
     // Database content is already static; never translate it again in-browser.
     $html = preg_replace(
