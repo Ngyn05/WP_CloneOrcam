@@ -12,7 +12,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('ORCAM_THEME_VERSION', '2.5.0');
+define('ORCAM_THEME_VERSION', '2.5.1');
 
 add_action('after_setup_theme', static function () {
     add_theme_support('title-tag');

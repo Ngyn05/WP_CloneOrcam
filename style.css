@@ -1326,77 +1326,291 @@ article#mainBody .orcam-blog > .orcam-flex img {
 
 /* Order Received / Thank You Page Styling */
 .orcam-checkout__content .woocommerce-order {
-    background: #fff;
+    background: #ffffff;
     border: 1px solid #e2e8f0;
-    border-radius: 20px;
-    box-shadow: 0 12px 36px -4px rgba(15, 23, 42, .07);
+    border-radius: 24px;
+    box-shadow: 0 20px 45px -10px rgba(15, 23, 42, .08), 0 4px 12px -2px rgba(15, 23, 42, .03);
     box-sizing: border-box;
     margin: 0 auto;
-    max-width: 820px;
-    padding: 40px clamp(20px, 4vw, 48px);
+    max-width: 860px;
+    padding: 44px clamp(20px, 4vw, 48px);
 }
 
 .orcam-checkout__content .woocommerce-notice--success {
-    background: linear-gradient(135deg, #ecfdf5, #d1fae5);
-    border: 1px solid #a7f3d0;
-    border-radius: 12px;
+    background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+    border: 1.5px solid #a7f3d0;
+    border-radius: 14px;
     color: #065f46;
-    font-size: 18px;
+    font-size: 16.5px;
     font-weight: 700;
-    margin: 0 0 28px;
+    line-height: 1.55;
+    margin: 0 0 30px;
     padding: 18px 24px;
     text-align: center;
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.08);
 }
 
 .orcam-checkout__content ul.woocommerce-order-overview {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 14px;
-    display: grid;
-    gap: 16px;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-    list-style: none;
-    margin: 0 0 32px;
-    padding: 20px;
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 16px !important;
+    box-sizing: border-box !important;
+    display: grid !important;
+    gap: 14px 16px !important;
+    grid-template-columns: repeat(3, 1fr) !important;
+    list-style: none !important;
+    margin: 0 0 36px !important;
+    padding: 20px !important;
 }
 
 .orcam-checkout__content ul.woocommerce-order-overview li {
-    border: 0;
-    border-right: 1px solid #e2e8f0;
-    color: #64748b;
-    font-size: 13px;
-    margin: 0;
-    padding: 0 12px 0 0;
+    background: #ffffff !important;
+    border: 1px solid #edf2f7 !important;
+    border-radius: 12px !important;
+    box-sizing: border-box !important;
+    color: #64748b !important;
+    display: flex !important;
+    flex-direction: column !important;
+    font-size: 11.5px !important;
+    font-weight: 750 !important;
+    gap: 6px !important;
+    letter-spacing: 0.04em !important;
+    margin: 0 !important;
+    min-width: 0 !important;
+    padding: 14px 16px !important;
+    text-transform: uppercase !important;
 }
 
-.orcam-checkout__content ul.woocommerce-order-overview li:last-child {
-    border-right: 0;
+.orcam-checkout__content ul.woocommerce-order-overview li.method {
+    grid-column: span 2 !important;
 }
 
 .orcam-checkout__content ul.woocommerce-order-overview li strong {
-    color: #0f172a;
-    display: block;
-    font-size: 15px;
-    font-weight: 750;
-    margin-top: 4px;
+    color: #0f172a !important;
+    display: block !important;
+    font-size: 14.5px !important;
+    font-weight: 750 !important;
+    letter-spacing: normal !important;
+    line-height: 1.4 !important;
+    overflow-wrap: anywhere !important;
+    text-transform: none !important;
+    word-break: break-all !important;
+}
+
+.orcam-checkout__content ul.woocommerce-order-overview li.total strong {
+    color: #2563eb !important;
+    font-size: 17px !important;
+    font-weight: 800 !important;
 }
 
 .orcam-checkout__content .woocommerce-order-details__title,
 .orcam-checkout__content .woocommerce-column__title {
-    color: #0f172a;
-    font-size: 20px;
-    font-weight: 750;
-    margin: 24px 0 16px;
+    color: #0f172a !important;
+    font-size: 22px !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.01em !important;
+    margin: 32px 0 16px !important;
+}
+
+.orcam-checkout__content table.order_details,
+.orcam-checkout__content table.woocommerce-table--order-details {
+    border: 1px solid #e2e8f0 !important;
+    border-collapse: separate !important;
+    border-radius: 14px !important;
+    border-spacing: 0 !important;
+    box-sizing: border-box !important;
+    margin-bottom: 32px !important;
+    overflow: hidden !important;
+    width: 100% !important;
+}
+
+.orcam-checkout__content table.order_details thead th,
+.orcam-checkout__content table.woocommerce-table--order-details thead th {
+    background: #f8fafc !important;
+    border-bottom: 1px solid #e2e8f0 !important;
+    color: #64748b !important;
+    font-size: 12px !important;
+    font-weight: 750 !important;
+    letter-spacing: 0.05em !important;
+    padding: 14px 18px !important;
+    text-transform: uppercase !important;
+}
+
+.orcam-checkout__content table.order_details td,
+.orcam-checkout__content table.order_details tfoot th,
+.orcam-checkout__content table.woocommerce-table--order-details td,
+.orcam-checkout__content table.woocommerce-table--order-details tfoot th {
+    border-bottom: 1px solid #f1f5f9 !important;
+    padding: 14px 18px !important;
+    vertical-align: middle !important;
+}
+
+.orcam-checkout__content table.order_details tbody tr:last-child td,
+.orcam-checkout__content table.woocommerce-table--order-details tbody tr:last-child td {
+    border-bottom: 1.5px solid #e2e8f0 !important;
+}
+
+.orcam-checkout__content table.order_details td.product-name,
+.orcam-checkout__content table.woocommerce-table--order-details td.product-name {
+    color: #1e293b !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    line-height: 1.5 !important;
+}
+
+.orcam-checkout__content table.order_details td.product-name a,
+.orcam-checkout__content table.woocommerce-table--order-details td.product-name a {
+    color: #2563eb !important;
+    font-weight: 700 !important;
+    text-decoration: none !important;
+}
+
+.orcam-checkout__content table.order_details td.product-name a:hover,
+.orcam-checkout__content table.woocommerce-table--order-details td.product-name a:hover {
+    text-decoration: underline !important;
+}
+
+.orcam-checkout__content table.order_details td.product-name strong.product-quantity,
+.orcam-checkout__content table.woocommerce-table--order-details td.product-name strong.product-quantity {
+    color: #64748b !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    margin-left: 4px !important;
+}
+
+.orcam-checkout__content table.order_details td.product-total,
+.orcam-checkout__content table.order_details th.product-total,
+.orcam-checkout__content table.woocommerce-table--order-details td.product-total,
+.orcam-checkout__content table.woocommerce-table--order-details th.product-total {
+    text-align: right !important;
+}
+
+.orcam-checkout__content table.order_details td.product-total,
+.orcam-checkout__content table.woocommerce-table--order-details td.product-total {
+    color: #0f172a !important;
+    font-size: 15.5px !important;
+    font-weight: 750 !important;
+    white-space: nowrap !important;
+}
+
+.orcam-checkout__content table.order_details tfoot th,
+.orcam-checkout__content table.woocommerce-table--order-details tfoot th {
+    background: #fafafa !important;
+    color: #64748b !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.02em !important;
+    text-transform: uppercase !important;
+}
+
+.orcam-checkout__content table.order_details tfoot td,
+.orcam-checkout__content table.woocommerce-table--order-details tfoot td {
+    background: #fafafa !important;
+    color: #0f172a !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    text-align: right !important;
+    white-space: nowrap !important;
+}
+
+.orcam-checkout__content table.order_details tfoot tr:last-child th,
+.orcam-checkout__content table.order_details tfoot tr:last-child td,
+.orcam-checkout__content table.woocommerce-table--order-details tfoot tr:last-child th,
+.orcam-checkout__content table.woocommerce-table--order-details tfoot tr:last-child td {
+    border-bottom: none !important;
 }
 
 .orcam-checkout__content .woocommerce-customer-details address {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    color: #334155;
-    font-style: normal;
-    line-height: 1.7;
-    padding: 18px 22px;
+    background: #f8fafc !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 14px !important;
+    color: #334155 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    font-size: 14.5px !important;
+    font-style: normal !important;
+    gap: 6px !important;
+    line-height: 1.7 !important;
+    padding: 20px 24px !important;
+}
+
+.orcam-checkout__content .woocommerce-customer-details address p {
+    align-items: center !important;
+    color: #1e293b !important;
+    display: flex !important;
+    font-weight: 600 !important;
+    gap: 8px !important;
+    margin: 0 !important;
+    overflow-wrap: anywhere !important;
+    word-break: break-all !important;
+}
+
+.orcam-checkout__content .woocommerce-customer-details--phone::before {
+    content: "📞 " !important;
+    font-size: 13px !important;
+}
+
+.orcam-checkout__content .woocommerce-customer-details--email::before {
+    content: "✉️ " !important;
+    font-size: 13px !important;
+}
+
+@media (max-width: 768px) {
+    .orcam-checkout__content ul.woocommerce-order-overview {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    .orcam-checkout__content ul.woocommerce-order-overview li.email {
+        grid-column: span 2 !important;
+    }
+    .orcam-checkout__content ul.woocommerce-order-overview li.method {
+        grid-column: span 1 !important;
+    }
+}
+
+@media (max-width: 640px) {
+    .orcam-checkout__content .woocommerce-order {
+        border-radius: 16px !important;
+        margin: 0 !important;
+        padding: 22px 16px !important;
+    }
+    .orcam-checkout__content .woocommerce-notice--success {
+        border-radius: 10px !important;
+        font-size: 14.5px !important;
+        padding: 15px 14px !important;
+    }
+    .orcam-checkout__content ul.woocommerce-order-overview {
+        gap: 10px !important;
+        grid-template-columns: 1fr !important;
+        margin-bottom: 24px !important;
+        padding: 12px !important;
+    }
+    .orcam-checkout__content ul.woocommerce-order-overview li {
+        grid-column: span 1 !important;
+        padding: 12px 14px !important;
+    }
+    .orcam-checkout__content .woocommerce-order-details__title,
+    .orcam-checkout__content .woocommerce-column__title {
+        font-size: 19px !important;
+        margin: 24px 0 14px !important;
+    }
+    .orcam-checkout__content table.order_details td,
+    .orcam-checkout__content table.order_details th,
+    .orcam-checkout__content table.woocommerce-table--order-details td,
+    .orcam-checkout__content table.woocommerce-table--order-details th {
+        font-size: 13.5px !important;
+        padding: 10px 12px !important;
+    }
+    .orcam-checkout__content table.order_details td.product-total,
+    .orcam-checkout__content table.order_details tfoot td,
+    .orcam-checkout__content table.woocommerce-table--order-details td.product-total,
+    .orcam-checkout__content table.woocommerce-table--order-details tfoot td {
+        font-size: 14px !important;
+        white-space: normal !important;
+    }
+    .orcam-checkout__content .woocommerce-customer-details address {
+        font-size: 13.5px !important;
+        padding: 16px 14px !important;
+    }
 }
 
 .orcam-default-product__buy-now { align-items:center;background:#3535c9;border-radius:6px;color:#fff;display:inline-flex;font-size:17px;font-weight:700;justify-content:center;min-height:52px;padding:0 28px;text-decoration:none;transition:background .2s ease,box-shadow .2s ease; }
