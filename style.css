@@ -2078,6 +2078,19 @@ form.cart .quantity,
 .orcam-pdp__btn--call:hover {
     background: #1e293b !important;
 }
+.orcam-pdp__btn--zalo {
+    background: #ffffff !important;
+    color: #0068ff !important;
+    border: 1.5px solid #0068ff !important;
+    box-shadow: 0 4px 14px rgba(0, 104, 255, 0.12) !important;
+}
+.orcam-pdp__btn--zalo:hover {
+    background: #eff6ff !important;
+    color: #0056cc !important;
+    border-color: #0056cc !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 18px rgba(0, 104, 255, 0.22) !important;
+}
 .orcam-pdp__details {
     margin-top: 40px !important;
 }
@@ -3062,6 +3075,73 @@ form.cart .quantity,
     justify-content: center !important;
     cursor: pointer !important;
     padding: 6px !important;
+}
+.orcam-pdp__actions {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+    margin-top: 8px !important;
+}
+.orcam-pdp__actions-row {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 10px !important;
+    width: 100% !important;
+}
+.orcam-pdp__btn {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    padding: 14px 16px !important;
+    border-radius: 10px !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    text-decoration: none !important;
+    transition: all .2s !important;
+    text-align: center !important;
+    white-space: nowrap !important;
+}
+.orcam-pdp__btn--buy {
+    background: #2563eb !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 14px rgba(37,99,235,0.3) !important;
+}
+.orcam-pdp__btn--buy:hover {
+    background: #1d4ed8 !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 20px rgba(37,99,235,0.4) !important;
+    color: #ffffff !important;
+}
+.orcam-pdp__btn--call {
+    background: #0f172a !important;
+    color: #ffffff !important;
+    font-size: 15px !important;
+    padding: 15px 20px !important;
+    width: 100% !important;
+}
+.orcam-pdp__btn--call:hover {
+    background: #1e293b !important;
+    color: #ffffff !important;
+}
+.orcam-pdp__btn--zalo {
+    background: #ffffff !important;
+    color: #0068ff !important;
+    border: 1.5px solid #0068ff !important;
+    box-shadow: 0 4px 14px rgba(0, 104, 255, 0.12) !important;
+}
+.orcam-pdp__btn--zalo:hover {
+    background: #eff6ff !important;
+    color: #0056cc !important;
+    border-color: #0056cc !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 18px rgba(0, 104, 255, 0.22) !important;
+}
+@media (max-width: 480px) {
+    .orcam-pdp__actions-row {
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+    }
 }
 .orcam-drawer-header-center {
     display: flex;

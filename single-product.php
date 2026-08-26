@@ -260,10 +260,23 @@ while (have_posts()) :
 
                     <!-- CTA Actions -->
                     <div class="orcam-pdp__actions">
-                        <a href="<?php echo esc_url($checkout_url); ?>" class="orcam-pdp__btn orcam-pdp__btn--buy">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
-                            <span>MUA NGAY - GIAO TẬN NƠI MIỄN PHÍ</span>
-                        </a>
+                        <div class="orcam-pdp__actions-row">
+                            <a href="<?php echo esc_url($checkout_url); ?>" class="orcam-pdp__btn orcam-pdp__btn--buy">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                                <span>MUA NGAY</span>
+                            </a>
+                            <a href="https://zalo.me/0917834532" target="_blank" rel="noopener noreferrer" class="orcam-pdp__btn orcam-pdp__btn--zalo">
+                                <svg viewBox="0 0 44 44" width="20" height="20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <rect width="44" height="44" rx="10" fill="#0068FF"/>
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M22 8.5C14.544 8.5 8.5 13.784 8.5 20.3c0 3.76 2.015 7.118 5.183 9.319-.229 1.98-1.173 4.61-1.235 4.795-.125.387.177.764.56.632 2.215-.745 5.19-2.062 6.594-2.94.757.13 1.55.194 2.398.194 7.456 0 13.5-5.284 13.5-11.8S29.456 8.5 22 8.5z" fill="#FFFFFF"/>
+                                    <path d="M12.4 23.5h3.6c.3 0 .5-.2.5-.5v-.2c0-.3-.2-.5-.5-.5h-2.3l2.8-3.9c.1-.2.1-.4 0-.6-.1-.2-.3-.3-.5-.3h-3.4c-.3 0-.5.2-.5.5v.2c0 .3.2.5.5.5h2.1l-2.8 3.9c-.1.2-.1.4 0 .6.1.2.3.3.5.3z" fill="#0068FF"/>
+                                    <path d="M19.4 23.6c1.5 0 2.5-.9 2.5-2.2v-2.6c0-.3-.2-.5-.5-.5h-.4c-.3 0-.5.2-.5.5v.3c-.3-.5-.9-.9-1.6-.9-1.4 0-2.4 1.1-2.4 2.7 0 1.6 1 2.7 2.4 2.7zm.2-1.1c-.8 0-1.4-.7-1.4-1.6 0-.9.6-1.6 1.4-1.6.8 0 1.4.7 1.4 1.6 0 .9-.6 1.6-1.4 1.6z" fill="#0068FF"/>
+                                    <path d="M23.5 23.5h.4c.3 0 .5-.2.5-.5v-4.7c0-.3-.2-.5-.5-.5h-.4c-.3 0-.5.2-.5.5V23c0 .3.2.5.5.5z" fill="#0068FF"/>
+                                    <path d="M28.2 23.6c1.6 0 2.7-1.2 2.7-2.7 0-1.6-1.1-2.7-2.7-2.7s-2.7 1.1-2.7 2.7c0 1.5 1.1 2.7 2.7 2.7zm0-1.1c-.9 0-1.6-.7-1.6-1.6 0-.9.7-1.6 1.6-1.6s1.6.7 1.6 1.6c0 .9-.7 1.6-1.6 1.6z" fill="#0068FF"/>
+                                </svg>
+                                <span>CHAT QUA ZALO</span>
+                            </a>
+                        </div>
                         <a href="tel:1900638400" class="orcam-pdp__btn orcam-pdp__btn--call">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.47 2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.09 6.09l1.81-1.81a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                             <span>GỌI HOTLINE TƯ VẤN: 1900.63.8400</span>

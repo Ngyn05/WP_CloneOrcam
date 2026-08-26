@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/inc/header-nav.php';
+require_once __DIR__ . '/inc/floating-contact.php';
 /**
  * OrCam theme bootstrap.
  *
@@ -12,7 +13,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('ORCAM_THEME_VERSION', '2.5.1');
+define('ORCAM_THEME_VERSION', '2.5.2');
 
 add_action('after_setup_theme', static function () {
     add_theme_support('title-tag');
@@ -2966,7 +2967,7 @@ function orcam_theme_render_document(string $file, ?string $document_html = null
     // downloading the rest of the media library.
     if (wp_normalize_path((string) realpath($file)) === wp_normalize_path((string) realpath(get_template_directory() . '/static-pages/vi/orcam-learn.html'))) {
         $html = str_replace(
-            '<h1><strong>OrCam Há»c </strong><span style="font-family: Trebuchet MS"><span style="color: rgb(73, 26, 189)"><strong>Cơ bản</strong></span></span></h1>',
+            '<h1><strong>OrCam Há» c </strong><span style="font-family: Trebuchet MS"><span style="color: rgb(73, 26, 189)"><strong>Cơ bản</strong></span></span></h1>',
             '<h1><strong>OrCam </strong><span style="font-family: Trebuchet MS"><span style="color: rgb(73, 26, 189)"><strong>Learn Basic</strong></span></span></h1>',
             $html
         );
@@ -3015,26 +3016,28 @@ function orcam_theme_render_document(string $file, ?string $document_html = null
         || $request_host === '127.0.0.1'
         || str_ends_with($request_host, '.local');
 
-    if ($is_local_development) {
-        // Third-party tracking/storage APIs are intentionally blocked by Edge
-        // on local domains. Do not execute those integrations during local
-        // development; production hosts retain them unchanged.
-        $html = preg_replace(
-            '#<script\b[^>]*>\s*\(function\(w,d,s,l,i\).*?</script>#is',
-            '',
-            $html
-        );
-        $html = preg_replace(
-            '#<script\b[^>]*\bsrc=["\'][^"\']*(?:googletagmanager\.com|cdn\.userway\.org)[^"\']*["\'][^>]*>\s*</script>#is',
-            '',
-            $html
-        );
-        $html = preg_replace(
-            '#<noscript>\s*<iframe\b[^>]*googletagmanager\.com.*?</iframe>\s*</noscript>#is',
-            '',
-            $html
-        );
+    // Remove legacy external tracking scripts (GTM-PVG6LWF / userway) that throw uncaught exceptions
+    $html = preg_replace('#<!-- Google Tag Manager -->.*?<!-- End Google Tag Manager -->#is', '', $html);
+    $html = preg_replace('#<script\b[^>]*>\s*(?:\(function\(w,d,s,l,i\)|window\.dataLayer\b).*?</script>#is', '', $html);
+    $html = preg_replace('#<script\b[^>]*\bsrc=["\'][^"\']*(?:googletagmanager\.com|cdn\.userway\.org)[^"\']*["\'][^>]*>\s*</script>#is', '', $html);
+    $html = preg_replace('#<noscript>\s*<iframe\b[^>]*googletagmanager\.com.*?</iframe>\s*</noscript>#is', '', $html);
 
+    // Deactivate legacy external GTM / Userway code blocks inside Svelte data payload so client hydration will not inject them
+    $html = preg_replace('#\\\\u003C!-- Google Tag Manager -->[\\s\\S]*?\\\\u003C!-- End Google Tag Manager -->#is', '', $html);
+    $html = preg_replace('#<!-- Google Tag Manager -->[\\s\\S]*?<!-- End Google Tag Manager -->#is', '', $html);
+    $html = str_replace(
+        array(
+            'https://www.googletagmanager.com/gtm.js?id=',
+            'https://www.googletagmanager.com/ns.html?id=',
+            'https://www.googletagmanager.com',
+            'https://cdn.userway.org/widget.js',
+            'GTM-PVG6LWF',
+        ),
+        '',
+        $html
+    );
+
+    if ($is_local_development) {
         // The exported documents preload route chunks for pages that are not
         // visited. Native imports still request each chunk when it is needed.
         $html = preg_replace('#<link\b[^>]*\brel=["\']modulepreload["\'][^>]*>#i', '', $html);
@@ -3083,6 +3086,7 @@ function orcam_theme_render_document(string $file, ?string $document_html = null
 
     $theme_stylesheet = $theme_uri . '/style.css?ver=' . rawurlencode(ORCAM_THEME_VERSION);
     $base = '<base href="' . esc_url(trailingslashit($base_uri)) . '">'
+        . '<script>window.dataLayer=window.dataLayer||[];</script>'
         . '<link rel="stylesheet" id="orcam-theme-css" href="' . esc_url($theme_stylesheet) . '">';
     $html = preg_replace('/<head(\\s[^>]*)?>/i', '$0' . $base, $html, 1);
 
@@ -3180,7 +3184,8 @@ function orcam_theme_render_document(string $file, ?string $document_html = null
             'nonce'  => wp_create_nonce('orcam_consultation'),
             'supportNonce' => wp_create_nonce('orcam_support_case'),
         )) . ';</script>';
-    $navigation_tag = $navigation_config . '<script id="orcam-static-navigation" src="' . esc_url($navigation_uri) . '"></script>';
+    $contact_widget_html = function_exists('orcam_get_floating_contact_widget_html') ? orcam_get_floating_contact_widget_html() : '';
+    $navigation_tag = $contact_widget_html . $navigation_config . '<script id="orcam-static-navigation" src="' . esc_url($navigation_uri) . '"></script>';
     $html = preg_replace('/<\/body>/i', $navigation_tag . '</body>', $html, 1);
 
     // Save rendered HTML to cache for instant sub-50ms responses (never cache checkout or AJAX)
@@ -3297,6 +3302,7 @@ function orcam_theme_render_shared_static_shell(string $content, string $title, 
     );
 
     $navigation_uri = $theme_uri . '/js/static-navigation.js?ver=' . rawurlencode(ORCAM_THEME_VERSION);
+    $contact_widget_html = function_exists('orcam_get_floating_contact_widget_html') ? orcam_get_floating_contact_widget_html() : '';
     $navigation_config = '<script>window.orcamThemeUri=' . wp_json_encode($theme_uri)
         . ';window.orcamHomeUrl=' . wp_json_encode(home_url('/vi/home'))
         . ';window.orcamShopUrl=' . wp_json_encode(home_url('/vi/shop/'))
@@ -3306,7 +3312,7 @@ function orcam_theme_render_shared_static_shell(string $content, string $title, 
             'nonce'  => wp_create_nonce('orcam_consultation'),
             'supportNonce' => wp_create_nonce('orcam_support_case'),
         )) . ';</script>';
-    $html = preg_replace('/<\/body>/i', $navigation_config . '<script id="orcam-static-navigation" src="' . esc_url($navigation_uri) . '"></script></body>', $html, 1);
+    $html = preg_replace('/<\/body>/i', $contact_widget_html . $navigation_config . '<script id="orcam-static-navigation" src="' . esc_url($navigation_uri) . '"></script></body>', $html, 1);
 
     if ($custom_cache_file !== '') {
         $cache_dir = orcam_theme_cache_dir();
