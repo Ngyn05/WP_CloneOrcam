@@ -3,7 +3,7 @@ Theme Name: OrCam Theme
 Theme URI: https://www.orcam.com/
 Author: OrCam
 Description: Complete WordPress conversion of the supplied OrCam static website.
-Version: 2.1.3
+Version: 2.1.4
 Requires at least: 6.0
 Requires PHP: 7.4
 Text Domain: orcam-theme
@@ -3124,6 +3124,71 @@ form.cart .quantity,
     background: #1e293b !important;
     color: #ffffff !important;
 }
+.orcam-pdp__callback {
+    background: #111111;
+    border-radius: 18px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, .18);
+    box-sizing: border-box;
+    color: #fff;
+    font-family: Roboto, Arial, Helvetica, sans-serif !important;
+    padding: 20px 26px 22px;
+    width: 100%;
+}
+.orcam-pdp__callback input,
+.orcam-pdp__callback button {
+    font-family: inherit !important;
+}
+.orcam-pdp__callback-title {
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.45;
+    margin: 0 0 14px;
+}
+.orcam-pdp__callback-row { display: flex; gap: 10px; }
+.orcam-pdp__callback-row input {
+    background: #fff;
+    border: 0;
+    border-radius: 999px;
+    box-sizing: border-box;
+    color: #172033;
+    flex: 1;
+    font-size: 16px;
+    min-width: 0;
+    outline: none;
+    padding: 15px 24px;
+}
+.orcam-pdp__callback-row input:focus { box-shadow: 0 0 0 3px rgba(255,255,255,.45); }
+.orcam-pdp__callback-row button {
+    background: #ffffff;
+    border: 1px solid #ffffff;
+    border-radius: 999px;
+    color: #111111;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 800;
+    line-height: 1.2;
+    padding: 14px 28px;
+    white-space: nowrap;
+}
+.orcam-pdp__callback-row button:hover {
+    background: #111111;
+    color: #ffffff;
+}
+.orcam-pdp__callback-status { font-size: 13px; font-weight: 700; margin: 12px 0 0; }
+.orcam-pdp__legacy-hotline, .orcam-honeypot { display: none !important; }
+
+/* Price privacy fallback for WooCommerce screens and invoice markup. */
+.amount, .woocommerce-Price-amount, .product-price, .product-subtotal,
+.cart-subtotal, .order-total, .orcam-pdp__price-wrap,
+.orcam-woocommerce-product-price { display: none !important; }
+.orcam-product-stock-status {
+    color: #16a34a;
+    display: inline-flex;
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin: 4px 0 16px;
+}
 .orcam-pdp__btn--zalo {
     background: #ffffff !important;
     color: #0068ff !important;
@@ -3142,6 +3207,9 @@ form.cart .quantity,
         grid-template-columns: 1fr !important;
         gap: 10px !important;
     }
+    .orcam-pdp__callback { padding: 18px; }
+    .orcam-pdp__callback-row { flex-direction: column; }
+    .orcam-pdp__callback-row button { width: 100%; }
 }
 .orcam-drawer-header-center {
     display: flex;

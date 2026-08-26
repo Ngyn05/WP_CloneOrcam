@@ -13,7 +13,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-define('ORCAM_THEME_VERSION', '2.5.2');
+define('ORCAM_THEME_VERSION', '2.5.3');
 
 add_action('after_setup_theme', static function () {
     add_theme_support('title-tag');
@@ -1283,6 +1283,67 @@ function orcam_theme_handle_consultation_form(): void
 }
 add_action('admin_post_nopriv_orcam_consultation', 'orcam_theme_handle_consultation_form');
 add_action('admin_post_orcam_consultation', 'orcam_theme_handle_consultation_form');
+
+/** Receive the short callback request shown on product pages. */
+function orcam_theme_handle_sales_callback(): void
+{
+    $redirect = wp_get_referer() ?: home_url('/vi/shop/');
+    if (!isset($_POST['orcam_callback_nonce'])
+        || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['orcam_callback_nonce'])), 'orcam_sales_callback')) {
+        wp_safe_redirect(add_query_arg('callback', 'invalid', $redirect));
+        exit;
+    }
+    if (!empty($_POST['website'])) {
+        wp_safe_redirect(add_query_arg('callback', 'success', $redirect));
+        exit;
+    }
+
+    $phone = sanitize_text_field(wp_unslash($_POST['phone'] ?? ''));
+    $digits = preg_replace('/\D+/', '', $phone);
+    $product_id = absint($_POST['product_id'] ?? 0);
+    if (strlen($digits) < 8 || strlen($digits) > 15) {
+        wp_safe_redirect(add_query_arg('callback', 'invalid', $redirect));
+        exit;
+    }
+
+    $product_name = $product_id ? get_the_title($product_id) : '';
+    $recipient = apply_filters('orcam_sales_callback_recipient', get_option('admin_email'));
+    $subject = sprintf('[OrCam] Khách hàng yêu cầu gọi lại%s', $product_name ? ' - ' . $product_name : '');
+    $body = "Số điện thoại: {$phone}\n"
+        . ($product_name ? "Sản phẩm quan tâm: {$product_name}\n" : '')
+        . "Trang gửi yêu cầu: {$redirect}\n"
+        . 'Thời gian: ' . current_time('d/m/Y H:i');
+
+    $sent = wp_mail($recipient, $subject, $body, array('Content-Type: text/plain; charset=UTF-8'));
+    wp_safe_redirect(add_query_arg('callback', $sent ? 'success' : 'error', $redirect));
+    exit;
+}
+add_action('admin_post_nopriv_orcam_sales_callback', 'orcam_theme_handle_sales_callback');
+add_action('admin_post_orcam_sales_callback', 'orcam_theme_handle_sales_callback');
+
+/** Hide prices from storefront, checkout, order views, emails and invoices. */
+add_filter('woocommerce_get_price_html', static function (): string {
+    return '<span class="orcam-product-stock-status">Còn hàng</span>';
+}, 9999);
+add_filter('woocommerce_cart_item_price', '__return_empty_string', 9999);
+add_filter('woocommerce_cart_item_subtotal', '__return_empty_string', 9999);
+add_filter('woocommerce_cart_subtotal', '__return_empty_string', 9999);
+add_filter('woocommerce_cart_totals_order_total_html', '__return_empty_string', 9999);
+add_filter('woocommerce_get_formatted_order_total', '__return_empty_string', 9999);
+add_filter('woocommerce_order_formatted_line_subtotal', '__return_empty_string', 9999);
+
+add_filter('woocommerce_get_order_item_totals', static function (array $totals): array {
+    foreach (array('cart_subtotal', 'shipping', 'discount', 'tax', 'payment_method', 'order_total', 'refund') as $key) {
+        unset($totals[$key]);
+    }
+    return $totals;
+}, 9999);
+
+// Compatibility with the most common WooCommerce PDF invoice extension.
+add_filter('wpo_wcpdf_order_item_price', '__return_empty_string', 9999);
+add_filter('wpo_wcpdf_order_item_subtotal', '__return_empty_string', 9999);
+add_filter('wpo_wcpdf_order_subtotal', '__return_empty_string', 9999);
+add_filter('wpo_wcpdf_order_total', '__return_empty_string', 9999);
 
 /** Receive customer-support cases and deliver them through WordPress mail. */
 function orcam_theme_handle_support_case(): void

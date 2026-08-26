@@ -21,15 +21,6 @@ while (have_posts()) :
     $title = get_the_title();
     $slug = $product->get_slug();
     $sku = $product->get_sku() ?: 'ORCAM-' . strtoupper(str_replace('orcam-', '', $slug));
-    $price = $product->get_price();
-    $regular_price = $product->get_regular_price();
-    $sale_price = $product->get_sale_price();
-    $is_on_sale = $product->is_on_sale();
-    $currency_symbol = function_exists('get_woocommerce_currency_symbol') ? get_woocommerce_currency_symbol() : 'đ';
-
-    $formatted_price = $price ? number_format((float) $price, 0, ',', '.') . ' ' . $currency_symbol : 'Liên hệ';
-    $formatted_regular = $regular_price ? number_format((float) $regular_price, 0, ',', '.') . ' ' . $currency_symbol : '';
-
     $checkout_url = function_exists('wc_get_checkout_url')
         ? add_query_arg('add-to-cart', $product_id, wc_get_checkout_url())
         : home_url('/vi/checkout/?add-to-cart=' . $product_id);
@@ -237,13 +228,7 @@ while (have_posts()) :
 
                     <h1 class="orcam-pdp__title"><?php echo esc_html($title); ?></h1>
 
-                    <div class="orcam-pdp__price-wrap">
-                        <span class="orcam-pdp__price"><?php echo esc_html($formatted_price); ?></span>
-                        <?php if ($is_on_sale && $formatted_regular) : ?>
-                            <span class="orcam-pdp__regular-price"><?php echo esc_html($formatted_regular); ?></span>
-                            <span class="orcam-pdp__discount-tag">Ưu đãi</span>
-                        <?php endif; ?>
-                    </div>
+                    <div class="orcam-product-stock-status">Còn hàng</div>
 
                     <!-- Highlight Features -->
                     <div class="orcam-pdp__highlights">
@@ -277,10 +262,33 @@ while (have_posts()) :
                                 <span>CHAT QUA ZALO</span>
                             </a>
                         </div>
-                        <a href="tel:1900638400" class="orcam-pdp__btn orcam-pdp__btn--call">
+                        <style id="orcam-callback-critical-css">
+                            .orcam-pdp__callback{background:#111;border-radius:18px;box-shadow:0 12px 28px rgba(0,0,0,.18);box-sizing:border-box;color:#fff;font-family:Roboto,Arial,Helvetica,sans-serif!important;padding:20px 26px 22px;width:100%}
+                            .orcam-pdp__callback-title{font-size:16px;font-weight:700;line-height:1.45;margin:0 0 14px}.orcam-pdp__callback-row{display:flex;gap:10px}
+                            .orcam-pdp__callback-row input{background:#fff;border:0;border-radius:999px;box-sizing:border-box;color:#172033;flex:1;font:16px Roboto,Arial,sans-serif!important;min-width:0;outline:none;padding:15px 24px}
+                            .orcam-pdp__callback-row button{background:#fff;border:1px solid #fff;border-radius:999px;color:#111;cursor:pointer;font:800 15px/1.2 Roboto,Arial,sans-serif!important;padding:14px 28px;white-space:nowrap}
+                            .orcam-pdp__callback-status{font-size:13px;font-weight:700;margin:12px 0 0}.orcam-honeypot,.orcam-pdp__legacy-hotline{display:none!important}
+                            @media(max-width:480px){.orcam-pdp__callback{padding:18px}.orcam-pdp__callback-row{flex-direction:column}.orcam-pdp__callback-row button{width:100%}}
+                        </style>
+                        <form class="orcam-pdp__callback" action="<?php echo esc_url(admin_url('admin-post.php')); ?>" method="post">
+                            <p class="orcam-pdp__callback-title">📞 Hãy để lại số điện thoại, chúng tôi sẽ gọi ngay cho bạn tư vấn miễn phí!</p>
+                            <div class="orcam-pdp__callback-row">
+                                <label class="screen-reader-text" for="orcam-callback-phone-<?php echo esc_attr((string) $product_id); ?>">Số điện thoại</label>
+                                <input id="orcam-callback-phone-<?php echo esc_attr((string) $product_id); ?>" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="Nhập số điện thoại tư vấn miễn phí..." pattern="[0-9+(). -]{8,20}" required>
+                                <button type="submit">GỬI ĐI</button>
+                            </div>
+                            <input type="hidden" name="action" value="orcam_sales_callback">
+                            <input type="hidden" name="product_id" value="<?php echo esc_attr((string) $product_id); ?>">
+                            <input class="orcam-honeypot" type="text" name="website" value="" tabindex="-1" autocomplete="off" aria-hidden="true">
+                            <?php wp_nonce_field('orcam_sales_callback', 'orcam_callback_nonce'); ?>
+                            <?php if (isset($_GET['callback'])) : ?>
+                                <p class="orcam-pdp__callback-status" role="status"><?php echo $_GET['callback'] === 'success' ? 'Cảm ơn bạn! Bộ phận tư vấn sẽ sớm gọi lại.' : 'Không thể gửi lúc này. Vui lòng kiểm tra số điện thoại và thử lại.'; ?></p>
+                            <?php endif; ?>
+                            <span class="orcam-pdp__legacy-hotline" aria-hidden="true" style="display:none!important">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.47 2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.09 6.09l1.81-1.81a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
                             <span>GỌI HOTLINE TƯ VẤN: 1900.63.8400</span>
-                        </a>
+                            </span>
+                        </form>
                     </div>
                 </div>
 
@@ -492,4 +500,3 @@ endwhile;
 
 $product_content = (string) ob_get_clean();
 orcam_theme_render_shared_static_shell($product_content, get_the_title(), false, '', '', false, false);
-

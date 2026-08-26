@@ -38,9 +38,7 @@ ob_start();
                             <a class="orcam-shop-card__title-link" href="<?php echo esc_url(get_permalink($post)); ?>">
                                 <h2><?php echo esc_html(get_the_title($post)); ?></h2>
                             </a>
-                            <?php if ($product->get_price() !== '') : ?>
-                                <div class="orcam-shop-card__price"><?php echo wp_kses_post($product->get_price_html()); ?></div>
-                            <?php endif; ?>
+                            <div class="orcam-product-stock-status">Còn hàng</div>
                             <p class="orcam-shop-card__description"><?php echo esc_html(wp_trim_words(wp_strip_all_tags($summary), 22, '…')); ?></p>
                             
                             <div class="orcam-shop-card__actions">
