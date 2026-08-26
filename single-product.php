@@ -282,7 +282,17 @@ while (have_posts()) :
                             <input class="orcam-honeypot" type="text" name="website" value="" tabindex="-1" autocomplete="off" aria-hidden="true">
                             <?php wp_nonce_field('orcam_sales_callback', 'orcam_callback_nonce'); ?>
                             <?php if (isset($_GET['callback'])) : ?>
-                                <p class="orcam-pdp__callback-status" role="status"><?php echo $_GET['callback'] === 'success' ? 'Cảm ơn bạn! Bộ phận tư vấn sẽ sớm gọi lại.' : 'Không thể gửi lúc này. Vui lòng kiểm tra số điện thoại và thử lại.'; ?></p>
+                                <?php
+                                $callback_status = sanitize_key(wp_unslash($_GET['callback']));
+                                if ($callback_status === 'success') {
+                                    $callback_message = 'Cảm ơn bạn! Bộ phận tư vấn sẽ sớm gọi lại.';
+                                } elseif ($callback_status === 'invalid') {
+                                    $callback_message = 'Số điện thoại không hợp lệ. Vui lòng kiểm tra và nhập lại.';
+                                } else {
+                                    $callback_message = 'Không thể gửi lúc này. Vui lòng thử lại sau.';
+                                }
+                                ?>
+                                <p class="orcam-pdp__callback-status" role="status"><?php echo esc_html($callback_message); ?></p>
                             <?php endif; ?>
                             <span class="orcam-pdp__legacy-hotline" aria-hidden="true" style="display:none!important">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.63 3.47 2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.91a16 16 0 0 0 6.09 6.09l1.81-1.81a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
